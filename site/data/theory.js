@@ -1,0 +1,676 @@
+const GrammarTheory = [
+  {
+    title: '1. El verbo be y los pronombres',
+    focus: 'Identidad, origen, estados y posesión',
+    sections: [
+      {
+        title: '1A · Be en afirmaciones y pronombres personales',
+        intro: 'Be permite decir quién es alguien, de dónde es, qué es algo y cómo se encuentra. El sujeto determina cuál de sus tres formas se utiliza.',
+        rules: [
+          'I se combina con am; he, she e it con is; you, we y they con are. You sirve tanto para una persona como para varias.',
+          'El pronombre de sujeto reemplaza el nombre de quien realiza o protagoniza la oración. He suele referirse a un varón, she a una mujer y it a una cosa, animal o situación.',
+          'En inglés el sujeto normalmente se expresa: no se omite delante del verbo como suele hacerse en español.',
+        ],
+        formula: 'Sujeto + am/is/are + información',
+        examples: [
+          ['I am in the garden.', 'Estoy en el jardín.'],
+          ['My cousins are at school.', 'Mis primos están en la escuela.'],
+        ],
+        note: 'Contracciones comunes: I’m, you’re, he’s, she’s, it’s, we’re y they’re.',
+      },
+      {
+        title: '1B · Be en negativas, preguntas y respuestas breves',
+        intro: 'Para negar se añade not a be. Para preguntar, be pasa delante del sujeto. No se usa do ni does con be como verbo principal.',
+        rules: [
+          'Las formas completas son am not, is not y are not. En conversación se usan isn’t y aren’t; con I se dice I’m not.',
+          'En una pregunta de sí/no, invierte be y el sujeto. En preguntas con palabra interrogativa, coloca primero esa palabra y después be.',
+          'Las respuestas breves repiten be: Yes, I am. / No, she isn’t. Evita contraer la forma afirmativa breve.',
+          'Las contracciones negativas no se separan del verbo: isn’t y aren’t; la forma I am not suele contraerse como I’m not.',
+        ],
+        formula: 'Negativa: sujeto + be + not · Pregunta: (palabra interrogativa) + be + sujeto?',
+        examples: [
+          ['We aren’t late.', 'No llegamos tarde.'],
+          ['Are the keys in your bag? Yes, they are.', '¿Están las llaves en tu bolso? Sí.'],
+          ['Where is your sister?', '¿Dónde está tu hermana?'],
+        ],
+      },
+      {
+        title: '1C · Adjetivos posesivos',
+        intro: 'Los adjetivos posesivos acompañan al sustantivo y señalan quién tiene una relación con él. Concuerdan con la persona que posee, no con el objeto poseído.',
+        rules: [
+          'I → my; you → your; he → his; she → her; it → its; we → our; they → their.',
+          'El posesivo va antes del sustantivo y no lleva artículo delante: my notebook, no the my notebook.',
+          'Its sin apóstrofo indica posesión. It’s con apóstrofo significa it is o it has.',
+          'His, her y their identifican a quién pertenece algo; no indican el género o número del objeto.',
+        ],
+        formula: 'Persona poseedora + posesivo + sustantivo',
+        examples: [
+          ['Marta is with her brother.', 'Marta está con su hermano.'],
+          ['The bird is in its nest.', 'El pájaro está en su nido.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '2. Sustantivos, adjetivos e imperativos',
+    focus: 'Artículos, plurales, descripción e instrucciones',
+    sections: [
+      {
+        title: '2A · Sustantivos singulares y plurales',
+        intro: 'Los nombres contables pueden nombrar una unidad o varias. El artículo indefinido aparece con un nombre contable singular, no con un plural.',
+        rules: [
+          'Usa a antes de sonido consonántico y an antes de sonido vocálico: a university, an orange. La decisión depende del sonido inicial, no solo de la letra.',
+          'La mayoría de los plurales añaden -s; los nombres que terminan en sonidos como -s, -sh, -ch, -x suelen añadir -es.',
+          'Si un nombre termina en consonante + y, normalmente cambia a -ies. Algunos plurales son irregulares, por ejemplo man/men y child/children.',
+          'En nombres formados por varias palabras, a menudo se pluraliza el elemento principal: bus stop / bus stops.',
+          'The identifica algo concreto que hablante y oyente pueden reconocer. Puede acompañar nombres singulares y plurales.',
+        ],
+        formula: 'a/an + nombre contable singular · plural regular: nombre + -s/-es',
+        examples: [
+          ['an address, two addresses', 'una dirección, dos direcciones'],
+          ['a city, three cities', 'una ciudad, tres ciudades'],
+          ['The windows are open.', 'Las ventanas están abiertas.'],
+        ],
+      },
+      {
+        title: '2B · Adjetivos',
+        intro: 'Un adjetivo aporta información sobre una persona o cosa. Su posición y forma son más fijas que en español.',
+        rules: [
+          'Delante del sustantivo, el adjetivo suele ir después del artículo: a useful map.',
+          'Después de be, el adjetivo describe al sujeto: The map is useful.',
+          'El adjetivo no lleva plural ni cambia por género: a quiet street / quiet streets.',
+          'Usa an si el adjetivo que precede al nombre comienza con sonido vocálico: an old house.',
+          'Very, really y quite suelen colocarse antes del adjetivo para graduar la descripción.',
+        ],
+        formula: 'artículo + adjetivo + sustantivo · sujeto + be + adjetivo',
+        examples: [
+          ['It is a comfortable chair.', 'Es una silla cómoda.'],
+          ['Those bags are heavy.', 'Esas bolsas son pesadas.'],
+          ['The test is quite easy.', 'El examen es bastante fácil.'],
+        ],
+      },
+      {
+        title: '2C · Imperativos y propuestas con let’s',
+        intro: 'El imperativo sirve para dar instrucciones, indicaciones y consejos directos. El sujeto you normalmente no se escribe.',
+        rules: [
+          'Usa la forma base del verbo para una instrucción afirmativa. Añade please para hacerla más cortés.',
+          'Para prohibir o pedir que no se haga algo, usa don’t + forma base.',
+          'Be + adjetivo forma instrucciones como Be careful. No añadas el pronombre you delante.',
+          'Let’s + verbo base propone una acción compartida; let’s not + verbo base propone no hacerla.',
+          'Can you…? y Could you…? permiten formular peticiones con tono más amable.',
+        ],
+        formula: 'Instrucción: verbo base · Negativa: don’t + verbo · Propuesta: let’s (not) + verbo',
+        examples: [
+          ['Please leave your coat here.', 'Por favor, deja tu abrigo aquí.'],
+          ['Don’t cross the road now.', 'No cruces la calle ahora.'],
+          ['Let’s not take the car.', 'No vayamos en coche.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '3. Presente simple y preguntas',
+    focus: 'Hábitos, hechos y orden de preguntas',
+    sections: [
+      {
+        title: '3A · Presente simple afirmativo y negativo',
+        intro: 'Se usa principalmente para hábitos, rutinas, preferencias y hechos que se consideran habituales o estables.',
+        rules: [
+          'Con I, you, we y they se usa la forma base. Con he, she e it se añade normalmente -s.',
+          'Añade -es después de terminaciones como -ch, -sh, -ss, -x y -o. En consonante + y, cambia y por -ies.',
+          'Have cambia a has; be tiene formas propias y do como verbo principal cambia a does en tercera persona.',
+          'La negativa usa don’t o doesn’t + verbo base. La -s está en doesn’t, por lo que el verbo principal no lleva otra -s.',
+          'Expresiones como every day, often y on Mondays suelen acompañar hábitos.',
+        ],
+        formula: 'Afirmación: sujeto + verbo (he/she/it + -s) · Negación: sujeto + don’t/doesn’t + verbo base',
+        examples: [
+          ['My brother fixes bicycles.', 'Mi hermano repara bicicletas.'],
+          ['I don’t eat meat.', 'No como carne.'],
+          ['Tara doesn’t live nearby.', 'Tara no vive cerca.'],
+        ],
+      },
+      {
+        title: '3B · Preguntas con do y does',
+        intro: 'El auxiliar do/does permite preguntar por rutinas y hechos con la mayoría de los verbos. También aparece en respuestas cortas.',
+        rules: [
+          'Empieza con do para I, you, we y they; usa does para he, she e it.',
+          'Después del sujeto va la forma base del verbo principal, incluso con he/she/it.',
+          'Las respuestas breves usan el auxiliar: Yes, we do. / No, she doesn’t.',
+          'Con el verbo be no se añade do/does: Are you busy? no Does you be busy?',
+          'En preguntas con who como sujeto puede no hacer falta do/does: Who works here?',
+        ],
+        formula: 'Do/Does + sujeto + verbo base? · Respuesta: Yes/No + sujeto + do/does (not)',
+        examples: [
+          ['Do your friends play volleyball?', '¿Tus amigos juegan voleibol?'],
+          ['Does Eli speak Italian? No, he doesn’t.', '¿Eli habla italiano? No.'],
+          ['What does this button do?', '¿Qué hace este botón?'],
+        ],
+      },
+      {
+        title: '3C · Orden de palabras en preguntas',
+        intro: 'El inglés utiliza un orden bastante estable: la palabra interrogativa precede al auxiliar, que va antes del sujeto.',
+        rules: [
+          'Con be: palabra interrogativa + be + sujeto. En preguntas de sí/no: be + sujeto.',
+          'Con otros verbos: palabra interrogativa + do/does + sujeto + verbo base.',
+          'How many + nombre plural pregunta por cantidad; what time pregunta por una hora.',
+          'Las preguntas de sujeto preguntan quién realiza la acción; normalmente who va seguido del verbo sin do/does.',
+          'Cierra las preguntas escritas con signo de interrogación.',
+        ],
+        formula: 'Pregunta con auxiliar: palabra interrogativa + auxiliar + sujeto + verbo base?',
+        examples: [
+          ['Where are your parents?', '¿Dónde están tus padres?'],
+          ['What time do the shops close?', '¿A qué hora cierran las tiendas?'],
+          ['Who teaches your class?', '¿Quién enseña a tu clase?'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '4. Posesión, preposiciones y frecuencia',
+    focus: 'Posesión, tiempo, lugar y hábitos',
+    sections: [
+      {
+        title: '4A · Posesivo ’s y preguntas con whose',
+        intro: 'El apóstrofo posesivo expresa una relación o pertenencia. Whose pregunta quién es el dueño de una cosa.',
+        rules: [
+          'Con un poseedor singular, añade ’s: Nina’s phone.',
+          'Con plurales regulares terminados en s, añade solo apóstrofo: my friends’ house. Con plurales irregulares, añade ’s: the children’s room.',
+          'Whose + sustantivo pregunta por el propietario; también puede usarse Whose is this?',
+          'No confundas who’s (who is / who has) con whose (posesión).',
+          'Para grupos de palabras, el apóstrofo suele añadirse al poseedor completo: my sister’s friend.',
+        ],
+        formula: 'Poseedor singular + ’s + objeto · Whose + objeto + be + esto/a?',
+        examples: [
+          ['This is Omar’s umbrella.', 'Este es el paraguas de Omar.'],
+          ['Whose shoes are these?', '¿De quién son estos zapatos?'],
+        ],
+      },
+      {
+        title: '4B · Preposiciones de tiempo, lugar y movimiento',
+        intro: 'Las preposiciones ayudan a precisar cuándo y dónde ocurre algo, y hacia dónde se mueve una persona.',
+        rules: [
+          'In suele acompañar meses, años, estaciones y partes amplias del día; on, días y fechas; at, horas y momentos concretos.',
+          'Para ubicaciones, at presenta un punto o lugar de actividad; in sitúa dentro de un espacio o área; on indica una superficie o algunas direcciones.',
+          'Con destinos usa to: go to the station. Con home normalmente se omite to: go home.',
+          'Preposiciones de lugar como next to, between, behind y opposite explican relaciones entre objetos.',
+          'Algunas expresiones se aprenden como una unidad, por ejemplo at night, in the morning y on the bus.',
+        ],
+        formula: 'Tiempo: in + periodo amplio · on + día/fecha · at + hora · movimiento: verbo + to + destino',
+        examples: [
+          ['The class starts at half past eight.', 'La clase empieza a las ocho y media.'],
+          ['We travel in October.', 'Viajamos en octubre.'],
+          ['The pharmacy is between the café and the bank.', 'La farmacia está entre el café y el banco.'],
+        ],
+      },
+      {
+        title: '4C · Adverbios y expresiones de frecuencia',
+        intro: 'Estas expresiones indican con qué frecuencia sucede una actividad y ayudan a describir rutinas.',
+        rules: [
+          'Always, usually, often, sometimes y never normalmente preceden al verbo principal.',
+          'Con be, el adverbio suele colocarse después: She is often busy.',
+          'En negativas con don’t/doesn’t, la frecuencia suele ir entre el auxiliar y el verbo principal.',
+          'Expresiones como every weekend, once a month y twice a week suelen ir al final de la oración.',
+          'How often pregunta por frecuencia. Never ya tiene sentido negativo y no suele combinarse con don’t.',
+        ],
+        formula: 'Sujeto + frecuencia + verbo principal · sujeto + be + frecuencia + complemento',
+        examples: [
+          ['I often call my grandparents.', 'A menudo llamo a mis abuelos.'],
+          ['She is never late.', 'Ella nunca llega tarde.'],
+          ['We go hiking once a month.', 'Vamos de excursión una vez al mes.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '5. Can y acciones en progreso',
+    focus: 'Capacidad, permiso, presente continuo y contraste',
+    sections: [
+      {
+        title: '5A · Can y can’t',
+        intro: 'Can puede expresar capacidad, posibilidad o permiso. Su forma no cambia según la persona.',
+        rules: [
+          'Usa can + verbo base para afirmaciones; can’t + verbo base para negaciones. No se añade to.',
+          'Para preguntar, coloca can antes del sujeto. Responde con can o can’t en forma breve.',
+          'Can también puede hacer una petición o preguntar si algo está permitido.',
+          'Could puede expresar capacidad general en el pasado o formular peticiones más corteses.',
+          'No uses do/does para construir preguntas con can.',
+        ],
+        formula: 'Afirmación: sujeto + can + verbo · Pregunta: Can + sujeto + verbo?',
+        examples: [
+          ['Ava can play chess.', 'Ava sabe jugar ajedrez.'],
+          ['Can I borrow your pen?', '¿Puedo pedirte prestado tu bolígrafo?'],
+          ['We couldn’t hear the guide.', 'No podíamos oír al guía.'],
+        ],
+      },
+      {
+        title: '5B · Presente continuo',
+        intro: 'El presente continuo presenta acciones que están ocurriendo ahora o situaciones temporales alrededor del momento actual.',
+        rules: [
+          'Se forma con am/is/are y el verbo terminado en -ing. El auxiliar concuerda con el sujeto.',
+          'En negativa, not sigue a be; en pregunta, be precede al sujeto.',
+          'En general se añade -ing; si el infinitivo termina en e muda, suele desaparecer; en ciertos verbos se duplica la consonante final.',
+          'No todos los verbos suelen describir acciones en progreso: verbos de estado como know o want normalmente se usan en simple.',
+          'At the moment, now, today y this week suelen señalar una situación actual o temporal.',
+        ],
+        formula: 'Sujeto + am/is/are + verbo-ing',
+        examples: [
+          ['The children are making a poster.', 'Los niños están haciendo un póster.'],
+          ['Is Maya waiting outside?', '¿Maya está esperando afuera?'],
+          ['I’m not working this afternoon.', 'No estoy trabajando esta tarde.'],
+        ],
+      },
+      {
+        title: '5C · Presente simple o continuo',
+        intro: 'Ambos tiempos hablan del presente, pero distinguen los hábitos de lo que ocurre temporalmente.',
+        rules: [
+          'El presente simple expresa rutinas, preferencias y situaciones consideradas estables.',
+          'El presente continuo destaca una acción en curso o una situación temporal.',
+          'Compara la idea, no solo una palabra clave: today puede referirse a una rutina de hoy o a una actividad que está pasando.',
+          'Present simple usa do/does para preguntas y negativas; present continuous usa formas de be.',
+          'What do you do? suele preguntar por ocupación o actividad habitual; What are you doing? por la acción actual.',
+        ],
+        formula: 'Hábito/hecho: presente simple · actividad actual/temporal: be + verbo-ing',
+        examples: [
+          ['I usually cycle, but today I’m taking the bus.', 'Normalmente voy en bici, pero hoy estoy tomando el autobús.'],
+          ['Does Leo work here? Is he working now?', '¿Leo trabaja aquí? ¿Está trabajando ahora?'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '6. Pronombres de objeto y patrones con verbos',
+    focus: 'Objetos, actividades y diferencia entre be y do',
+    sections: [
+      {
+        title: '6A · Pronombres de objeto',
+        intro: 'Los pronombres de objeto reemplazan a la persona o cosa que recibe una acción, o que aparece después de una preposición.',
+        rules: [
+          'Sujeto y objeto son funciones distintas: I → me; you → you; he → him; she → her; it → it; we → us; they → them.',
+          'El pronombre de objeto normalmente va después del verbo: invite them.',
+          'Después de una preposición también se usa la forma de objeto: with us, for her, to him.',
+          'No reemplaces el sujeto con una forma de objeto: He called me, no Him called me.',
+        ],
+        formula: 'Sujeto + verbo + pronombre de objeto · preposición + pronombre de objeto',
+        examples: [
+          ['Please wait for us.', 'Por favor, espéranos.'],
+          ['I know her, but she doesn’t know me.', 'La conozco, pero ella no me conoce.'],
+        ],
+      },
+      {
+        title: '6B · Like, love, enjoy y verbo terminado en -ing',
+        intro: 'Para hablar de actividades que gustan, disgustan o se disfrutan, estos verbos pueden ir seguidos de otra acción con -ing.',
+        rules: [
+          'Después de like, love, don’t mind, don’t like y hate se puede usar verbo-ing.',
+          'Enjoy y prefer también suelen llevar -ing cuando les sigue una actividad.',
+          'Para escribir -ing, normalmente se añade la terminación; una e final suele desaparecer y algunos verbos duplican consonante.',
+          'El sujeto de la oración controla el verbo principal: He likes…, pero el verbo de actividad sigue en -ing.',
+          'Prefer puede comparar dos actividades; utiliza una estructura paralela en ambos lados.',
+        ],
+        formula: 'Sujeto + like/love/enjoy/hate + actividad-ing',
+        examples: [
+          ['We enjoy cooking together.', 'Disfrutamos cocinar juntos.'],
+          ['He doesn’t mind getting up early.', 'No le molesta levantarse temprano.'],
+          ['I prefer walking to driving.', 'Prefiero caminar a conducir.'],
+        ],
+      },
+      {
+        title: '6C · ¿Be o do?',
+        intro: 'Elige el auxiliar de acuerdo con la función verbal. Be acompaña descripciones y forma el continuo; do ayuda con el presente simple.',
+        rules: [
+          'Be es verbo principal en descripciones y estados: She is tired. Para preguntar se invierte: Is she tired?',
+          'Be también funciona como auxiliar del presente continuo: They are studying.',
+          'Do/does es el auxiliar del presente simple para preguntar o negar con verbos distintos de be: Do you cook?',
+          'Do también puede ser el verbo principal con sentido de hacer; puede aparecer junto a un auxiliar: What do you do?',
+          'En una respuesta breve, repite el auxiliar usado en la pregunta.',
+        ],
+        formula: 'Descripción/continuo: be · Presente simple con otros verbos: do/does',
+        examples: [
+          ['Are you tired? Yes, I am.', '¿Estás cansado? Sí.'],
+          ['Does your aunt drive? No, she doesn’t.', '¿Tu tía conduce? No.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '7. Pasado de be y verbos regulares',
+    focus: 'Was/were, terminaciones -ed y preguntas en pasado',
+    sections: [
+      {
+        title: '7A · Pasado de be: was y were',
+        intro: 'Was y were describen estados, ubicaciones e identidades en un momento pasado.',
+        rules: [
+          'Was se usa con I, he, she e it; were con you, we y they.',
+          'La negativa añade not: wasn’t / weren’t. Para preguntar, was o were pasa delante del sujeto.',
+          'Las respuestas breves repiten was/were: Yes, they were. / No, I wasn’t.',
+          'Yesterday, last night, in 2019 y ago sitúan hechos en el pasado.',
+          'Born aparece con was/were para hablar del nacimiento: was born / were born.',
+        ],
+        formula: 'Afirmación: sujeto + was/were · Pregunta: was/were + sujeto?',
+        examples: [
+          ['The café was closed yesterday.', 'El café estuvo cerrado ayer.'],
+          ['Were you at the match? Yes, we were.', '¿Estuviste en el partido? Sí.'],
+          ['My grandparents weren’t born here.', 'Mis abuelos no nacieron aquí.'],
+        ],
+      },
+      {
+        title: '7B · Pasado simple de verbos regulares',
+        intro: 'Se utiliza para acciones terminadas en el pasado. La forma afirmativa regular se construye con una terminación escrita.',
+        rules: [
+          'La mayoría de los verbos añade -ed; los que terminan en e añaden solo -d.',
+          'En consonante + y, suele cambiar y por i antes de -ed. En algunos verbos cortos se duplica la consonante final.',
+          'La misma forma pasada sirve para todas las personas.',
+          'En negativas y preguntas se usa didn’t/did + verbo base. No conserves -ed después de did.',
+          'En preguntas con palabra interrogativa, esta precede a did: What did they order?',
+        ],
+        formula: 'Afirmación: sujeto + verbo-ed · Negativa: didn’t + verbo base · Pregunta: Did + sujeto + verbo base?',
+        examples: [
+          ['We arrived before noon.', 'Llegamos antes del mediodía.'],
+          ['Tess didn’t answer the message.', 'Tess no respondió el mensaje.'],
+          ['Did you finish the report?', '¿Terminaste el informe?'],
+        ],
+      },
+      {
+        title: '7C · Repaso y patrones del pasado',
+        intro: 'El pasado simple cuenta hechos completados. Las preguntas y negativas conservan la forma base del verbo después de did.',
+        rules: [
+          'Una narración puede combinar was/were para describir el contexto y verbos de acción para contar lo ocurrido.',
+          'Usa did para preguntas y didn’t para negativas con verbos de acción; no se usa did para negar was/were.',
+          'Could es el pasado de can para capacidad o posibilidad general: couldn’t expresa incapacidad.',
+          'La palabra interrogativa mantiene el orden: where + did + sujeto + verbo base.',
+          'Ordena la historia con expresiones temporales como first, later y finally, sin cambiar la forma verbal.',
+        ],
+        formula: 'Contexto: was/were · Acción: verbo pasado · Pregunta/negativa: did/didn’t + forma base',
+        examples: [
+          ['It was cold, so we stayed indoors.', 'Hacía frío, así que nos quedamos dentro.'],
+          ['Could you swim when you were five?', '¿Podías nadar cuando tenías cinco años?'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '8. Pasado irregular y expresiones con there',
+    focus: 'Relatos pasados y existencia de cosas',
+    sections: [
+      {
+        title: '8A · Pasado simple de verbos regulares e irregulares',
+        intro: 'En afirmativo, los verbos irregulares utilizan una forma propia que se aprende junto al infinitivo. El resto de la estructura es la del pasado simple.',
+        rules: [
+          'Los verbos regulares siguen reglas de escritura de -ed; los irregulares pueden cambiar por completo o no cambiar.',
+          'La forma pasada no cambia por persona: I went, she went, they went.',
+          'Did y didn’t van seguidos de la forma base, también con verbos irregulares.',
+          'Yesterday, last summer y two days ago son ejemplos de momentos pasados terminados.',
+          'Was/were pertenece al verbo be y no se combina con did para formular sus preguntas.',
+        ],
+        formula: 'Afirmación: sujeto + forma pasada · Pregunta/negativa: did/didn’t + forma base',
+        examples: [
+          ['He chose a blue jacket.', 'Él eligió una chaqueta azul.'],
+          ['We didn’t see the sign.', 'No vimos el letrero.'],
+          ['Where did your friends go?', '¿Adónde fueron tus amigos?'],
+        ],
+      },
+      {
+        title: '8B · There is/are, some y any',
+        intro: 'There is/are presenta la existencia o presencia de algo. La elección entre singular y plural depende del sustantivo que sigue.',
+        rules: [
+          'Usa there is con un nombre singular o incontable y there are con nombres plurales.',
+          'Some suele aparecer con plurales o incontables en afirmaciones; any es común en preguntas y negativas.',
+          'There’s es la contracción de there is. There are suele escribirse completo.',
+          'No confundas there is (existencia) con it is (identificación o descripción de algo ya mencionado).',
+          'En listas de elementos, la concordancia suele seguir el primer elemento después de there.',
+        ],
+        formula: 'There is + singular/incontable · There are + plural · some/any + cantidad no especificada',
+        examples: [
+          ['There is some bread on the table.', 'Hay pan en la mesa.'],
+          ['Are there any clean glasses?', '¿Hay vasos limpios?'],
+          ['There aren’t any trains after midnight.', 'No hay trenes después de medianoche.'],
+        ],
+      },
+      {
+        title: '8C · There was y there were',
+        intro: 'Para hablar de la existencia de algo en el pasado, cambia is/are por was/were.',
+        rules: [
+          'There was acompaña un elemento singular o incontable; there were acompaña un plural.',
+          'Las formas negativas son there wasn’t y there weren’t.',
+          'Para preguntar, was/were aparece antes de there: Was there…? / Were there…?',
+          'Some y any mantienen usos parecidos a los del presente: some en afirmaciones y any con frecuencia en preguntas y negativas.',
+          'Distingue la existencia pasada (there was a café) de una descripción pasada (it was a café).',
+        ],
+        formula: 'There was + singular · There were + plural · Was/Were there + nombre?',
+        examples: [
+          ['There was a small garden here.', 'Aquí había un jardín pequeño.'],
+          ['There weren’t any seats on the bus.', 'No había asientos en el autobús.'],
+          ['Was there a message for me?', '¿Había un mensaje para mí?'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '9. Cantidades y comparaciones',
+    focus: 'Contables, cuantificadores y adjetivos comparativos',
+    sections: [
+      {
+        title: '9A · Contables e incontables; a/an, some y any',
+        intro: 'Los sustantivos contables se pueden enumerar como unidades. Los incontables nombran sustancias, categorías o conceptos que normalmente no se cuentan uno por uno.',
+        rules: [
+          'Los contables tienen singular y plural; en singular necesitan determinante como a/an, the o un posesivo.',
+          'Los incontables normalmente usan verbo singular y no llevan a/an. Para contarlos se añade una unidad: a bottle of water.',
+          'Some aparece normalmente en afirmaciones con plurales e incontables. Any es habitual en negativas y preguntas.',
+          'Some también puede usarse en ofrecimientos o peticiones cuando se espera o se propone una respuesta afirmativa.',
+          'Nombres como coffee o cake pueden ser contables cuando se habla de una porción o una taza.',
+        ],
+        formula: 'a/an + contable singular · some/any + plural contable o incontable',
+        examples: [
+          ['There’s an egg and some rice.', 'Hay un huevo y algo de arroz.'],
+          ['Would you like some tea?', '¿Te gustaría un poco de té?'],
+          ['We need two bottles of water.', 'Necesitamos dos botellas de agua.'],
+        ],
+      },
+      {
+        title: '9B · How much, how many y cuantificadores',
+        intro: 'Los cuantificadores expresan una cantidad aproximada o nula. La pregunta adecuada depende de si el nombre se puede contar.',
+        rules: [
+          'How many pregunta por sustantivos contables en plural; how much por sustantivos incontables.',
+          'A lot of puede acompañar ambos tipos en afirmaciones y conversaciones cotidianas.',
+          'Much se usa con incontables y many con contables plurales, especialmente en preguntas y negativas.',
+          'A few indica una cantidad pequeña pero positiva con contables; a little hace lo mismo con incontables.',
+          'Not many/not much indica cantidad limitada; none significa cero y puede responder por sí solo.',
+          'Quite a lot of y lots of son alternativas frecuentes para una cantidad considerable.',
+        ],
+        formula: 'How many + plural contable? · How much + incontable?',
+        examples: [
+          ['How many emails did you get?', '¿Cuántos correos recibiste?'],
+          ['There’s a little milk left.', 'Queda un poco de leche.'],
+          ['We don’t have many chairs.', 'No tenemos muchas sillas.'],
+        ],
+      },
+      {
+        title: '9C · Adjetivos comparativos',
+        intro: 'El comparativo contrasta dos personas, lugares o cosas. Than introduce el segundo elemento comparado.',
+        rules: [
+          'Muchos adjetivos cortos añaden -er; los acabados en e añaden solo -r.',
+          'Con consonante + y, suele cambiar y por i antes de -er. En algunos adjetivos cortos se duplica la consonante final.',
+          'Muchos adjetivos largos usan more antes del adjetivo, no una terminación añadida.',
+          'Good, bad y far tienen formas comparativas irregulares comunes: better, worse y farther/further.',
+          'Than introduce el término de comparación. No añadas more y -er simultáneamente.',
+        ],
+        formula: 'adjetivo corto + -er + than · more + adjetivo largo + than',
+        examples: [
+          ['This route is safer than the highway.', 'Esta ruta es más segura que la autopista.'],
+          ['The blue sofa is more comfortable than the old one.', 'El sofá azul es más cómodo que el antiguo.'],
+          ['Today’s weather is better than yesterday’s.', 'El clima de hoy es mejor que el de ayer.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '10. Superlativos y futuro con be going to',
+    focus: 'Comparar con un grupo, planes y predicciones',
+    sections: [
+      {
+        title: '10A · Adjetivos superlativos',
+        intro: 'El superlativo señala el grado máximo o mínimo de una cualidad dentro de un grupo.',
+        rules: [
+          'Los adjetivos cortos suelen formar el superlativo con the + -est; los terminados en e añaden solo -st.',
+          'En consonante + y, suele cambiar y por i antes de -est. Algunos adjetivos duplican la consonante final.',
+          'Los adjetivos largos suelen usar the most; para expresar el extremo menor se usa the least.',
+          'Good, bad y far tienen formas irregulares: the best, the worst y the farthest/furthest.',
+          'Después del superlativo, in suele introducir el lugar o grupo y of presenta un conjunto.',
+        ],
+        formula: 'the + adjetivo corto-est · the most/least + adjetivo largo',
+        examples: [
+          ['That is the narrowest street in town.', 'Esa es la calle más estrecha del pueblo.'],
+          ['June was the most exciting month of the year.', 'Junio fue el mes más emocionante del año.'],
+          ['This is the best seat in the room.', 'Este es el mejor asiento de la habitación.'],
+        ],
+      },
+      {
+        title: '10B · Be going to para planes',
+        intro: 'Be going to permite hablar de intenciones y planes que una persona ya tiene, no solo de decisiones instantáneas.',
+        rules: [
+          'Combina la forma correcta de be con going to y la forma base del verbo.',
+          'En negativa, not va después de be. En pregunta, be pasa delante del sujeto.',
+          'La contracción puede unirse al sujeto: I’m going to…, she’s going to…, they’re going to…',
+          'Expresiones como tomorrow, next month y this evening ayudan a situar el plan.',
+          'Después de going to no se conjuga el verbo principal ni se añade -ing.',
+        ],
+        formula: 'Sujeto + am/is/are + (not) going to + verbo base',
+        examples: [
+          ['We’re going to visit the coast in July.', 'Vamos a visitar la costa en julio.'],
+          ['Is Jo going to change jobs?', '¿Jo va a cambiar de trabajo?'],
+          ['I’m not going to stay out late.', 'No voy a quedarme fuera hasta tarde.'],
+        ],
+      },
+      {
+        title: '10C · Be going to para predicciones',
+        intro: 'La misma estructura expresa una predicción sobre el futuro, especialmente cuando la situación actual aporta indicios.',
+        rules: [
+          'Usa be going to + verbo base para decir qué crees que ocurrirá.',
+          'Una evidencia visible o una circunstancia presente puede apoyar la predicción.',
+          'El verbo be concuerda con el sujeto también en preguntas y negativas.',
+          'Maybe, probably o I think pueden expresar el grado de seguridad; su posición depende de la estructura.',
+          'Distingue la predicción (va a ocurrir) del plan deliberado (hemos decidido hacerlo).',
+        ],
+        formula: 'Sujeto + am/is/are + going to + verbo base',
+        examples: [
+          ['The glass is near the edge; it’s going to fall.', 'El vaso está al borde; se va a caer.'],
+          ['I think our team is going to win.', 'Creo que nuestro equipo va a ganar.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '11. Adverbios, infinitivo y artículo the',
+    focus: 'Modo, verbos seguidos de to y uso del artículo definido',
+    sections: [
+      {
+        title: '11A · Adverbios de modo y modificadores',
+        intro: 'Un adverbio de modo explica cómo se realiza una acción. Los modificadores como very o quite ajustan la intensidad de una descripción.',
+        rules: [
+          'Muchos adverbios se forman con adjetivo + -ly; si termina en consonante + y, suele cambiar a -ily.',
+          'Algunos son irregulares o conservan la misma forma: good → well; fast y hard pueden servir como adjetivo o adverbio.',
+          'El adverbio suele ir después del verbo o de su objeto: She answered politely.',
+          'Friendly y lovely suelen ser adjetivos, aunque terminen en -ly.',
+          'Very, really e incredibly preceden a un adjetivo o adverbio; quite suele expresar un grado moderado o considerable según el contexto.',
+        ],
+        formula: 'verbo + adverbio de modo · very/really/quite + adjetivo o adverbio',
+        examples: [
+          ['The driver stopped carefully.', 'El conductor se detuvo con cuidado.'],
+          ['They speak very clearly.', 'Hablan muy claramente.'],
+          ['It’s a friendly dog.', 'Es un perro amigable.'],
+        ],
+      },
+      {
+        title: '11B · Verbo + to + infinitivo',
+        intro: 'Algunos verbos se enlazan con una segunda acción mediante to y la forma base del verbo.',
+        rules: [
+          'Want, need, decide, plan, promise, hope, learn y choose se usan con frecuencia seguidos de to + verbo.',
+          'Would like + to expresa un deseo o una petición cortés.',
+          'La forma negativa coloca not antes de to: decide not to go.',
+          'No todos los verbos siguen este patrón: like/enjoy suelen admitir verbo-ing para actividades.',
+          'Después de modal verbs como can se usa la forma base sin to.',
+        ],
+        formula: 'verbo principal + to + verbo base',
+        examples: [
+          ['They decided to leave early.', 'Decidieron salir temprano.'],
+          ['Would you like to join us?', '¿Te gustaría acompañarnos?'],
+          ['He promised not to forget.', 'Prometió no olvidarlo.'],
+        ],
+      },
+      {
+        title: '11C · Artículo definido the',
+        intro: 'The presenta algo específico, conocido o identificable. En otros casos, el inglés habla de una categoría general sin artículo.',
+        rules: [
+          'Usa the cuando se sabe a qué persona o cosa se refiere el contexto.',
+          'Úsalo con elementos únicos en el contexto y con superlativos.',
+          'Normalmente no se usa para hablar en general de personas, comidas o nombres plurales genéricos.',
+          'A menudo se omite con comidas habituales, transporte en by y algunos lugares o actividades comunes como home, work o school.',
+          'Los nombres de instrumentos pueden llevar the en ciertos patrones; revisa la expresión completa.',
+        ],
+        formula: 'the + referencia específica/única · sin artículo + idea general o expresión fija',
+        examples: [
+          ['Please close the kitchen window.', 'Por favor, cierra la ventana de la cocina.'],
+          ['Children need sleep.', 'Los niños necesitan dormir.'],
+          ['We go to work by train.', 'Vamos al trabajo en tren.'],
+        ],
+      },
+    ],
+  },
+  {
+    title: '12. Presente perfecto y pasado simple',
+    focus: 'Experiencias, resultados recientes y momentos pasados',
+    sections: [
+      {
+        title: '12A · Presente perfecto',
+        intro: 'El presente perfecto conecta una experiencia o resultado anterior con el presente, sin centrar la atención en el momento exacto.',
+        rules: [
+          'Se forma con have/has + participio pasado: have para I/you/we/they y has para he/she/it.',
+          'Las negativas usan haven’t/hasn’t + participio. Para preguntar, have/has va antes del sujeto.',
+          'Ever pregunta si una experiencia ocurrió alguna vez; never indica que no ha ocurrido en ningún momento.',
+          'Already indica que algo ocurrió antes de lo esperado; yet suele aparecer al final de preguntas y negativas.',
+          'Just se coloca entre have/has y el participio para una acción reciente.',
+          'Los participios regulares suelen coincidir con el pasado en -ed; muchos irregulares deben aprenderse individualmente.',
+        ],
+        formula: 'Afirmación: sujeto + have/has + participio · Pregunta: Have/Has + sujeto + participio?',
+        examples: [
+          ['Have you ever ridden a ferry?', '¿Alguna vez has viajado en ferry?'],
+          ['Mina has just sent the address.', 'Mina acaba de enviar la dirección.'],
+          ['We haven’t chosen a date yet.', 'Todavía no hemos elegido una fecha.'],
+        ],
+      },
+      {
+        title: '12B · Presente perfecto o pasado simple',
+        intro: 'La elección depende de si importa una experiencia conectada al presente o un hecho ubicado en un momento pasado terminado.',
+        rules: [
+          'Pregunta con presente perfecto por una experiencia sin pedir un momento exacto.',
+          'Usa pasado simple para decir cuándo ocurrió o para narrar detalles de una acción terminada.',
+          'Yesterday, last year, in May y ago son tiempos pasados terminados; normalmente no se combinan con presente perfecto.',
+          'Una conversación puede empezar con presente perfecto y continuar con preguntas en pasado simple sobre los detalles.',
+          'Been to suele indicar que alguien visitó un lugar y regresó; gone to suele indicar que fue y todavía está allí o de camino.',
+        ],
+        formula: 'Experiencia sin fecha: have/has + participio · momento pasado concreto: pasado simple',
+        examples: [
+          ['Have you tried Thai food? Yes, I have.', '¿Has probado comida tailandesa? Sí.'],
+          ['When did you try it? I tried it in Lima.', '¿Cuándo la probaste? La probé en Lima.'],
+          ['Kai has gone to the shop; he isn’t back yet.', 'Kai ha ido a la tienda; aún no vuelve.'],
+        ],
+      },
+      {
+        title: '12C · Elegir el tiempo al contar experiencias',
+        intro: 'Para contar con claridad, separa la experiencia general de los momentos y hechos concretos que la componen.',
+        rules: [
+          'Have you ever…? permite iniciar una conversación sobre experiencias vitales.',
+          'Al preguntar cuándo, dónde o con quién sucedió, normalmente se pasa al pasado simple.',
+          'Present perfect también puede describir un resultado reciente que aún es relevante: una tarea ya terminada, por ejemplo.',
+          'El participio de be es been; el de go es gone. No confundas el participio con el pasado simple went.',
+          'Para preguntas y negativas del presente perfecto, have/has es el auxiliar y el verbo principal permanece en participio.',
+        ],
+        formula: 'Experiencia: Have you ever + participio? · Detalle pasado: Wh-word + did + sujeto + verbo base?',
+        examples: [
+          ['I’ve lost my ticket, so I can’t get in.', 'He perdido mi boleto, así que no puedo entrar.'],
+          ['Where did you buy it?', '¿Dónde lo compraste?'],
+          ['They’ve been to Chile twice.', 'Han estado en Chile dos veces.'],
+        ],
+      },
+    ],
+  },
+];
