@@ -1,0 +1,19 @@
+{
+  "name": "English Practice",
+  "short_name": "English Practice",
+  "description": "Practica inglés con ejercicios, teoría y seguimiento de progreso.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6fb",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    {
+      "src": "icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

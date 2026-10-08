@@ -25,6 +25,7 @@ Sitio web de práctica de inglés basado en el contenido de **English File Eleme
 - **Estadísticas detalladas** con gráficos
 - **Modo oscuro** 🌙
 - **Diseño responsive** (móvil, tablet, PC)
+- **Uso sin conexión tras la primera visita online**: el navegador guarda los archivos de la aplicación mediante un service worker. Abre y deja cargar el sitio con internet una vez; luego podrá abrirse offline en ese mismo navegador. Las traducciones online siguen necesitando conexión.
 - **Sin dependencias instalables**: HTML + CSS + JS puro; el modo online del traductor es opcional y requiere internet
 
 ---
@@ -97,6 +98,8 @@ npx http-server site
 Abre `http://localhost:8000` en tu navegador.
 
 El modo offline funciona sin conexión una vez que los archivos del sitio están disponibles localmente. Su glosario está en `site/js/translator.js`; la calidad depende de las frases y palabras incluidas. El modo online usa la API pública de [Apertium](https://apertium.org/apy/), un proyecto de traducción automática de código abierto. La página envía el texto por HTTPS al servicio para traducirlo; no incluyas información confidencial. El endpoint público puede tener límites o interrupciones y la calidad varía según la traducción.
+
+Al abrir el sitio publicado con conexión, un service worker guarda la aplicación en el navegador. Espera a que termine la carga antes de desconectarte; luego vuelve a abrir la misma dirección en el mismo navegador para usar ejercicios, teoría, progreso y traducción local sin conexión. El traductor online requiere internet. Los datos de progreso permanecen en el almacenamiento local del navegador.
 
 ### Validar contenido
 
