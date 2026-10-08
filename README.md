@@ -17,6 +17,7 @@ Sitio web de práctica de inglés basado en el contenido de **English File Eleme
   - ✓/✗ Verdadero / Falso
 - **Progreso guardado** en el navegador (localStorage)
 - **Racha de días** 🔥 y puntos ⭐
+- **Sonido de acierto** generado localmente por el navegador; se puede activar o silenciar desde el botón 🔊
 - **Repaso de errores** automático
 - **Modo práctica libre** y **Modo examen** con temporizador en vivo, iniciado al pulsar «Iniciar examen»
 - **Teoría de gramática** con 12 temas y 36 subtemas, explicaciones originales en español y ejemplos propios; cada tema se puede leer en una tarjeta desplazable o ampliar a pantalla completa desde la navegación principal

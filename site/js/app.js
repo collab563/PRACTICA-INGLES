@@ -4,6 +4,7 @@
 let STATE = Storage.load();
 let EXAM = null;
 const ONLINE_TRANSLATOR_API = 'https://apertium.org/apy/translate';
+let feedbackAudioContext = null;
 
 function $(sel, root = document) { return root.querySelector(sel); }
 function $$(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
@@ -24,6 +25,55 @@ function updateHeaderStats() {
   $('#pointsNum').textContent = STATE.points;
 }
 
+function updateSoundToggle() {
+  const button = $('#soundToggle');
+  button.textContent = STATE.soundEnabled ? '🔊' : '🔇';
+  button.setAttribute('aria-label', STATE.soundEnabled ? 'Silenciar sonidos' : 'Activar sonidos');
+  button.setAttribute('aria-pressed', String(STATE.soundEnabled));
+  button.title = STATE.soundEnabled ? 'Sonidos activados' : 'Sonidos silenciados';
+}
+
+function playCorrectSound() {
+  if (!STATE.soundEnabled) return;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    console.warn('Los efectos de sonido no están disponibles en este navegador.');
+    return;
+  }
+
+  try {
+    if (!feedbackAudioContext) feedbackAudioContext = new AudioContextClass();
+    const playChime = () => {
+      const notes = [659.25, 880];
+      const startAt = feedbackAudioContext.currentTime;
+      notes.forEach((frequency, index) => {
+        const oscillator = feedbackAudioContext.createOscillator();
+        const gain = feedbackAudioContext.createGain();
+        const noteStart = startAt + index * 0.12;
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.0001, noteStart);
+        gain.gain.exponentialRampToValueAtTime(0.12, noteStart + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.2);
+        oscillator.connect(gain);
+        gain.connect(feedbackAudioContext.destination);
+        oscillator.start(noteStart);
+        oscillator.stop(noteStart + 0.21);
+      });
+    };
+
+    if (feedbackAudioContext.state === 'suspended') {
+      feedbackAudioContext.resume().then(playChime).catch(error => {
+        console.warn('No se pudo iniciar el sonido de respuesta correcta.', error);
+      });
+    } else {
+      playChime();
+    }
+  } catch (error) {
+    console.warn('No se pudo reproducir el sonido de respuesta correcta.', error);
+  }
+}
+
 // Theme
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', STATE.theme);
@@ -33,10 +83,19 @@ function applyTheme() {
 function init() {
   // Init theme
   applyTheme();
+  updateSoundToggle();
   $('#themeToggle').addEventListener('click', () => {
     STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
     applyTheme();
     Storage.save(STATE);
+  });
+  $('#soundToggle').addEventListener('click', () => {
+    STATE.soundEnabled = !STATE.soundEnabled;
+    updateSoundToggle();
+    Storage.save(STATE);
+  });
+  document.addEventListener('answered', event => {
+    if (event.detail.correct) playCorrectSound();
   });
   const translatorLink = $('.nav-link[data-route="translate"]');
   translatorLink.addEventListener('click', event => {

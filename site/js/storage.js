@@ -13,6 +13,7 @@ const defaultState = {
   wrongQuestions: [], // [{ file, lesson, section, qIndex, ts }]
   examHistory: [],   // [{ date, score, total, mode, fileIds }]
   theme: 'light',
+  soundEnabled: true,
   lastVisited: null,
 };
 

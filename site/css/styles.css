@@ -142,7 +142,7 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   font-size: 0.9rem;
   font-weight: 600;
 }
-.theme-toggle {
+.theme-toggle, .sound-toggle {
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -154,7 +154,7 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   font-size: 1.1rem;
   transition: all var(--transition);
 }
-.theme-toggle:hover { background: var(--primary-light); }
+.theme-toggle:hover, .sound-toggle:hover { background: var(--primary-light); }
 
 /* ========== MAIN ========== */
 main { flex: 1; padding: 2.5rem 1.5rem; }
@@ -1085,7 +1085,7 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   .brand-logo { font-size: 1.35rem; }
   .header-stats .streak-badge span:not(.streak-icon) { display: none; }
   .header-stats { gap: 0.35rem; }
-  .theme-toggle { width: 42px; height: 42px; }
+  .theme-toggle, .sound-toggle { width: 42px; height: 42px; }
   .nav-link { padding: 0.45rem 0.35rem; font-size: 0.78rem; }
   .hero { padding: 1.25rem 0 2rem; }
   .hero h1 { font-size: 1.55rem; }
