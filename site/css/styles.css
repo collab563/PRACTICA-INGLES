@@ -472,6 +472,121 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   border-top: 1px solid var(--border);
 }
 
+/* ========== VOCABULARY PRACTICE ========== */
+.vocabulary-menu {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.vocabulary-card {
+  display: grid;
+  place-items: center;
+  padding: 1.25rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+  font-weight: 600;
+  gap: 0.4rem;
+}
+.vocabulary-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.vocabulary-emoji { font-size: 2rem; }
+.vocabulary-practice {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.vocabulary-progress-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.vocabulary-card-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+.vocabulary-image {
+  width: min(100%, 420px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: block;
+  margin: 0 auto;
+}
+.vocabulary-number-display {
+  display: grid;
+  place-items: center;
+  width: min(100%, 420px);
+  min-height: clamp(160px, 35vw, 260px);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--primary);
+  font-size: clamp(2rem, 8vw, 5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.vocabulary-question h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+.vocabulary-question p {
+  color: var(--text-muted);
+}
+.vocabulary-input {
+  width: 100%;
+  min-height: 52px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  background: var(--bg);
+}
+.vocabulary-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.vocabulary-input.wrong {
+  border-color: var(--error);
+  background: var(--error-light);
+}
+.vocabulary-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+.vocabulary-feedback.success {
+  background: var(--success-light);
+  color: var(--success-text);
+}
+.vocabulary-feedback.error {
+  background: var(--error-light);
+  color: var(--error-text);
+}
+.hidden { display: none !important; }
+
 /* ========== LESSON DETAIL ========== */
 .lesson-header {
   background: var(--bg-card);

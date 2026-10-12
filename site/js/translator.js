@@ -183,6 +183,36 @@ crisps|patatas fritas de bolsa
 biscuits|galletas
 sweets|dulces
 dessert|postre
+apples|manzanas
+eggs|huevos
+orange juice|jugo de naranja
+salmon|salmón
+tuna|atún
+herbs|hierbas
+sausages|salchichas
+steak|bistec
+ham|jamón
+olive oil|aceite de oliva
+pasta|pasta
+seafood|mariscos
+spices|especias
+carrots|zanahorias
+french fries|papas fritas
+lettuce|lechuga
+mushrooms|champiñones
+onions|cebollas
+peas|guisantes
+peppers|pimientos
+potatoes|patatas
+tomatoes|tomates
+bananas|plátanos
+oranges|naranjas
+pineapple|piña
+strawberries|fresas
+fruit salad|ensalada de frutas
+chocolate|chocolate
+nuts|nueces
+sandwich|sándwich
 lemonade|limonada
 bottle|botella
 packet|paquete
@@ -753,6 +783,20 @@ milk|leche
 coffee|café
 tea|té
 apple|manzana
+cheese|queso
+egg|huevo
+fish|pescado
+rice|arroz
+salad|ensalada
+toast|tostada
+vegetable|verdura
+cake|pastel
+cookie|galleta
+ice cream|helado
+jam|mermelada
+fruit|fruta
+dessert|postre
+desserts|postres
 meat|carne
 money|dinero
 time|tiempo
@@ -914,13 +958,8 @@ ticket|boleto
 breakfast|desayuno
 lunch|almuerzo
 dinner|cena
-fruit|fruta
 vegetable|verdura
-cheese|queso
-egg|huevo
-fish|pescado
 chicken|pollo
-rice|arroz
 potato|patata
 sugar|azúcar
 salt|sal

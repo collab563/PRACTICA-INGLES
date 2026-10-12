@@ -6,6 +6,123 @@ let EXAM = null;
 const ONLINE_TRANSLATOR_API = 'https://apertium.org/apy/translate';
 let feedbackAudioContext = null;
 
+const FILE_10_VOCABULARY = {
+  food: [
+    { word: 'apples', aliases: ['apple'], translation: 'manzanas', image: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=900&q=80', alt: 'Apples' },
+    { word: 'bread', translation: 'pan', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80', alt: 'Bread' },
+    { word: 'butter', translation: 'mantequilla', image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=900&q=80', alt: 'Butter' },
+    { word: 'cereal', translation: 'cereal', image: 'images/vocabulary/cereal.png', alt: 'Bowl of corn flakes' },
+    { word: 'cheese', translation: 'queso', image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=900&q=80', alt: 'Cheese' },
+    { word: 'coffee', translation: 'café', image: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=900&q=80', alt: 'Coffee' },
+    { word: 'eggs', aliases: ['egg'], translation: 'huevos', image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=900&q=80', alt: 'Eggs' },
+    { word: 'jam', translation: 'mermelada', image: 'https://images.unsplash.com/photo-1707092009843-2b5a919d17b0?auto=format&fit=crop&w=900&q=80', alt: 'Jam served on toast' },
+    { word: 'orange juice', translation: 'jugo de naranja', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=900&q=80', alt: 'Orange juice' },
+    { word: 'sugar', translation: 'azúcar', image: 'https://images.unsplash.com/photo-1709651808265-977ed7ef78c6?auto=format&fit=crop&w=900&q=80', alt: 'Sugar cubes' },
+    { word: 'tea', translation: 'té', image: 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?auto=format&fit=crop&w=900&q=80', alt: 'Tea' },
+    { word: 'toast', translation: 'tostada', image: 'images/vocabulary/toast.png', alt: 'Slices of toasted bread in a basket' },
+    { word: 'fish', translation: 'pescado', image: 'https://images.unsplash.com/photo-1611214774777-3d997a9d0e35?auto=format&fit=crop&w=900&q=80', alt: 'Fresh fish on ice' },
+    { word: 'herbs', aliases: ['herb'], translation: 'hierbas', image: 'https://images.unsplash.com/photo-1784802905060-427471c824d0?auto=format&fit=crop&w=900&q=80', alt: 'Fresh basil leaves' },
+    { word: 'meat', translation: 'carne', image: 'https://images.unsplash.com/photo-1783632666729-fbfb2ed5516a?auto=format&fit=crop&w=900&q=80', alt: 'Raw meat' },
+    { word: 'chicken', translation: 'pollo', image: 'images/vocabulary/chicken.png', alt: 'Raw chicken legs with herbs' },
+    { word: 'sausages', aliases: ['sausage'], translation: 'salchichas', image: 'https://images.unsplash.com/photo-1766589152317-2bafe6f2923c?auto=format&fit=crop&w=900&q=80', alt: 'Grilled sausages' },
+    { word: 'steak', translation: 'bistec', image: 'images/vocabulary/steak.png', alt: 'Grilled steaks on a cast iron pan' },
+    { word: 'ham', translation: 'jamón', image: 'images/vocabulary/ham.png', alt: 'Sliced ham on a cutting board' },
+    { word: 'oil', translation: 'aceite', image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=900&q=80', alt: 'Oil' },
+    { word: 'pasta', translation: 'pasta', image: 'images/vocabulary/pasta.png', alt: 'Fusilli pasta in a bowl' },
+    { word: 'milk', translation: 'leche', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=900&q=80', alt: 'Milk' },
+    { word: 'rice', translation: 'arroz', image: 'images/vocabulary/rice.png', alt: 'Uncooked white rice with a wooden scoop' },
+    { word: 'salad', translation: 'ensalada', image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=900&q=80', alt: 'Salad' },
+    { word: 'seafood', translation: 'mariscos', image: 'https://images.unsplash.com/photo-1765100479761-2359e22fbe16?auto=format&fit=crop&w=900&q=80', alt: 'Assorted seafood platter' },
+    { word: 'spices', translation: 'especias', image: 'images/vocabulary/spices.png', alt: 'A variety of spices in bowls and spoons' },
+    { word: 'carrots', aliases: ['carrot'], translation: 'zanahorias', image: 'https://images.unsplash.com/photo-1445282768818-728615cc910a?auto=format&fit=crop&w=900&q=80', alt: 'Carrots' },
+    { word: 'chips', aliases: ['french fries'], translation: 'papas fritas', image: 'images/vocabulary/chips.png', alt: 'French fries in a bowl' },
+    { word: 'lettuce', translation: 'lechuga', image: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=80', alt: 'Lettuce' },
+    { word: 'mushrooms', aliases: ['mushroom'], translation: 'champiñones', image: 'https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=900&q=80', alt: 'Mushrooms' },
+    { word: 'onions', aliases: ['onion'], translation: 'cebollas', image: 'https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=80', alt: 'Onions' },
+    { word: 'peas', aliases: ['pea'], translation: 'guisantes', image: 'https://images.unsplash.com/photo-1632640107771-80c37386cfcd?auto=format&fit=crop&w=900&q=80', alt: 'Green peas in a bowl' },
+    { word: 'peppers', aliases: ['pepper'], translation: 'pimientos', image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=80', alt: 'Peppers' },
+    { word: 'potatoes', aliases: ['potato'], translation: 'patatas', image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=80', alt: 'Potatoes' },
+    { word: 'tomatoes', aliases: ['tomato'], translation: 'tomates', image: 'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=900&q=80', alt: 'Tomatoes' },
+    { word: 'bananas', aliases: ['banana'], translation: 'plátanos', image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=80', alt: 'Bananas' },
+    { word: 'oranges', aliases: ['orange'], translation: 'naranjas', image: 'https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=900&q=80', alt: 'Oranges' },
+    { word: 'pineapple', aliases: ['a pineapple'], translation: 'piña', image: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=900&q=80', alt: 'Pineapple' },
+    { word: 'strawberries', aliases: ['strawberry'], translation: 'fresas', image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=900&q=80', alt: 'Strawberries' },
+    { word: 'cake', translation: 'pastel', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=80', alt: 'Cake' },
+    { word: 'fruit salad', translation: 'ensalada de frutas', image: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=900&q=80', alt: 'Fruit salad' },
+    { word: 'ice cream', translation: 'helado', image: 'https://images.unsplash.com/photo-1560008581-09826d1de69e?auto=format&fit=crop&w=900&q=80', alt: 'Ice cream' },
+    { word: 'cookie', aliases: ['biscuit', 'biscuits'], translation: 'galleta', image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=900&q=80', alt: 'Cookie' },
+    { word: 'chocolate', translation: 'chocolate', image: 'https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=900&q=80', alt: 'Chocolate' },
+    { word: 'crisps', aliases: ['crisp'], translation: 'papas fritas de bolsa', image: 'images/vocabulary/crisps.png', alt: 'Packets of potato crisps and crisps in a bowl' },
+    { word: 'nuts', aliases: ['nut'], translation: 'nueces', image: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d46?auto=format&fit=crop&w=900&q=80', alt: 'Nuts' },
+    { word: 'sandwich', aliases: ['a sandwich'], translation: 'sándwich', image: 'images/vocabulary/sandwich.png', alt: 'Sandwich with lettuce, tomato, cheese, and ham' },
+    { word: 'sweets', aliases: ['sweet'], translation: 'dulces', image: 'https://images.unsplash.com/photo-1581798459219-318e76aecc7b?auto=format&fit=crop&w=900&q=80', alt: 'Sweets' },
+  ],
+};
+
+function numberBelowOneThousandToEnglish(number) {
+  const units = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const parts = [];
+
+  if (number >= 100) {
+    parts.push(`${units[Math.floor(number / 100)]} hundred`);
+    number %= 100;
+  }
+  if (number >= 20) {
+    parts.push(tens[Math.floor(number / 10)]);
+    number %= 10;
+  } else if (number >= 10) {
+    parts.push(teens[number - 10]);
+    number = 0;
+  }
+  if (number > 0) parts.push(units[number]);
+
+  return parts.join(' ');
+}
+
+function numberToEnglish(number) {
+  const scales = [[1000000, 'million'], [1000, 'thousand']];
+  const parts = [];
+  let remainder = number;
+
+  scales.forEach(([scale, label]) => {
+    const group = Math.floor(remainder / scale);
+    if (group > 0) {
+      parts.push(`${numberBelowOneThousandToEnglish(group)} ${label}`);
+      remainder %= scale;
+    }
+  });
+  if (remainder > 0) parts.push(numberBelowOneThousandToEnglish(remainder));
+  return parts.join(' ');
+}
+
+function createNumberVocabulary() {
+  const numbers = Array.from({ length: 10 }, (_, index) => index + 1);
+  for (let digits = 2; digits <= 9; digits += 1) {
+    const count = digits <= 3 ? 12 : 11;
+    const minimum = 10 ** (digits - 1);
+    const maximum = 10 ** digits - 1;
+    const selected = new Set();
+    while (selected.size < count) {
+      const number = minimum + Math.floor(Math.random() * (maximum - minimum + 1));
+      const trailingRepeatedDigits = String(number).match(/(.)\1*$/)?.[0].length || 0;
+      if (number <= 10 || trailingRepeatedDigits >= 3) continue;
+      selected.add(number);
+    }
+    numbers.push(...selected);
+  }
+  for (let index = numbers.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [numbers[index], numbers[swapIndex]] = [numbers[swapIndex], numbers[index]];
+  }
+  return numbers.map(number => ({
+    number,
+    word: numberToEnglish(number),
+    accepted: [numberToEnglish(number)],
+  }));
+}
+
 function $(sel, root = document) { return root.querySelector(sel); }
 function $$(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
 
@@ -125,6 +242,7 @@ function init() {
   Router.add('home', renderHome);
   Router.add('theory', renderTheory);
   Router.add('file', renderFile);
+  Router.add('vocabulary', params => renderVocabularyPractice(params[0]));
   Router.add('lesson', renderLesson);
   Router.add('practice', renderPractice);
   Router.add('translate', () => renderTranslator());
@@ -561,6 +679,142 @@ function attachTheoryInteractions(view) {
   });
 }
 
+function renderVocabularyPractice(categoryKey = 'food') {
+  const view = $('#mainView');
+  const isNumberPractice = categoryKey === 'numbers';
+  let collection = isNumberPractice ? createNumberVocabulary() : FILE_10_VOCABULARY.food;
+  const label = isNumberPractice ? 'Numbers' : 'Food';
+  let words = collection.map(item => ({ ...item, accepted: [item.word, ...(item.aliases || [])] }));
+  let currentIndex = 0;
+  let correctCount = 0;
+  let advanceTimeout = null;
+
+  const normalizeAnswer = value => String(value).trim().toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
+  const normalizeNumberAnswer = value => normalizeAnswer(value.replace(/-/g, ' ')).replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const finishVocabularySession = () => {
+    const percent = Math.round((correctCount / words.length) * 100);
+    view.innerHTML = `
+      <a href="#practice" class="back-link">← Volver a Practicar</a>
+      <div class="lesson-header text-center">
+        <div style="font-size:3rem">🎉</div>
+        <h1>Vocabulary · ${escapeHTML(label)}</h1>
+        <p class="topics">Has completado ${words.length} palabras.</p>
+        <p style="font-size:1.5rem; color:var(--primary); font-weight:700;">${correctCount} / ${words.length} correctas (${percent}%)</p>
+        <div class="mt-2">
+          <button class="btn" type="button" id="vocabRetryBtn">🔁 Repetir</button>
+          <a href="#practice" class="btn btn-secondary">Volver</a>
+        </div>
+      </div>
+    `;
+    $('#vocabRetryBtn')?.addEventListener('click', () => renderVocabularyPractice(categoryKey));
+  };
+
+  const renderItem = () => {
+    const item = words[currentIndex];
+    const progress = `${currentIndex + 1} / ${words.length}`;
+    if (advanceTimeout) {
+      clearTimeout(advanceTimeout);
+      advanceTimeout = null;
+    }
+    const card = document.createElement('div');
+    card.className = 'vocabulary-practice';
+    card.innerHTML = `
+      <div class="vocabulary-progress-bar">
+        <span>Progress</span>
+        <strong>${progress}</strong>
+      </div>
+      <div class="vocabulary-card-panel">
+        ${isNumberPractice
+          ? `<div class="vocabulary-number-display" aria-label="Número ${item.number}">${item.number}</div>`
+          : `<img class="vocabulary-image" src="${item.image}" alt="${escapeHTML(item.alt)}" />`}
+        <div class="vocabulary-question">
+          <h3>${isNumberPractice ? '¿Cómo se llama el número?' : '¿Qué comida ves?'}</h3>
+          <p>${isNumberPractice ? 'Escribe el número en inglés.' : 'Escribe su nombre en inglés.'}</p>
+        </div>
+        <input id="vocabularyAnswer" class="vocabulary-input" type="text" placeholder="${isNumberPractice ? 'Escribe el número en inglés...' : 'Escribe la palabra...'}" autocomplete="off" />
+        <div class="exercise-actions">
+          <button class="btn" id="checkVocabularyBtn" type="button">Comprobar</button>
+          <button class="btn btn-secondary" id="skipVocabularyBtn" type="button">${currentIndex === words.length - 1 ? 'Finalizar práctica' : 'Pasar a la siguiente'}</button>
+        </div>
+        <div id="vocabularyFeedback" class="vocabulary-feedback hidden"> </div>
+      </div>
+    `;
+
+    const feedback = card.querySelector('#vocabularyFeedback');
+    const input = card.querySelector('#vocabularyAnswer');
+    const checkBtn = card.querySelector('#checkVocabularyBtn');
+    const skipBtn = card.querySelector('#skipVocabularyBtn');
+
+    const advance = () => {
+      if (advanceTimeout) {
+        clearTimeout(advanceTimeout);
+        advanceTimeout = null;
+      }
+      if (currentIndex < words.length - 1) {
+        currentIndex += 1;
+        renderItem();
+      } else {
+        finishVocabularySession();
+      }
+    };
+
+    checkBtn.addEventListener('click', () => {
+      if (checkBtn.disabled) return;
+      const value = isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
+      const accepted = item.accepted.map(term => isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
+      const correct = accepted.includes(value);
+      input.disabled = true;
+      checkBtn.disabled = true;
+      if (correct) {
+        correctCount += 1;
+        playCorrectSound();
+        feedback.className = 'vocabulary-feedback success';
+        feedback.innerHTML = `<strong>✅ Correcto!</strong><span>La respuesta es <strong>${escapeHTML(item.word)}</strong>.</span>`;
+        advanceTimeout = setTimeout(advance, 900);
+      } else {
+        input.classList.add('wrong');
+        feedback.className = 'vocabulary-feedback error';
+        feedback.innerHTML = `<strong>❌ No es esa.</strong><span>La respuesta correcta es <strong>${escapeHTML(item.word)}</strong>.</span>`;
+      }
+    });
+
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        checkBtn.click();
+      }
+    });
+
+    skipBtn.addEventListener('click', advance);
+
+    const wrap = $('#mainView');
+    wrap.innerHTML = `
+      <a href="#practice" class="back-link">← Volver a Practicar</a>
+      <div class="lesson-header">
+        <span class="file-num">Vocabulary · ${escapeHTML(label)}</span>
+        <h1 style="margin-top:0.5rem">${escapeHTML(label)} practice</h1>
+        <p class="topics">${isNumberPractice ? 'Escribe cada número con palabras en inglés.' : 'Escribe el nombre de la comida o elemento que aparece en la imagen.'}</p>
+        <button class="btn btn-secondary" id="shuffleVocabularyBtn" type="button">🔀 Mezclar y reiniciar</button>
+      </div>
+    `;
+    $('#shuffleVocabularyBtn').addEventListener('click', () => {
+      if (isNumberPractice) collection = createNumberVocabulary();
+      words = collection.map(item => ({ ...item, accepted: [item.word, ...(item.aliases || [])] }));
+      for (let index = words.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [words[index], words[randomIndex]] = [words[randomIndex], words[index]];
+      }
+      currentIndex = 0;
+      correctCount = 0;
+      renderItem();
+    });
+    wrap.appendChild(card);
+  };
+
+  renderItem();
+}
+
 // --- FILE (LESSON LIST) ---
 function renderFile(params) {
   const fileId = params[0];
@@ -725,6 +979,19 @@ function renderPractice(params) {
         </div>
       `).join('')}
     </div>
+    <section class="vocabulary-section">
+      <h2 class="section-title">🗂️ Vocabulary</h2>
+      <div class="vocabulary-menu">
+        <button class="vocabulary-card" data-vocabulary="food" type="button">
+          <span class="vocabulary-emoji">🍽️</span>
+          <span>Food</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="numbers" type="button">
+          <span class="vocabulary-emoji">🔢</span>
+          <span>Numbers</span>
+        </button>
+      </div>
+    </section>
   `;
   $$('.practice-mode').forEach(el => {
     el.addEventListener('click', () => {
@@ -733,6 +1000,9 @@ function renderPractice(params) {
       else if (mode === 'wrong') Router.navigate('practice/wrong');
       else if (mode === 'file') Router.navigate('practice/file/' + el.dataset.file);
     });
+  });
+  $$('.vocabulary-card').forEach(card => {
+    card.addEventListener('click', () => Router.navigate('vocabulary/' + card.dataset.vocabulary));
   });
 }
 

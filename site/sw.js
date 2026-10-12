@@ -1,9 +1,20 @@
-const CACHE_NAME = 'english-practice-v1';
+const CACHE_NAME = 'english-practice-v13';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icons/app-icon.svg',
+  './images/vocabulary/cereal.png',
+  './images/vocabulary/toast.png',
+  './images/vocabulary/chicken.png',
+  './images/vocabulary/sandwich.png',
+  './images/vocabulary/crisps.png',
+  './images/vocabulary/ham.png',
+  './images/vocabulary/pasta.png',
+  './images/vocabulary/rice.png',
+  './images/vocabulary/spices.png',
+  './images/vocabulary/chips.png',
+  './images/vocabulary/steak.png',
   './css/styles.css',
   './data/files.js',
   './data/theory.js',
