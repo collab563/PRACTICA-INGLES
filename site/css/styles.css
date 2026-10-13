@@ -553,6 +553,43 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
 .vocabulary-question p {
   color: var(--text-muted);
 }
+.vocabulary-speech-control {
+  display: grid;
+  gap: 0.35rem;
+}
+.vocabulary-speech-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.vocabulary-speech-control small {
+  color: var(--text-muted);
+}
+.vocabulary-note-dialog {
+  width: min(92vw, 520px);
+  max-height: min(85vh, 640px);
+  margin: auto;
+  padding: 1.5rem;
+  overflow-y: auto;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.vocabulary-note-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+}
+.vocabulary-note-dialog h2 {
+  margin-bottom: 1rem;
+}
+.vocabulary-note-dialog p {
+  margin-bottom: 0.85rem;
+  line-height: 1.6;
+}
+.vocabulary-note-close {
+  margin-top: 0.5rem;
+}
 .vocabulary-input {
   width: 100%;
   min-height: 52px;

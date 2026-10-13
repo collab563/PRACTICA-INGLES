@@ -68,6 +68,7 @@ function numberBelowOneThousandToEnglish(number) {
   if (number >= 100) {
     parts.push(`${units[Math.floor(number / 100)]} hundred`);
     number %= 100;
+    if (number > 0) parts.push('and');
   }
   if (number >= 20) {
     parts.push(tens[Math.floor(number / 10)]);
@@ -93,7 +94,10 @@ function numberToEnglish(number) {
       remainder %= scale;
     }
   });
-  if (remainder > 0) parts.push(numberBelowOneThousandToEnglish(remainder));
+  if (remainder > 0) {
+    if (parts.length && remainder < 100) parts.push('and');
+    parts.push(numberBelowOneThousandToEnglish(remainder));
+  }
   return parts.join(' ');
 }
 
@@ -188,6 +192,62 @@ function playCorrectSound() {
     }
   } catch (error) {
     console.warn('No se pudo reproducir el sonido de respuesta correcta.', error);
+  }
+}
+
+async function speakVocabularyWord(text) {
+  const synthesis = window.speechSynthesis;
+  if (!synthesis || typeof SpeechSynthesisUtterance === 'undefined') {
+    showToast('La pronunciación de voz no está disponible en este navegador.', 'error');
+    return;
+  }
+
+  let voices = synthesis.getVoices();
+  if (!voices.length) {
+    voices = await new Promise(resolve => {
+      let timeout;
+      const loadVoices = () => {
+        const availableVoices = synthesis.getVoices();
+        if (availableVoices.length) {
+          clearTimeout(timeout);
+          synthesis.removeEventListener('voiceschanged', loadVoices);
+          resolve(availableVoices);
+        }
+      };
+      synthesis.addEventListener('voiceschanged', loadVoices);
+      timeout = setTimeout(() => {
+        synthesis.removeEventListener('voiceschanged', loadVoices);
+        resolve(synthesis.getVoices());
+      }, 1000);
+      loadVoices();
+    });
+  }
+
+  const englishVoices = voices.filter(candidate => /^en(-|$)/i.test(candidate.lang));
+  const voice = englishVoices.find(candidate => candidate.localService) || englishVoices[0];
+  if (!voice) {
+    showToast('No se encontró ninguna voz de inglés disponible en este navegador.', 'error');
+    return;
+  }
+
+  try {
+    synthesis.cancel();
+    if (!voice.localService) {
+      showToast('Esta voz de inglés puede necesitar conexión a internet.');
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+    utterance.rate = 0.85;
+    utterance.onerror = event => {
+      if (event.error === 'canceled' || event.error === 'interrupted') return;
+      console.warn('No se pudo reproducir la pronunciación.', event.error);
+      showToast('No se pudo reproducir la pronunciación.', 'error');
+    };
+    synthesis.speak(utterance);
+  } catch (error) {
+    console.warn('No se pudo iniciar la pronunciación.', error);
+    showToast('No se pudo iniciar la pronunciación.', 'error');
   }
 }
 
@@ -687,6 +747,8 @@ function renderVocabularyPractice(categoryKey = 'food') {
   let words = collection.map(item => ({ ...item, accepted: [item.word, ...(item.aliases || [])] }));
   let currentIndex = 0;
   let correctCount = 0;
+  const correctlyAnswered = new Set();
+  const responses = new Map();
   let advanceTimeout = null;
 
   const normalizeAnswer = value => String(value).trim().toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
@@ -730,10 +792,26 @@ function renderVocabularyPractice(categoryKey = 'food') {
           : `<img class="vocabulary-image" src="${item.image}" alt="${escapeHTML(item.alt)}" />`}
         <div class="vocabulary-question">
           <h3>${isNumberPractice ? '¿Cómo se llama el número?' : '¿Qué comida ves?'}</h3>
-          <p>${isNumberPractice ? 'Escribe el número en inglés.' : 'Escribe su nombre en inglés.'}</p>
+          <p>${isNumberPractice ? 'Escribe el número en inglés. Se acepta la forma británica con “and” y la estadounidense sin “and”.' : 'Escribe su nombre en inglés.'}</p>
         </div>
+        <div class="vocabulary-speech-control">
+          <div class="vocabulary-speech-buttons">
+            <button class="btn btn-secondary" id="speakVocabularyBtn" type="button">🔊 Escuchar pronunciación</button>
+            <button class="btn btn-secondary" id="vocabularyNoteBtn" type="button" aria-haspopup="dialog">📝 Nota</button>
+          </div>
+          <small>Funciona sin internet si el dispositivo tiene una voz de inglés instalada.</small>
+        </div>
+        <dialog class="vocabulary-note-dialog" aria-labelledby="vocabularyNoteTitle">
+          <h2 id="vocabularyNoteTitle">Configurar voz en Android</h2>
+          <p>Abre Ajustes → Accesibilidad → Salida de texto a voz. En algunos modelos está en Administración general → Texto a voz.</p>
+          <p>Selecciona Speech Recognition &amp; Synthesis from Google o Servicios de voz de Google como motor.</p>
+          <p>En Instalar datos de voz, descarga English (United States) o English (United Kingdom).</p>
+          <p>Cierra y vuelve a abrir Chrome y prueba el botón.</p>
+          <button class="btn btn-secondary vocabulary-note-close" type="button">Cerrar</button>
+        </dialog>
         <input id="vocabularyAnswer" class="vocabulary-input" type="text" placeholder="${isNumberPractice ? 'Escribe el número en inglés...' : 'Escribe la palabra...'}" autocomplete="off" />
         <div class="exercise-actions">
+          <button class="btn btn-secondary" id="previousVocabularyBtn" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Pregunta anterior</button>
           <button class="btn" id="checkVocabularyBtn" type="button">Comprobar</button>
           <button class="btn btn-secondary" id="skipVocabularyBtn" type="button">${currentIndex === words.length - 1 ? 'Finalizar práctica' : 'Pasar a la siguiente'}</button>
         </div>
@@ -745,12 +823,32 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const input = card.querySelector('#vocabularyAnswer');
     const checkBtn = card.querySelector('#checkVocabularyBtn');
     const skipBtn = card.querySelector('#skipVocabularyBtn');
+    const previousBtn = card.querySelector('#previousVocabularyBtn');
+    const speakBtn = card.querySelector('#speakVocabularyBtn');
+    const noteBtn = card.querySelector('#vocabularyNoteBtn');
+    const noteDialog = card.querySelector('.vocabulary-note-dialog');
+
+    const savedResponse = responses.get(currentIndex);
+    if (savedResponse) {
+      input.value = savedResponse.answer;
+      feedback.className = `vocabulary-feedback ${savedResponse.correct ? 'success' : 'error'}`;
+      feedback.innerHTML = savedResponse.correct
+        ? `<strong>✅ Correcto!</strong><span>La respuesta es <strong>${escapeHTML(item.word)}</strong>.</span>`
+        : `<strong>❌ No es esa.</strong><span>La respuesta correcta es <strong>${escapeHTML(item.word)}</strong>.</span>`;
+      if (savedResponse.correct) {
+        input.disabled = true;
+        checkBtn.disabled = true;
+      } else {
+        input.classList.add('wrong');
+      }
+    }
 
     const advance = () => {
       if (advanceTimeout) {
         clearTimeout(advanceTimeout);
         advanceTimeout = null;
       }
+      window.speechSynthesis?.cancel();
       if (currentIndex < words.length - 1) {
         currentIndex += 1;
         renderItem();
@@ -759,20 +857,52 @@ function renderVocabularyPractice(categoryKey = 'food') {
       }
     };
 
+    previousBtn.addEventListener('click', () => {
+      if (currentIndex === 0) return;
+      currentIndex -= 1;
+      renderItem();
+    });
+
+    speakBtn.addEventListener('click', () => speakVocabularyWord(item.word));
+    noteBtn.addEventListener('click', () => noteDialog.showModal());
+    $('.vocabulary-note-close', noteDialog).addEventListener('click', () => noteDialog.close());
+    noteDialog.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && noteDialog.open) {
+        event.preventDefault();
+        noteDialog.close();
+      }
+    });
+    noteDialog.addEventListener('click', event => {
+      if (event.target === noteDialog) noteDialog.close();
+    });
+
+    input.addEventListener('input', () => {
+      if (responses.get(currentIndex)?.correct) return;
+      responses.delete(currentIndex);
+      feedback.className = 'vocabulary-feedback hidden';
+      input.classList.remove('wrong');
+    });
+
     checkBtn.addEventListener('click', () => {
       if (checkBtn.disabled) return;
       const value = isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
       const accepted = item.accepted.map(term => isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
       const correct = accepted.includes(value);
+      responses.set(currentIndex, { answer: input.value, correct });
       input.disabled = true;
       checkBtn.disabled = true;
       if (correct) {
-        correctCount += 1;
+        if (!correctlyAnswered.has(currentIndex)) {
+          correctlyAnswered.add(currentIndex);
+          correctCount += 1;
+        }
         playCorrectSound();
         feedback.className = 'vocabulary-feedback success';
         feedback.innerHTML = `<strong>✅ Correcto!</strong><span>La respuesta es <strong>${escapeHTML(item.word)}</strong>.</span>`;
         advanceTimeout = setTimeout(advance, 900);
       } else {
+        input.disabled = false;
+        checkBtn.disabled = false;
         input.classList.add('wrong');
         feedback.className = 'vocabulary-feedback error';
         feedback.innerHTML = `<strong>❌ No es esa.</strong><span>La respuesta correcta es <strong>${escapeHTML(item.word)}</strong>.</span>`;
@@ -799,6 +929,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
       </div>
     `;
     $('#shuffleVocabularyBtn').addEventListener('click', () => {
+      window.speechSynthesis?.cancel();
       if (isNumberPractice) collection = createNumberVocabulary();
       words = collection.map(item => ({ ...item, accepted: [item.word, ...(item.aliases || [])] }));
       for (let index = words.length - 1; index > 0; index -= 1) {
@@ -807,6 +938,8 @@ function renderVocabularyPractice(categoryKey = 'food') {
       }
       currentIndex = 0;
       correctCount = 0;
+      correctlyAnswered.clear();
+      responses.clear();
       renderItem();
     });
     wrap.appendChild(card);
