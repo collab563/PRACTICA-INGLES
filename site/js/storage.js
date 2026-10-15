@@ -83,6 +83,18 @@ const Storage = {
     Storage.save(state);
     return state;
   },
+  recordActivity(state, correct) {
+    state.totalAnswered += 1;
+    if (correct) {
+      state.totalCorrect += 1;
+      state.points += 10;
+    } else {
+      state.points = Math.max(0, state.points - 2);
+    }
+    Storage.updateStreak(state);
+    Storage.save(state);
+    return state;
+  },
   markCompleted(state, file, lesson) {
     if (!state.fileProgress[file]) state.fileProgress[file] = {};
     if (!state.fileProgress[file][lesson]) state.fileProgress[file][lesson] = { answered: 0, correct: 0, completed: false };

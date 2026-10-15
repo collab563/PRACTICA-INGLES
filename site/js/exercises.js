@@ -12,6 +12,18 @@ const Exercises = {
     }
     return this.normalize(user) === this.normalize(accepted);
   },
+  localizePrompt(prompt) {
+    const labels = {
+      'Forma la oración:': 'Build the sentence:',
+      'Forma la pregunta:': 'Build the question:',
+      'Forma una pregunta:': 'Build a question:',
+      'Forma una respuesta corta:': 'Build a short answer:',
+      'Ordena:': 'Put the words in order:',
+      'Ordena la fecha:': 'Put the date in order:',
+      'Empareja cada elemento con su traducción o equivalente:': 'Match each item with its equivalent:',
+    };
+    return labels[prompt] || prompt;
+  },
 
   // Render a single exercise
   render(ex, qIdx, container) {
@@ -20,13 +32,15 @@ const Exercises = {
     el.dataset.qidx = qIdx;
     const numEl = document.createElement('div');
     numEl.className = 'exercise-num';
-    numEl.textContent = `Pregunta ${qIdx + 1}`;
+    numEl.textContent = `Question ${qIdx + 1}`;
     el.appendChild(numEl);
 
     const promptEl = document.createElement('div');
     promptEl.className = 'exercise-prompt';
-    promptEl.innerHTML = ex.prompt;
-    el.appendChild(promptEl);
+    promptEl.innerHTML = this.localizePrompt(ex.prompt);
+    if (!['fill', 'comparative-sentence', 'comparative-form'].includes(ex.type)) {
+      el.appendChild(promptEl);
+    }
 
     if (ex.hint) {
       const hintEl = document.createElement('div');
@@ -45,8 +59,9 @@ const Exercises = {
     el.appendChild(body);
 
     if (ex.type === 'mc') body.appendChild(this.renderMC(ex, el, feedbackEl));
-    else if (ex.type === 'fill') body.appendChild(this.renderFill(ex, el, feedbackEl));
+    else if (ex.type === 'fill' || ex.type === 'comparative-sentence' || ex.type === 'comparative-form') body.appendChild(this.renderFill(ex, el, feedbackEl));
     else if (ex.type === 'reorder') body.appendChild(this.renderReorder(ex, el, feedbackEl));
+    else if (ex.type === 'conversation') body.appendChild(this.renderConversation(ex, el, feedbackEl));
     else if (ex.type === 'match') body.appendChild(this.renderMatch(ex, el, feedbackEl));
     else if (ex.type === 'tf') body.appendChild(this.renderTF(ex, el, feedbackEl));
 
@@ -121,7 +136,7 @@ const Exercises = {
     actions.className = 'exercise-actions';
     const checkBtn = document.createElement('button');
     checkBtn.className = 'btn';
-    checkBtn.textContent = 'Comprobar';
+    checkBtn.textContent = 'Check';
     checkBtn.type = 'button';
     checkBtn.addEventListener('click', () => {
       let allCorrect = true;
@@ -139,7 +154,7 @@ const Exercises = {
     });
     const revealBtn = document.createElement('button');
     revealBtn.className = 'btn btn-ghost';
-    revealBtn.textContent = 'Mostrar respuesta';
+    revealBtn.textContent = 'Show answer';
     revealBtn.type = 'button';
     revealBtn.addEventListener('click', () => {
       inputs.forEach((inp, i) => {
@@ -151,7 +166,7 @@ const Exercises = {
       checkBtn.disabled = true;
       revealBtn.disabled = true;
       const correctAnswerText = Array.isArray(ex.answer) ? ex.answer.join(', ') : ex.answer;
-      this.showFeedback(fbEl, false, ex.explanation || 'Esta era la respuesta correcta.', correctAnswerText);
+      this.showFeedback(fbEl, false, ex.explanation || 'This was the correct answer.', correctAnswerText);
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: false, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     });
     actions.appendChild(checkBtn);
@@ -200,7 +215,7 @@ const Exercises = {
     actions.className = 'exercise-actions';
     const checkBtn = document.createElement('button');
     checkBtn.className = 'btn';
-    checkBtn.textContent = 'Comprobar';
+    checkBtn.textContent = 'Check';
     checkBtn.type = 'button';
     checkBtn.addEventListener('click', () => {
       const got = Array.from(answer.querySelectorAll('.word-chip')).map(c => c.textContent.replace(' ✕', ''));
@@ -215,7 +230,7 @@ const Exercises = {
     });
     const resetBtn = document.createElement('button');
     resetBtn.className = 'btn btn-ghost';
-    resetBtn.textContent = 'Reiniciar';
+    resetBtn.textContent = 'Reset';
     resetBtn.type = 'button';
     resetBtn.addEventListener('click', () => {
       // Move all back
@@ -231,6 +246,96 @@ const Exercises = {
     actions.appendChild(resetBtn);
     wrap.appendChild(actions);
     return wrap;
+  },
+
+  // --- Complete questions in a conversation ---
+  renderConversation(ex, exEl, fbEl) {
+    const wrap = document.createElement('div');
+    wrap.className = 'conversation-exercise';
+    const inputs = [];
+    let answerIndex = 0;
+
+    ex.turns.forEach(turn => {
+      const row = document.createElement('div');
+      row.className = `conversation-turn${turn.answers?.length ? ' conversation-question' : ''}`;
+      const speaker = document.createElement('strong');
+      speaker.className = 'conversation-speaker';
+      speaker.textContent = `${turn.speaker}:`;
+      row.appendChild(speaker);
+
+      const text = document.createElement('span');
+      text.className = 'conversation-turn-content';
+      const parts = turn.text.split('___');
+      parts.forEach((part, index) => {
+        text.appendChild(document.createTextNode(part));
+        if (index < (turn.answers || []).length) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'fill-input conversation-input';
+          input.autocomplete = 'off';
+          input.spellcheck = false;
+          input.setAttribute('aria-label', `Missing word ${answerIndex + 1}`);
+          inputs.push(input);
+          answerIndex += 1;
+          text.appendChild(input);
+        }
+      });
+      row.appendChild(text);
+
+      wrap.appendChild(row);
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'exercise-actions';
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'btn';
+    checkBtn.textContent = 'Check';
+    checkBtn.type = 'button';
+    checkBtn.addEventListener('click', () => {
+      const answers = Array.isArray(ex.answer) ? ex.answer : [ex.answer];
+      let allCorrect = true;
+      inputs.forEach((input, index) => {
+        const correct = this.acceptVariants(input.value, answers[index]);
+        input.disabled = true;
+        input.classList.add(correct ? 'correct' : 'wrong');
+        if (!correct) allCorrect = false;
+      });
+      checkBtn.disabled = true;
+      revealBtn.disabled = true;
+      this.showFeedback(fbEl, allCorrect, ex.explanation, answers.map(answer => this.escapeHTML(answer)).join(' / '));
+      exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: allCorrect, qIdx: +exEl.dataset.qidx }, bubbles: true }));
+    });
+
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'btn btn-ghost';
+    revealBtn.textContent = 'Show answers';
+    revealBtn.type = 'button';
+    revealBtn.addEventListener('click', () => {
+      const answers = Array.isArray(ex.answer) ? ex.answer : [ex.answer];
+      inputs.forEach((input, index) => {
+        input.value = answers[index];
+        input.disabled = true;
+        input.classList.add('correct');
+      });
+      checkBtn.disabled = true;
+      revealBtn.disabled = true;
+      this.showFeedback(fbEl, false, ex.explanation, answers.map(answer => this.escapeHTML(answer)).join(' / '));
+      exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: false, qIdx: +exEl.dataset.qidx }, bubbles: true }));
+    });
+
+    actions.append(checkBtn, revealBtn);
+    wrap.appendChild(actions);
+    return wrap;
+  },
+
+  escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
   },
 
   // --- Match pairs ---
@@ -309,7 +414,7 @@ const Exercises = {
     actions.className = 'exercise-actions';
     const giveUpBtn = document.createElement('button');
     giveUpBtn.className = 'btn btn-ghost';
-    giveUpBtn.textContent = 'Mostrar respuestas';
+    giveUpBtn.textContent = 'Show answers';
     giveUpBtn.type = 'button';
     giveUpBtn.addEventListener('click', () => {
       if (locked) return;
@@ -336,11 +441,11 @@ const Exercises = {
     const tfTrue = document.createElement('button');
     tfTrue.className = 'tf-btn';
     tfTrue.type = 'button';
-    tfTrue.textContent = '✓ True (Verdadero)';
+    tfTrue.textContent = '✓ True';
     const tfFalse = document.createElement('button');
     tfFalse.className = 'tf-btn';
     tfFalse.type = 'button';
-    tfFalse.textContent = '✗ False (Falso)';
+    tfFalse.textContent = '✗ False';
     const onClick = (val) => {
       if (locked) return;
       if (selected !== null) return;
@@ -354,7 +459,7 @@ const Exercises = {
         (ex.answer ? tfTrue : tfFalse).classList.add('correct');
       }
       locked = true;
-      this.showFeedback(fbEl, correct, ex.explanation, ex.answer ? 'Verdadero' : 'Falso');
+      this.showFeedback(fbEl, correct, ex.explanation, ex.answer ? 'True' : 'False');
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     };
     tfTrue.addEventListener('click', () => onClick(true));
@@ -369,8 +474,8 @@ const Exercises = {
     fbEl.classList.remove('hidden', 'correct', 'wrong');
     fbEl.classList.add(correct ? 'correct' : 'wrong');
     let html = `<span class="ico">${correct ? '✅' : '❌'}</span><div class="msg">`;
-    html += `<strong>${correct ? '¡Correcto! ¡Bien hecho!' : 'No del todo.'}</strong>`;
-    if (!correct && answerText) html += `<div>Respuesta correcta: <strong>${answerText}</strong></div>`;
+    html += `<strong>${correct ? 'Correct! Well done!' : 'Not quite.'}</strong>`;
+    if (!correct && answerText) html += `<div>Correct answer: <strong>${answerText}</strong></div>`;
     if (explanation) html += `<div style="margin-top:0.4rem; color: var(--text-muted);">${explanation}</div>`;
     html += '</div>';
     fbEl.innerHTML = html;

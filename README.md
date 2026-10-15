@@ -1,15 +1,15 @@
 # 📚 English Practice — Cuestionarios interactivos de inglés
 
-Sitio web de práctica de inglés basado en el contenido de **English File Elementary 4th Edition**. Permite practicar con cuestionarios interactivos de opción múltiple, rellenar huecos, ordenar palabras, emparejar y verdadero/falso.
+Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicios interactivos, práctica de lectura y escritura, vocabulario y traducción.
 
-> ⚠️ **Aviso legal**: Este proyecto está inspirado en el contenido del libro *English File Elementary 4th Edition* (Christina Latham-Koenig, Clive Oxenden, Jerry Lambert, Paul Seligson) — publicado por Oxford University Press. **No se reproduce ningún material con derechos de autor**: ni imágenes, ni texto literal del libro, ni archivos de audio. Todas las preguntas han sido creadas de forma original siguiendo los temas gramaticales y de vocabulario del currículo público de A1/A2.
+> ⚠️ **Aviso**: *English File Elementary 4th Edition* se cita únicamente como referencia de temas y nivel. Este proyecto no está afiliado, patrocinado ni aprobado por Oxford University Press. Esta nota no verifica los derechos de cada recurso: antes de redistribuirlo, confirma que cada pregunta, explicación, lectura y archivo multimedia sea original o tenga permiso/licencia suficiente.
 
 ---
 
 ## ✨ Características
 
 - **10 niveles (Files)** × **3 lecciones** = 30 lecciones
-- **~460 preguntas** en 5 formatos diferentes:
+- **~460 preguntas en los 10 Files** en 5 formatos básicos; Grammar Practice también incluye ejercicios de conversación y comparativos:
   - 📝 Opción múltiple
   - ✍️ Rellenar huecos
   - 🔀 Ordenar palabras
@@ -22,11 +22,24 @@ Sitio web de práctica de inglés basado en el contenido de **English File Eleme
 - **Modo práctica libre** y **Modo examen** con temporizador en vivo, iniciado al pulsar «Iniciar examen»
 - **Teoría de gramática** con 12 temas y 36 subtemas, explicaciones originales en español y ejemplos propios; cada tema se puede leer en una tarjeta desplazable o ampliar a pantalla completa desde la navegación principal
 - **Traductores inglés ↔ español online y offline**: el panel flotante permite elegir entre el glosario local, que no envía texto a internet, o el servicio público de Apertium por HTTPS, que requiere conexión y recibe el texto para traducirlo. No envíes información confidencial; la disponibilidad y la calidad pueden variar. El traductor offline sigue disponible como alternativa. El glosario conserva palabras desconocidas y ofrece traducciones aproximadas, sin análisis gramatical completo.
+- **Práctica de lectura**: 10 lecturas en cada uno de tres niveles, con preguntas de comprensión y actividades de emparejar.
+- **Práctica de escritura**: tres niveles con 10 oraciones cada uno para traducir del español al inglés.
+- **Evaluador de escritura con IA**: ofrece comentarios sobre gramática, ortografía, redundancia y orden de palabras mediante Google Gemini. También permite usar Gemini para traducir desde el traductor.
+- **Vocabulario de comida y números**, con pronunciación mediante las voces disponibles en el navegador.
+- **Créditos de imágenes**: las fotos locales y sus fuentes/licencias verificables están documentadas en [`site/IMAGE-CREDITS.md`](site/IMAGE-CREDITS.md); la aplicación muestra los créditos junto a cada foto.
 - **Estadísticas detalladas** con gráficos
 - **Modo oscuro** 🌙
 - **Diseño responsive** (móvil, tablet, PC)
 - **Uso sin conexión tras la primera visita online**: el navegador guarda los archivos de la aplicación mediante un service worker. Abre y deja cargar el sitio con internet una vez; luego podrá abrirse offline en ese mismo navegador. Las traducciones online siguen necesitando conexión.
-- **Sin dependencias instalables**: HTML + CSS + JS puro; el modo online del traductor es opcional y requiere internet
+- **Sin dependencias instalables para el sitio**: HTML + CSS + JavaScript. Los servicios online son opcionales y requieren conexión.
+
+### Privacidad y uso de servicios externos
+
+- El progreso de ejercicios se guarda en el almacenamiento local del navegador (`localStorage`); no hace falta crear una cuenta para usar el sitio.
+- El traductor offline procesa el texto en el navegador. Si eliges Apertium, el texto se envía por HTTPS a ese servicio para traducirlo.
+- El evaluador de escritura y la traducción con Gemini envían el texto que escribas a Google Gemini. Para usarlos, debes proporcionar tu propia clave de API. La clave se mantiene en memoria durante la sesión de la página y la aplicación no la guarda en `localStorage`; las estadísticas de uso de tokens se guardan en `sessionStorage`.
+- La aplicación no guarda automáticamente el texto enviado ni las respuestas de IA en el almacenamiento del navegador. El tratamiento que hagan Google o Apertium está sujeto a sus propias condiciones y políticas.
+- No introduzcas información personal, confidencial ni claves de API en textos que envíes a servicios online. No publiques tu clave en el repositorio, capturas de pantalla o enlaces.
 
 ---
 
@@ -79,8 +92,9 @@ git push
 
 ### Requisitos
 
-- Python 3.6+ (opcional, para `build.py`)
-- Node.js 14+ (opcional, para validación con `validate.js`)
+- Python 3.6+ para los comandos de `build.py`
+- Node.js 14+ para validar y obtener estadísticas (`build.py validate`, `build.py stats` y `site/validate.js`)
+- No se requieren dependencias de npm para ejecutar el sitio
 
 ### Servir localmente
 
@@ -97,7 +111,9 @@ npx http-server site
 
 Abre `http://localhost:8000` en tu navegador.
 
-El modo offline funciona sin conexión una vez que los archivos del sitio están disponibles localmente. Su glosario está en `site/js/translator.js`; la calidad depende de las frases y palabras incluidas. El modo online usa la API pública de [Apertium](https://apertium.org/apy/), un proyecto de traducción automática de código abierto. La página envía el texto por HTTPS al servicio para traducirlo; no incluyas información confidencial. El endpoint público puede tener límites o interrupciones y la calidad varía según la traducción.
+El modo offline funciona sin conexión una vez que los archivos del sitio están disponibles localmente. Su glosario está en `site/js/translator.js`; la calidad depende de las frases y palabras incluidas. El modo online de Apertium envía el texto por HTTPS al servicio; no incluyas información confidencial. El endpoint público puede tener límites o interrupciones y la calidad varía según la traducción.
+
+El evaluador de escritura y el traductor con Gemini usan una clave de API que proporciona cada usuario. La clave solo se mantiene en memoria durante la sesión de la página; no se incluye en el código ni se persiste en el almacenamiento local. El texto enviado se transmite a Google Gemini. Revisa las condiciones y políticas del proveedor antes de usarlo y no envíes información personal o confidencial.
 
 Al abrir el sitio publicado con conexión, un service worker guarda la aplicación en el navegador. Espera a que termine la carga antes de desconectarte; luego vuelve a abrir la misma dirección en el mismo navegador para usar ejercicios, teoría, progreso y traducción local sin conexión. El traductor online requiere internet. Los datos de progreso permanecen en el almacenamiento local del navegador.
 
@@ -112,7 +128,7 @@ node site/validate.js        # validación detallada de cada pregunta
 ### Empaquetar para distribuir
 
 ```bash
-python3 build.py package     # crea english-practice.zip
+python3 build.py package     # crea english-practice-deploy.zip y english-practice-source.zip
 ```
 
 ---
@@ -163,19 +179,27 @@ O usa `python3 build.py add-file` para ver la plantilla.
 ├── build.py              ← Script Python: validar / servir / empaquetar
 ├── site/
 │   ├── index.html        ← Página principal
+│   ├── IMAGE-CREDITS.md  ← Fuentes y licencias de las imágenes
 │   ├── css/
-│   │   └── styles.css    ← Estilos
+│   │   ├── styles.css    ← Estilos principales
+│   │   └── writing-evaluator.css
 │   ├── js/
 │   │   ├── app.js        ← Lógica principal + vistas
 │   │   ├── exercises.js  ← Renderizado y calificación de ejercicios
 │   │   ├── router.js     ← Router hash-based
 │   │   ├── storage.js    ← localStorage: progreso, racha, puntos
-│   │   └── translator.js ← Glosario inglés-español sin conexión
+│   │   ├── translator.js ← Glosario offline y servicios de traducción
+│   │   ├── reading-practice.js
+│   │   ├── writing-practice.js
+│   │   ├── writing-evaluator.js ← Evaluación y traducción con Gemini
+│   │   └── register-service-worker.js
 │   ├── data/
-│   │   ├── files.js      ← 459 preguntas en 30 lecciones
-│   │   └── theory.js     ← 12 temas de teoría gramatical original
+│   │   ├── files.js      ← Preguntas de 10 niveles y 30 lecciones
+│   │   ├── theory.js     ← 12 temas de teoría gramatical
+│   │   ├── reading.js    ← Lecturas y preguntas de comprensión
+│   │   ├── reading-extensions.js
+│   │   └── writing.js    ← Oraciones para practicar traducción
 │   └── validate.js       ← Validador Node.js
-├── english-practice.zip  ← Paquete listo para distribuir
 └── README.md             ← Este archivo
 ```
 
@@ -200,18 +224,18 @@ O usa `python3 build.py add-file` para ver la plantilla.
 
 ## 📜 Licencia
 
-El código de este proyecto es **MIT** — úsalo, modif́icalo, distribúyelo libremente.
+Este repositorio no incluye actualmente un archivo `LICENSE`. Por tanto, no se debe asumir que el código está publicado bajo MIT ni que se concede permiso para reutilizarlo; añade una licencia explícita si quieres autorizar su uso, modificación o distribución.
 
-El **contenido** (las preguntas) son obra original del autor de este repo, inspiradas en el currículo público de A1/A2, no en material con copyright del libro.
+El contenido está organizado para practicar temas de nivel A1/A2 y no es material oficial del libro citado. Su originalidad y su posible similitud con materiales de terceros no se han verificado de forma independiente; comprueba las fuentes y los permisos antes de redistribuirlo.
 
 ---
 
 ## 🙏 Créditos
 
-- **Libro de referencia**: English File Elementary 4th Edition — Latham-Koenig, Oxenden, Lambert, Seligson (OUP). No se reproduce contenido con copyright.
+- **Referencia curricular**: *English File Elementary 4th Edition*, de Oxford University Press.
 - **Iconos**: Emoji unicode.
-- **Inspirado en**: la necesidad de practicar sin gastar libros ni conexión.
+- Proyecto educativo independiente; no está afiliado ni aprobado por Oxford University Press.
 
 ---
 
-¿Errores o sugerencias? Abre un issue o edita el código — es todo tuyo 💪
+¿Errores o sugerencias? Abre un issue o contribuye con una propuesta. La ausencia de una licencia significa que no se concede permiso general para reutilizar el código.

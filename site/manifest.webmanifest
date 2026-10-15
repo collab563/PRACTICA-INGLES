@@ -1,8 +1,8 @@
 {
   "name": "English Practice",
   "short_name": "English Practice",
-  "description": "Practica inglés con ejercicios, teoría y seguimiento de progreso.",
-  "lang": "es",
+  "description": "Practice English with exercises, grammar, and progress tracking.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

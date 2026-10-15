@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Practica inglés con cuestionarios interactivos basados en English File Elementary 4th Edition" />
-  <title>English Practice — Cuestionarios de Inglés</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://thumb.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://apertium.org; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="description" content="Practise English with independent interactive grammar, vocabulary, reading, and writing activities." />
+  <title>English Practice — Interactive English Quizzes</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/writing-evaluator.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E" />
 </head>
 <body>
@@ -18,24 +20,24 @@
         <span class="brand-text">English Practice</span>
       </a>
       <nav class="main-nav">
-        <a href="#home" data-route="home" class="nav-link active">Inicio</a>
-        <a href="#theory" data-route="theory" class="nav-link">Teoría</a>
-        <a href="#practice" data-route="practice" class="nav-link">Practicar</a>
-        <a href="#translate" data-route="translate" class="nav-link" aria-controls="translatorOverlayRoot" aria-expanded="false">Traducir</a>
-        <a href="#review" data-route="review" class="nav-link">Repaso</a>
-        <a href="#stats" data-route="stats" class="nav-link">Progreso</a>
+        <a href="#home" data-route="home" class="nav-link active">Home</a>
+        <a href="#theory" data-route="theory" class="nav-link">Theory</a>
+        <a href="#practice" data-route="practice" class="nav-link">Practice</a>
+        <a href="#translate" data-route="translate" class="nav-link" aria-controls="translatorOverlayRoot" aria-expanded="false">Translate</a>
+        <a href="#review" data-route="review" class="nav-link">Review</a>
+        <a href="#stats" data-route="stats" class="nav-link">Progress</a>
       </nav>
       <div class="header-stats">
-        <div class="streak-badge" title="Racha de días">
+        <div class="streak-badge" title="Daily streak">
           <span class="streak-icon">🔥</span>
           <span class="streak-num" id="streakNum">0</span>
         </div>
-        <div class="points-badge" title="Puntos">
+        <div class="points-badge" title="Points">
           <span class="points-icon">⭐</span>
           <span class="points-num" id="pointsNum">0</span>
         </div>
-        <button id="soundToggle" class="theme-toggle sound-toggle" type="button" aria-label="Silenciar sonidos" aria-pressed="true" title="Sonidos activados">🔊</button>
-        <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button>
+        <button id="soundToggle" class="theme-toggle sound-toggle" type="button" aria-label="Mute sounds" aria-pressed="true" title="Sounds on">🔊</button>
+        <button id="themeToggle" class="theme-toggle" aria-label="Change theme">🌙</button>
       </div>
     </div>
   </header>
@@ -47,7 +49,7 @@
   <!-- FOOTER -->
   <footer class="app-footer">
     <div class="container">
-      <p>Hecho con ❤️ para practicar inglés · Basado en el contenido de <em>English File Elementary 4th Edition</em></p>
+      <p>Independent English practice · Not affiliated with Oxford University Press · <a href="IMAGE-CREDITS.md">Image credits and licenses</a></p>
     </div>
   </footer>
 
@@ -57,20 +59,17 @@
   <!-- Scripts -->
   <script src="data/files.js"></script>
   <script src="data/theory.js"></script>
+  <script src="data/reading.js"></script>
+  <script src="data/reading-extensions.js"></script>
+  <script src="data/writing.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/router.js"></script>
   <script src="js/exercises.js"></script>
   <script src="js/translator.js"></script>
   <script src="js/app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(() => navigator.serviceWorker.ready)
-          .then(() => console.info('English Practice está listo para usarse sin conexión.'))
-          .catch(error => console.error('No se pudo preparar el modo sin conexión.', error));
-      });
-    }
-  </script>
+  <script src="js/reading-practice.js"></script>
+  <script src="js/writing-practice.js"></script>
+  <script src="js/writing-evaluator.js"></script>
+  <script src="js/register-service-worker.js"></script>
 </body>
 </html>
