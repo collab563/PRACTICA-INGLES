@@ -2,7 +2,7 @@
 
 Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicios interactivos, práctica de lectura y escritura, vocabulario y traducción.
 
-> ⚠️ **Aviso**: *English File Elementary 4th Edition* se cita únicamente como referencia de temas y nivel. Este proyecto no está afiliado, patrocinado ni aprobado por Oxford University Press. Esta nota no verifica los derechos de cada recurso: antes de redistribuirlo, confirma que cada pregunta, explicación, lectura y archivo multimedia sea original o tenga permiso/licencia suficiente.
+> **Fuentes y contenido**: *English File Elementary 4th Edition* se utiliza como referencia de nivel y temas. Los conceptos gramaticales, los temas generales y el vocabulario común no implican por sí solos que se haya copiado una obra. No se ha hecho una comparación exhaustiva de los textos concretos del proyecto con sus fuentes; si se identifica una reproducción o adaptación cercana de ejercicios, lecturas o explicaciones, verifica los permisos antes de redistribuirla. Este proyecto no está afiliado, patrocinado ni aprobado por Oxford University Press.
 
 ---
 
@@ -20,7 +20,7 @@ Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicio
 - **Sonido de acierto** generado localmente por el navegador; se puede activar o silenciar desde el botón 🔊
 - **Repaso de errores** automático
 - **Modo práctica libre** y **Modo examen** con temporizador en vivo, iniciado al pulsar «Iniciar examen»
-- **Teoría de gramática** con 12 temas y 36 subtemas, explicaciones originales en español y ejemplos propios; cada tema se puede leer en una tarjeta desplazable o ampliar a pantalla completa desde la navegación principal
+- **Teoría de gramática** con 12 temas y 36 subtemas; cada tema se puede leer en una tarjeta desplazable o ampliar a pantalla completa desde la navegación principal
 - **Traductores inglés ↔ español online y offline**: el panel flotante permite elegir entre el glosario local, que no envía texto a internet, o el servicio público de Apertium por HTTPS, que requiere conexión y recibe el texto para traducirlo. No envíes información confidencial; la disponibilidad y la calidad pueden variar. El traductor offline sigue disponible como alternativa. El glosario conserva palabras desconocidas y ofrece traducciones aproximadas, sin análisis gramatical completo.
 - **Práctica de lectura**: 10 lecturas en cada uno de tres niveles, con preguntas de comprensión y actividades de emparejar.
 - **Práctica de escritura**: tres niveles con 10 oraciones cada uno para traducir del español al inglés.

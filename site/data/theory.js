@@ -124,9 +124,9 @@ const GrammarTheory = [
         ],
         formula: 'Affirmative: subject + verb (he/she/it + -s) · Negative: subject + don’t/doesn’t + base verb',
         examples: [
-          ['My brother fixes bicycles.', 'Mi hermano repara bicicletas.'],
-          ['I don’t eat meat.', 'No como carne.'],
-          ['Tara doesn’t live nearby.', 'Tara no vive cerca.'],
+          ['Our neighbours clean their garden every Saturday.', 'Nuestros vecinos limpian su jardín todos los sábados.'],
+          ['We don’t watch television during dinner.', 'No vemos televisión durante la cena.'],
+          ['Nadia doesn’t carry cash.', 'Nadia no lleva efectivo.'],
         ],
       },
       {
@@ -141,9 +141,9 @@ const GrammarTheory = [
         ],
         formula: 'Do/Does + subject + base verb? · Answer: Yes/No + subject + do/does (not)',
         examples: [
-          ['Do your friends play volleyball?', '¿Tus amigos juegan voleibol?'],
-          ['Does Eli speak Italian? No, he doesn’t.', '¿Eli habla italiano? No.'],
-          ['What does this button do?', '¿Qué hace este botón?'],
+          ['Do the cooks prepare lunch at noon?', '¿Los cocineros preparan el almuerzo al mediodía?'],
+          ['Does Mr Lee teach music online?', '¿El señor Lee enseña música por internet?'],
+          ['Where do your sisters study?', '¿Dónde estudian tus hermanas?'],
         ],
       },
       {
@@ -158,9 +158,9 @@ const GrammarTheory = [
         ],
         formula: 'Question with an auxiliary: question word + auxiliary + subject + base verb?',
         examples: [
-          ['Where are your parents?', '¿Dónde están tus padres?'],
-          ['What time do the shops close?', '¿A qué hora cierran las tiendas?'],
-          ['Who teaches your class?', '¿Quién enseña a tu clase?'],
+          ['When does the swimming pool open?', '¿Cuándo abre la piscina?'],
+          ['How much is this notebook?', '¿Cuánto cuesta este cuaderno?'],
+          ['Who teaches the evening class?', '¿Quién enseña la clase de la tarde?'],
         ],
       },
     ],
@@ -460,9 +460,9 @@ const GrammarTheory = [
         ],
         formula: 'a/an + singular countable noun · some/any + plural countable or uncountable noun',
         examples: [
-          ['There’s an egg and some rice.', 'Hay un huevo y algo de arroz.'],
-          ['Would you like some tea?', '¿Te gustaría un poco de té?'],
-          ['We need two bottles of water.', 'Necesitamos dos botellas de agua.'],
+          ['There is an avocado on the counter.', 'Hay un aguacate sobre la encimera.'],
+          ['Could I have some peaches, please?', '¿Me darías unos duraznos, por favor?'],
+          ['We need a little butter for the cake.', 'Necesitamos un poco de mantequilla para el pastel.'],
         ],
       },
       {
@@ -478,9 +478,9 @@ const GrammarTheory = [
         ],
         formula: 'How many + plural countable noun? · How much + uncountable noun?',
         examples: [
-          ['How many emails did you get?', '¿Cuántos correos recibiste?'],
-          ['There’s a little milk left.', 'Queda un poco de leche.'],
-          ['We don’t have many chairs.', 'No tenemos muchas sillas.'],
+          ['How many windows does the house have?', '¿Cuántas ventanas tiene la casa?'],
+          ['There is a little time before the show.', 'Queda un poco de tiempo antes del espectáculo.'],
+          ['We don’t have many notebooks.', 'No tenemos muchos cuadernos.'],
         ],
       },
       {
@@ -495,9 +495,9 @@ const GrammarTheory = [
         ],
         formula: 'short adjective + -er + than · more + long adjective + than',
         examples: [
-          ['This route is safer than the highway.', 'Esta ruta es más segura que la autopista.'],
-          ['The blue sofa is more comfortable than the old one.', 'El sofá azul es más cómodo que el antiguo.'],
-          ['Today’s weather is better than yesterday’s.', 'El clima de hoy es mejor que el de ayer.'],
+          ['The village is quieter than the nearby city.', 'El pueblo es más tranquilo que la ciudad cercana.'],
+          ['This puzzle is more difficult than the last one.', 'Este rompecabezas es más difícil que el anterior.'],
+          ['The blue suitcase is lighter than the black one.', 'La maleta azul es más liviana que la negra.'],
         ],
       },
     ],

@@ -224,7 +224,7 @@ def cmd_package():
                 continue
             if f.suffix in EXCLUDE_EXT:
                 continue
-            if f.name.startswith('.'):
+            if f.name.startswith('.') and f.name != '.gitignore':
                 continue
             zf.write(f, rel)
 
