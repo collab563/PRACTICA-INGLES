@@ -1859,6 +1859,21 @@ reading number|número de lectura
     }
   });
 
+  // Add the site's vocabulary list to the offline translator without replacing
+  // translations that are already part of its hand-curated dictionary.
+  const vocabularyWords = Array.isArray(globalThis.VocabularyWords) ? globalThis.VocabularyWords : [];
+  vocabularyWords.forEach(pair => {
+    if (typeof pair.en !== 'string' || typeof pair.es !== 'string') return;
+    const english = pair.en.trim().toLocaleLowerCase('en');
+    const spanish = pair.es.trim();
+    if (!english || !spanish) return;
+    if (!(english in enToEs)) enToEs[english] = spanish;
+    spanish.split(/\s*\/\s*/).forEach(meaning => {
+      const key = meaning.trim().toLocaleLowerCase('es');
+      if (key && !(key in esToEn)) esToEn[key] = english;
+    });
+  });
+
   verbForms.forEach(({ base, past, pastTranslation, futureTranslation }) => {
     const futureForm = `will ${base}`;
     const pastPhrase = `i ${past}`;

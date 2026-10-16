@@ -1,7 +1,8 @@
-const CACHE_NAME = 'english-practice-v36';
+const CACHE_NAME = 'english-practice-v39';
 const APP_SHELL = [
   './',
   './index.html',
+  './vocabulary_words.md',
   './manifest.webmanifest',
   './icons/app-icon.svg',
   './images/vocabulary/cereal.jpg',

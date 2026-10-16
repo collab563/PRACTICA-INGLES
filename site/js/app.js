@@ -1182,6 +1182,10 @@ function attachTheoryInteractions(view) {
 }
 
 function renderVocabularyPractice(categoryKey = 'food') {
+  if (categoryKey === 'translation' || categoryKey.startsWith('translation-')) {
+    renderTranslationPractice(categoryKey);
+    return;
+  }
   const view = $('#mainView');
   const isNumberPractice = categoryKey === 'numbers';
   let collection = isNumberPractice ? createNumberVocabulary() : FILE_10_VOCABULARY.food;
@@ -1414,6 +1418,95 @@ function renderVocabularyPractice(categoryKey = 'food') {
   renderItem();
 }
 
+function renderTranslationPractice(categoryKey = 'translation') {
+  const view = $('#mainView');
+  const direction = categoryKey === 'translation-en-es' ? 'en-es' : categoryKey === 'translation-es-en' ? 'es-en' : '';
+  if (!direction) {
+    view.innerHTML = `
+      <a href="#practice/vocabulary" class="back-link">← Back to Vocabulary</a>
+      <div class="lesson-header"><span class="file-num">Vocabulary practice</span><h1>Practice Translation</h1><p class="topics">Choose a translation direction.</p></div>
+      <div class="vocabulary-menu vocabulary-menu-expanded">
+        <button class="vocabulary-card" data-direction="en-es" type="button"><span class="vocabulary-emoji">🇬🇧 → 🇪🇸</span><span>English to Spanish</span></button>
+        <button class="vocabulary-card" data-direction="es-en" type="button"><span class="vocabulary-emoji">🇪🇸 → 🇬🇧</span><span>Spanish to English</span></button>
+      </div>`;
+    $$('.vocabulary-card', view).forEach(button => button.addEventListener('click', () => Router.navigate(`vocabulary/translation-${button.dataset.direction}`)));
+    return;
+  }
+
+  const suppliedPairs = Array.isArray(globalThis.VocabularyWords) ? globalThis.VocabularyWords : [];
+  const foodPairs = FILE_10_VOCABULARY.food.map(item => ({ en: item.word, es: item.translation }));
+  let pairs = [...foodPairs, ...suppliedPairs.filter(pair => pair && typeof pair.en === 'string' && typeof pair.es === 'string')];
+  const previousFirstWordKey = `translation-first-word-${direction}`;
+  const shufflePairs = () => {
+    for (let i = pairs.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+    }
+    const previousFirstWord = sessionStorage.getItem(previousFirstWordKey);
+    if (pairs.length > 1 && pairs[0].en === previousFirstWord) {
+      [pairs[0], pairs[1]] = [pairs[1], pairs[0]];
+    }
+    sessionStorage.setItem(previousFirstWordKey, pairs[0].en);
+  };
+  shufflePairs();
+  let index = 0;
+  let timeout;
+  const render = (success = false) => {
+    if (timeout) clearTimeout(timeout);
+    const pair = pairs[index];
+    const prompt = direction === 'en-es' ? pair.en : pair.es;
+    const answers = (direction === 'en-es' ? pair.es : pair.en).split(/\s*\/\s*/).map(value => value.toLowerCase().trim());
+    view.innerHTML = `
+      <a href="#practice/vocabulary" class="back-link">← Back to Vocabulary</a>
+      <div class="lesson-header"><span class="file-num">Vocabulary · Practice Translation</span><h1>${direction === 'en-es' ? 'English to Spanish' : 'Spanish to English'}</h1>
+      <p class="topics">Word ${index + 1} of ${pairs.length}</p>
+      <button class="btn btn-secondary" id="shuffleTranslationWords" type="button">🔀 Shuffle words</button>
+      <div class="vocabulary-progress-track"><span style="width:${((index + 1) / pairs.length) * 100}%"></span></div></div>
+      <section class="translation-practice ${success ? 'translation-success' : ''}" aria-live="polite">
+        <p class="translation-prompt">${escapeHTML(prompt)}</p>
+        <label for="translationAnswer">${direction === 'en-es' ? 'Write the Spanish translation' : 'Write the English translation'}</label>
+        <input id="translationAnswer" class="vocabulary-input" type="text" autocomplete="off" autofocus>
+        <div class="exercise-actions">
+          <button class="btn btn-secondary" id="showTranslationAnswer" type="button">Show answer</button>
+          <button class="btn btn-secondary" id="nextTranslationWord" type="button">Next question →</button>
+        </div>
+        <p class="translation-feedback" role="status">${success ? '✓ Correct!' : ''}</p>
+      </section>`;
+    const input = $('#translationAnswer', view);
+    $('#shuffleTranslationWords', view).addEventListener('click', () => {
+      shufflePairs();
+      index = 0;
+      render();
+    });
+    $('#nextTranslationWord', view).addEventListener('click', () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = null;
+      index = (index + 1) % pairs.length;
+      render();
+    });
+    $('#showTranslationAnswer', view).addEventListener('click', () => {
+      $('.translation-feedback', view).textContent = `Answer: ${answers.join(' / ')}`;
+    });
+    input.focus();
+    const check = () => {
+      if (!answers.includes(input.value.toLowerCase().trim())) {
+        $('.translation-feedback', view).textContent = 'Not quite. Try again.';
+        input.classList.add('wrong');
+        return;
+      }
+      $('.translation-feedback', view).textContent = '✓ Correct!';
+      $('.translation-practice', view).classList.add('translation-success');
+      timeout = setTimeout(() => { index = (index + 1) % pairs.length; render(); }, 350);
+    };
+    input.addEventListener('input', () => {
+      if (answers.includes(input.value.toLowerCase().trim())) check();
+      else { input.classList.remove('wrong'); $('.translation-feedback', view).textContent = ''; }
+    });
+    input.addEventListener('keydown', event => { if (event.key === 'Enter') check(); });
+  };
+  render();
+}
+
 // --- FILE (LESSON LIST) ---
 function renderFile(params) {
   const fileId = params[0];
@@ -1571,6 +1664,10 @@ function renderPractice(params) {
         <button class="vocabulary-card" data-vocabulary="numbers" type="button">
           <span class="vocabulary-emoji">🔢</span>
           <span>Numbers</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="translation" type="button">
+          <span class="vocabulary-emoji">🔤</span>
+          <span>Practice Translation</span>
         </button>
       </div>
     `;
