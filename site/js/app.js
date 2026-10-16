@@ -1455,7 +1455,9 @@ function renderTranslationPractice(categoryKey = 'translation') {
     if (timeout) clearTimeout(timeout);
     const pair = pairs[index];
     const prompt = direction === 'en-es' ? pair.en : pair.es;
-    const answers = (direction === 'en-es' ? pair.es : pair.en).split(/\s*\/\s*/).map(value => value.toLowerCase().trim());
+    const answers = (direction === 'en-es' ? pair.es : pair.en).split(/\s*\/\s*/).map(value => value.trim());
+    const normalizeAnswer = value => value.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const normalizedAnswers = answers.map(normalizeAnswer);
     view.innerHTML = `
       <a href="#practice/vocabulary" class="back-link">← Back to Vocabulary</a>
       <div class="lesson-header"><span class="file-num">Vocabulary · Practice Translation</span><h1>${direction === 'en-es' ? 'English to Spanish' : 'Spanish to English'}</h1>
@@ -1489,7 +1491,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
     });
     input.focus();
     const check = () => {
-      if (!answers.includes(input.value.toLowerCase().trim())) {
+      if (!normalizedAnswers.includes(normalizeAnswer(input.value))) {
         $('.translation-feedback', view).textContent = 'Not quite. Try again.';
         input.classList.add('wrong');
         return;
@@ -1499,7 +1501,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
       timeout = setTimeout(() => { index = (index + 1) % pairs.length; render(); }, 350);
     };
     input.addEventListener('input', () => {
-      if (answers.includes(input.value.toLowerCase().trim())) check();
+      if (normalizedAnswers.includes(normalizeAnswer(input.value))) check();
       else { input.classList.remove('wrong'); $('.translation-feedback', view).textContent = ''; }
     });
     input.addEventListener('keydown', event => { if (event.key === 'Enter') check(); });
