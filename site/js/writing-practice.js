@@ -112,6 +112,7 @@ function renderWritingPractice(params = []) {
         <p class="writing-prompt" lang="es">${escapeHTML(prompt)}</p>
         <label class="writing-answer-label" for="writingAnswer">Your translation</label>
         <textarea id="writingAnswer" class="writing-answer-input" rows="3" placeholder="Write your English translation here..." autocomplete="off" spellcheck="true"></textarea>
+        <div id="writingPhoneticControl"></div>
         <div id="writingFeedback" class="writing-feedback hidden" role="status" aria-live="polite"></div>
         <div class="writing-actions">
           <button class="btn" id="checkWritingAnswer" type="button">Check answer</button>
@@ -122,6 +123,8 @@ function renderWritingPractice(params = []) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     const answerInput = $('#writingAnswer');
+    $('#writingPhoneticControl').appendChild(createPhoneticControl(() => answerInput.value, { watchInput: answerInput }));
+    focusAnswerFieldOnDesktop(answerInput);
     const feedback = $('#writingFeedback');
     const checkButton = $('#checkWritingAnswer');
     checkButton.addEventListener('click', () => {

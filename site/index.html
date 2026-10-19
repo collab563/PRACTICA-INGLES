@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://thumb.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://apertium.org; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://images.unsplash.com https://thumb.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://apertium.org; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <meta name="description" content="Practise English with independent interactive grammar, vocabulary, reading, and writing activities." />
   <title>English Practice — Interactive English Quizzes</title>
   <link rel="manifest" href="manifest.webmanifest" />
@@ -62,10 +62,15 @@
   <script src="data/reading.js"></script>
   <script src="data/reading-extensions.js"></script>
   <script src="data/writing.js"></script>
+  <script src="data/phonetics.js"></script>
+  <script src="data/vocabulary-extra.js"></script>
+  <script src="data/vocabulary-translation-sets.js"></script>
+  <script src="data/food-dishes.js"></script>
   <script src="vocabulary_words.md" type="text/javascript"></script>
   <script src="js/storage.js"></script>
   <script src="js/router.js"></script>
   <script src="js/exercises.js"></script>
+  <script src="js/phonetic-transcription.js"></script>
   <script src="js/translator.js"></script>
   <script src="js/app.js"></script>
   <script src="js/reading-practice.js"></script>

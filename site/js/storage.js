@@ -10,7 +10,7 @@ const defaultState = {
   totalAnswered: 0,
   totalCorrect: 0,
   fileProgress: {}, // { '1': { 'A': { answered: 0, correct: 0, completed: false } } }
-  wrongQuestions: [], // [{ file, lesson, section, qIndex, ts }]
+  wrongQuestions: [], // [{ file, lesson, section, qIdx, ts }]
   examHistory: [],   // [{ date, score, total, mode, fileIds }]
   theme: 'light',
   soundEnabled: true,
@@ -71,14 +71,49 @@ const Storage = {
     if (correct) state.totalCorrect++;
     // Track wrong questions for review
     if (!correct) {
-      const existing = state.wrongQuestions.find(w => w.file === file && w.lesson === lesson && w.section === section && w.qIndex === qIndex);
+      const existing = state.wrongQuestions.find(w =>
+        w.file === file && w.lesson === lesson && w.section === section &&
+        (Number.isInteger(w.qIdx) ? w.qIdx : w.qIndex) === qIndex
+      );
       if (!existing) {
-        state.wrongQuestions.push({ file, lesson, section, qIndex, ts: Date.now() });
+        state.wrongQuestions.push({ file, lesson, section, qIdx: qIndex, ts: Date.now() });
       }
     } else {
       // Remove from wrong list when answered correctly
-      state.wrongQuestions = state.wrongQuestions.filter(w => !(w.file === file && w.lesson === lesson && w.section === section && w.qIndex === qIndex));
+      state.wrongQuestions = state.wrongQuestions.filter(w => !(
+        w.file === file && w.lesson === lesson && w.section === section &&
+        (Number.isInteger(w.qIdx) ? w.qIdx : w.qIndex) === qIndex
+      ));
     }
+    Storage.updateStreak(state);
+    Storage.save(state);
+    return state;
+  },
+  // Record a review attempt while keeping its original mistake queued until it is correct.
+  recordReviewAnswer(state, questionRef, storedQuestion, correct) {
+    const { file, lesson, section, qIdx } = questionRef;
+    if (!state.fileProgress[file]) state.fileProgress[file] = {};
+    if (!state.fileProgress[file][lesson]) state.fileProgress[file][lesson] = { answered: 0, correct: 0, completed: false };
+    const lessonProgress = state.fileProgress[file][lesson];
+    lessonProgress.answered++;
+    if (correct) {
+      lessonProgress.correct++;
+      state.points += 10;
+      state.totalCorrect++;
+    } else {
+      state.points = Math.max(0, state.points - 2);
+    }
+    state.totalAnswered++;
+
+    const sameQuestion = (entry, ref) => Boolean(ref && entry.file === ref.file && entry.lesson === ref.lesson &&
+      entry.section === ref.section &&
+      (Number.isInteger(entry.qIdx) ? entry.qIdx : entry.qIndex) === ref.qIdx);
+    if (correct) {
+      state.wrongQuestions = state.wrongQuestions.filter(entry =>
+        !sameQuestion(entry, questionRef) && !sameQuestion(entry, storedQuestion)
+      );
+    }
+
     Storage.updateStreak(state);
     Storage.save(state);
     return state;

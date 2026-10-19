@@ -1351,6 +1351,11 @@ phrase|frase
 text|texto
 paragraph|párrafo
 translation|traducción
+translate|traducir
+to review|revisar
+review|revisión
+mistakes|errores
+theory|teoría
 meaning|significado
 practice|práctica
 incorrect|incorrecto
@@ -1975,34 +1980,98 @@ reading number|número de lectura
     'cómo': 'how',
     'inglés': 'english',
     'español': 'spanish',
+    'revisar': 'to review',
+    'repasar': 'to review',
+    'repaso': 'review',
   });
 
+  function normalizeLookup(value) {
+    const enyeMarker = '\uE000';
+    return String(value)
+      .toLocaleLowerCase('es')
+      .normalize('NFC')
+      .replace(/ñ/g, enyeMarker)
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .split(enyeMarker).join('ñ');
+  }
+
+  function createFoldedText(text) {
+    let folded = '';
+    const sourceRanges = [];
+    const combiningMark = /\p{M}/u;
+
+    for (let index = 0; index < text.length;) {
+      const start = index;
+      let cluster = String.fromCodePoint(text.codePointAt(index));
+      index += cluster.length;
+      while (index < text.length) {
+        const next = String.fromCodePoint(text.codePointAt(index));
+        if (!combiningMark.test(next)) break;
+        cluster += next;
+        index += next.length;
+      }
+
+      const normalized = normalizeLookup(cluster);
+      folded += normalized;
+      for (let offset = 0; offset < normalized.length; offset++) {
+        sourceRanges.push({ start, end: index });
+      }
+    }
+
+    return { text: folded, sourceRanges };
+  }
+
   function createPattern(dictionary) {
-    const alternatives = Object.keys(dictionary)
+    const normalizedDictionary = Object.create(null);
+    const preferredSource = Object.create(null);
+    Object.entries(dictionary).forEach(([source, translation]) => {
+      const key = normalizeLookup(source);
+      if (!key) return;
+      const hasDiacritics = /[áéíóúü]/iu.test(source);
+      if (!(key in normalizedDictionary) || (hasDiacritics && !preferredSource[key])) {
+        normalizedDictionary[key] = translation;
+        preferredSource[key] = hasDiacritics;
+      }
+    });
+
+    const alternatives = Object.keys(normalizedDictionary)
       .sort((a, b) => b.length - a.length)
       .map(phrase => phrase.split(/\s+/)
         .map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
         .join('\\s+'))
       .join('|');
-    return new RegExp(`(^|[^\\p{L}\\p{N}])(${alternatives})(?=$|[^\\p{L}\\p{N}])`, 'giu');
+    return {
+      dictionary: normalizedDictionary,
+      pattern: new RegExp(`(^|[^\\p{L}\\p{N}])(${alternatives})(?=$|[^\\p{L}\\p{N}])`, 'giu'),
+    };
   }
 
-  const dictionaries = { 'en-es': enToEs, 'es-en': esToEn };
-  const patterns = {
+  const dictionaries = {
     'en-es': createPattern(enToEs),
     'es-en': createPattern(esToEn),
   };
 
   function translate(text, direction) {
-    const dictionary = dictionaries[direction];
-    const pattern = patterns[direction];
-    if (!dictionary || !pattern || !text) return text;
+    const lookup = dictionaries[direction];
+    if (!lookup || !text) return text;
+    const { dictionary, pattern } = lookup;
+    const folded = createFoldedText(text);
+    let translated = '';
+    let sourceCursor = 0;
     pattern.lastIndex = 0;
     const locale = direction === 'en-es' ? 'en' : 'es';
 
-    return text.replace(pattern, (match, prefix, source) => {
-      const translation = dictionary[source.trim().toLocaleLowerCase(locale)];
-      if (!translation) return match;
+    for (const match of folded.text.matchAll(pattern)) {
+      const matchStart = match.index + match[1].length;
+      const matchEnd = matchStart + match[2].length;
+      const firstRange = folded.sourceRanges[matchStart];
+      const lastRange = folded.sourceRanges[matchEnd - 1];
+      if (!firstRange || !lastRange || firstRange.start < sourceCursor) continue;
+
+      const source = text.slice(firstRange.start, lastRange.end);
+      const translation = dictionary[normalizeLookup(match[2])];
+      if (!translation) continue;
       const letters = source.match(/\p{L}/gu) || [];
       const isUpperCase = letters.length > 0 && source === source.toLocaleUpperCase(locale);
       const startsUpperCase = letters.length > 0 && source[0] === source[0].toLocaleUpperCase(locale);
@@ -2010,8 +2079,11 @@ reading number|número de lectura
       if (!isUpperCase && startsUpperCase) {
         output = output[0].toLocaleUpperCase(locale) + output.slice(1);
       }
-      return prefix + output;
-    });
+      translated += text.slice(sourceCursor, firstRange.start) + output;
+      sourceCursor = lastRange.end;
+    }
+
+    return translated + text.slice(sourceCursor);
   }
 
   return { translate, verbForms };

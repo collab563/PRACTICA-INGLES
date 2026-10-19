@@ -175,6 +175,7 @@ function renderReadingPractice(params = []) {
       <p class="reading-advance-message hidden" id="readingAdvanceMessage" role="status">Great work! Moving to the next reading…</p>
     `;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    focusAnswerFieldOnDesktop($('.reading-match-letter', view));
 
     $$('.reading-question', view).forEach(questionCard => {
       const feedback = $('.reading-question-feedback', questionCard);

@@ -5,6 +5,14 @@ let STATE = Storage.load();
 let EXAM = null;
 const ONLINE_TRANSLATOR_API = 'https://apertium.org/apy/translate';
 let feedbackAudioContext = null;
+let activeFlagResearchController = null;
+let activeFlagPhotoPreviewUrl = '';
+window.addEventListener('hashchange', () => {
+  activeFlagResearchController?.abort();
+  activeFlagResearchController = null;
+  if (activeFlagPhotoPreviewUrl) URL.revokeObjectURL(activeFlagPhotoPreviewUrl);
+  activeFlagPhotoPreviewUrl = '';
+});
 
 const FILE_10_VOCABULARY = {
   food: [
@@ -411,21 +419,6 @@ function init() {
     event.preventDefault();
     toggleFloatingTranslator();
   });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && $('#translatorOverlayRoot').firstElementChild) {
-      closeFloatingTranslator(true);
-    }
-  });
-  document.addEventListener('pointerdown', event => {
-    const root = $('#translatorOverlayRoot');
-    if (root.firstElementChild && !root.contains(event.target) &&
-        event.target !== translatorLink && !translatorLink.contains(event.target)) {
-      closeFloatingTranslator();
-    }
-  });
-  window.addEventListener('hashchange', () => {
-    if ($('#translatorOverlayRoot').firstElementChild) closeFloatingTranslator();
-  });
   updateHeaderStats();
   // Init storage streak
   Storage.updateStreak(STATE);
@@ -508,7 +501,7 @@ function renderTranslator(view = $('#mainView'), floating = false, mode = 'offli
 
   view.innerHTML = floating ? `
     <section class="translator-floating" role="dialog" aria-modal="false" aria-label="Floating translator">
-      <header class="translator-floating-header">
+      <header class="translator-floating-header" tabindex="0" aria-label="Move translator window with mouse, touch, or arrow keys">
         <h2>🌐 ${title}</h2>
         <div class="translator-floating-header-actions">
           <button type="button" class="btn btn-ghost translator-floating-change">Change</button>
@@ -719,21 +712,90 @@ function renderTranslator(view = $('#mainView'), floating = false, mode = 'offli
   });
 
   if (floating) {
+    enableFloatingTranslatorDrag(view);
     $('.translator-floating-close', view).addEventListener('click', () => closeFloatingTranslator(true));
     $('.translator-floating-change', view).addEventListener('click', openTranslatorChooser);
   }
 }
 
+function enableFloatingTranslatorDrag(root) {
+  const panel = root.querySelector('.translator-floating');
+  const header = panel?.querySelector('.translator-floating-header');
+  if (!panel || !header) return;
+
+  const clampPosition = (left, top) => {
+    const bounds = panel.getBoundingClientRect();
+    const headerBounds = header.getBoundingClientRect();
+    const visibleWidth = Math.min(80, bounds.width);
+    const visibleHeaderHeight = Math.min(32, headerBounds.height);
+    return {
+      left: Math.max(visibleWidth - bounds.width, Math.min(left, window.innerWidth - visibleWidth)),
+      top: Math.max(visibleHeaderHeight - headerBounds.height, Math.min(top, window.innerHeight - visibleHeaderHeight)),
+    };
+  };
+  const placePanel = (left, top) => {
+    const position = clampPosition(left, top);
+    root.style.left = `${position.left}px`;
+    root.style.top = `${position.top}px`;
+    root.style.right = 'auto';
+    root.style.bottom = 'auto';
+  };
+
+  let drag = null;
+  root.addEventListener('pointerdown', event => {
+    const target = event.target instanceof Element ? event.target : null;
+    const isInteractive = target?.closest('button, a, input, select, textarea, summary, [contenteditable="true"]');
+    const frame = root.getBoundingClientRect();
+    const edge = 8;
+    const isOnFrame = event.clientX <= frame.left + edge || event.clientX >= frame.right - edge ||
+      event.clientY <= frame.top + edge || event.clientY >= frame.bottom - edge;
+    if (!event.isPrimary || event.button !== 0 || isInteractive || (!header.contains(target) && !isOnFrame)) return;
+    const bounds = panel.getBoundingClientRect();
+    drag = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - bounds.left,
+      offsetY: event.clientY - bounds.top,
+    };
+    root.setPointerCapture(event.pointerId);
+    panel.classList.add('is-dragging');
+    event.preventDefault();
+  });
+  root.addEventListener('pointermove', event => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    placePanel(event.clientX - drag.offsetX, event.clientY - drag.offsetY);
+    event.preventDefault();
+  });
+  const stopDragging = event => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    drag = null;
+    panel.classList.remove('is-dragging');
+    if (root.hasPointerCapture(event.pointerId)) root.releasePointerCapture(event.pointerId);
+  };
+  root.addEventListener('pointerup', stopDragging);
+  root.addEventListener('pointercancel', stopDragging);
+  header.addEventListener('keydown', event => {
+    if (event.target !== header || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    const bounds = panel.getBoundingClientRect();
+    const step = event.shiftKey ? 48 : 24;
+    const left = bounds.left + (event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0);
+    const top = bounds.top + (event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0);
+    placePanel(left, top);
+    event.preventDefault();
+  });
+}
+
 function toggleFloatingTranslator() {
   const root = $('#translatorOverlayRoot');
   if (root.firstElementChild) {
-    if (root.querySelector('.translator-mode-choice')) {
-      closeFloatingTranslator();
-    } else {
+    if (!root.querySelector('.translator-mode-choice')) {
       openTranslatorChooser();
     }
     return;
   }
+  root.style.removeProperty('left');
+  root.style.removeProperty('top');
+  root.style.removeProperty('right');
+  root.style.removeProperty('bottom');
   openTranslatorChooser();
 }
 
@@ -742,7 +804,7 @@ function openTranslatorChooser() {
   const hasGeminiKey = Boolean(window.GeminiTranslationService?.hasActiveKey());
   root.innerHTML = `
     <section class="translator-floating translator-mode-choice" role="dialog" aria-modal="false" aria-label="Choose a translator">
-      <header class="translator-floating-header">
+      <header class="translator-floating-header" tabindex="0" aria-label="Move translator window with mouse, touch, or arrow keys">
         <h2>Choose a translator</h2>
         <button type="button" class="btn btn-secondary translator-floating-close" aria-label="Close translator options">✕</button>
       </header>
@@ -764,12 +826,12 @@ function openTranslatorChooser() {
       </div>
     </section>
   `;
+  enableFloatingTranslatorDrag(root);
   $('.nav-link[data-route="translate"]').setAttribute('aria-expanded', 'true');
   $('.translator-floating-close', root).addEventListener('click', () => closeFloatingTranslator(true));
   const keySetupButton = $('#openGeminiKeySetup', root);
   if (keySetupButton) {
     keySetupButton.addEventListener('click', () => {
-      closeFloatingTranslator();
       Router.navigate('writing/evaluate');
     });
   }
@@ -782,10 +844,26 @@ function openTranslatorChooser() {
 }
 
 function closeFloatingTranslator(returnFocus = false) {
-  $('#translatorOverlayRoot').replaceChildren();
+  const root = $('#translatorOverlayRoot');
+  root.replaceChildren();
+  root.style.removeProperty('left');
+  root.style.removeProperty('top');
+  root.style.removeProperty('right');
+  root.style.removeProperty('bottom');
   const trigger = $('.nav-link[data-route="translate"]');
   trigger.setAttribute('aria-expanded', 'false');
   if (returnFocus) trigger.focus();
+  syncFloatingTranslatorLayer();
+}
+
+function syncFloatingTranslatorLayer(preferredDialog = null) {
+  const root = $('#translatorOverlayRoot');
+  if (!root) return;
+  const activeDialog = preferredDialog?.open
+    ? preferredDialog
+    : document.querySelector('.question-word-dialog[open]') || document.querySelector('.theory-dialog[open]');
+  const target = activeDialog || document.body;
+  if (root.parentElement !== target) target.append(root);
 }
 
 // --- HOME ---
@@ -1147,11 +1225,15 @@ function attachTheoryInteractions(view) {
     wordDialogTitle.textContent = guide.title;
     wordDialogBody.innerHTML = renderQuestionWordGuide(guide);
     wordDialog.showModal();
+    syncFloatingTranslatorLayer(wordDialog);
     $('.question-word-dialog-close', wordDialog).focus();
   });
 
   $('.question-word-dialog-close', wordDialog).addEventListener('click', () => wordDialog.close());
-  wordDialog.addEventListener('close', updateDialogScrollLock);
+  wordDialog.addEventListener('close', () => {
+    updateDialogScrollLock();
+    syncFloatingTranslatorLayer();
+  });
   wordDialog.addEventListener('click', event => {
     if (event.target === wordDialog) wordDialog.close();
   });
@@ -1163,13 +1245,17 @@ function attachTheoryInteractions(view) {
       dialogTitle.textContent = topic.title;
       dialogBody.innerHTML = renderTheoryBody(topic);
       dialog.showModal();
+      syncFloatingTranslatorLayer(dialog);
       updateDialogScrollLock();
       $('.theory-dialog-close', dialog).focus();
     });
   });
 
   $('.theory-dialog-close', dialog).addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', updateDialogScrollLock);
+  dialog.addEventListener('close', () => {
+    updateDialogScrollLock();
+    syncFloatingTranslatorLayer();
+  });
   dialog.addEventListener('keydown', event => {
     if (event.key === 'Escape' && dialog.open) {
       event.preventDefault();
@@ -1181,15 +1267,219 @@ function attachTheoryInteractions(view) {
   });
 }
 
+const FLAG_INFO_CACHE_PREFIX = 'english-practice-flag-info-v1-';
+
+function flagCodeFromItem(item) {
+  return String(item?.image || '').match(/\/([a-z]{2})\.svg$/i)?.[1]?.toUpperCase() || '';
+}
+
+function readSavedFlagInfo(code) {
+  if (!/^[A-Z]{2}$/.test(code)) return null;
+  try {
+    const saved = JSON.parse(localStorage.getItem(`${FLAG_INFO_CACHE_PREFIX}${code}`) || 'null');
+    if (!saved?.info || typeof saved.info.country_english !== 'string') return null;
+    return saved;
+  } catch (_) { return null; }
+}
+
+function saveFlagInfo(code, info, sources) {
+  if (!/^[A-Z]{2}$/.test(code)) return false;
+  try {
+    localStorage.setItem(`${FLAG_INFO_CACHE_PREFIX}${code}`, JSON.stringify({
+      info,
+      sources: Array.isArray(sources) ? sources.slice(0, 5) : [],
+      savedAt: new Date().toISOString(),
+    }));
+    return true;
+  } catch (_) { return false; }
+}
+
+function renderFlagInfoCard(container, info, sources = [], savedAt = '') {
+  container.replaceChildren();
+  const article = document.createElement('article');
+  article.className = 'flag-info-card';
+  article.setAttribute('aria-live', 'polite');
+
+  if (!info?.identified) {
+    const heading = document.createElement('h3');
+    heading.textContent = 'I could not identify this flag confidently.';
+    const message = document.createElement('p');
+    message.textContent = 'Try a clear, front-facing photo that shows the whole flag without glare or folds.';
+    article.append(heading, message);
+  } else {
+    const heading = document.createElement('h3');
+    heading.textContent = info.country_english || 'Flag identified';
+    article.appendChild(heading);
+
+    if (info.country_spanish) {
+      const translation = document.createElement('p');
+      translation.className = 'flag-info-translation';
+      translation.textContent = info.country_spanish;
+      article.appendChild(translation);
+    }
+
+    const confidenceLabels = { high: 'High confidence', medium: 'Medium confidence', low: 'Low confidence' };
+    const confidence = document.createElement('span');
+    confidence.className = `flag-confidence flag-confidence-${['high', 'medium', 'low'].includes(info.confidence) ? info.confidence : 'medium'}`;
+    confidence.textContent = confidenceLabels[info.confidence] || confidenceLabels.medium;
+    article.appendChild(confidence);
+
+    const details = [
+      ['Capital', info.capital],
+      ['Continent', info.continent],
+      ['Official languages', Array.isArray(info.official_languages) ? info.official_languages.join(', ') : ''],
+      ['Flag symbolism', info.flag_meaning_spanish],
+    ].filter(([, value]) => typeof value === 'string' && value.trim());
+    if (details.length) {
+      const list = document.createElement('dl');
+      list.className = 'flag-info-details';
+      details.forEach(([label, value]) => {
+        const term = document.createElement('dt');
+        term.textContent = label;
+        const description = document.createElement('dd');
+        description.textContent = value;
+        list.append(term, description);
+      });
+      article.appendChild(list);
+    }
+
+    if (info.summary_spanish) {
+      const summary = document.createElement('p');
+      summary.className = 'flag-info-summary';
+      summary.textContent = info.summary_spanish;
+      article.appendChild(summary);
+    }
+  }
+
+  if (savedAt) {
+    const savedLabel = document.createElement('p');
+    savedLabel.className = 'flag-info-saved';
+    const date = new Date(savedAt);
+    savedLabel.textContent = Number.isNaN(date.getTime())
+      ? 'Saved on this device for offline review.'
+      : `Saved on this device · ${date.toLocaleDateString()}`;
+    article.appendChild(savedLabel);
+  }
+
+  const safeSources = (Array.isArray(sources) ? sources : [])
+    .filter(source => source && typeof source.title === 'string' && typeof source.uri === 'string')
+    .filter(source => {
+      try { return new URL(source.uri).protocol === 'https:'; } catch (_) { return false; }
+    })
+    .slice(0, 5);
+  if (safeSources.length) {
+    const sourceHeading = document.createElement('h4');
+    sourceHeading.textContent = 'Web sources';
+    const sourceList = document.createElement('ul');
+    sourceList.className = 'flag-info-sources';
+    safeSources.forEach(source => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = source.uri;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = source.title || new URL(source.uri).hostname;
+      item.appendChild(link);
+      sourceList.appendChild(item);
+    });
+    article.append(sourceHeading, sourceList);
+  } else if (info?.identified) {
+    const sourceNote = document.createElement('p');
+    sourceNote.className = 'flag-info-saved';
+    sourceNote.textContent = 'No direct web citations were returned for this result.';
+    article.appendChild(sourceNote);
+  }
+  container.appendChild(article);
+}
+
+function renderFoodSubsections() {
+  const view = $('#mainView');
+  view.innerHTML = `
+    <a href="#practice/vocabulary" class="back-link">← Back</a>
+    <div class="lesson-header">
+      <span class="file-num">Vocabulary practice</span>
+      <h1 style="margin-top:0.5rem">Food</h1>
+      <p class="topics">Choose a food picture practice or explore famous dishes by country.</p>
+    </div>
+    <div class="vocabulary-menu vocabulary-menu-expanded">
+      <button class="vocabulary-card" type="button" data-food-subsection="food-practice">
+        <span class="vocabulary-emoji" aria-hidden="true">🍽️</span>
+        <strong>Food practice</strong>
+        <small>Practice the food picture exercise.</small>
+      </button>
+      <button class="vocabulary-card" type="button" data-food-subsection="dishes">
+        <span class="vocabulary-emoji" aria-hidden="true">🥘</span>
+        <strong>Dish</strong>
+        <small>Learn famous dishes from around the world.</small>
+      </button>
+    </div>
+  `;
+  $$('.vocabulary-card[data-food-subsection]', view).forEach(button => {
+    button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.foodSubsection}`));
+  });
+}
+
+function renderDishCountryMenu() {
+  const view = $('#mainView');
+  const countries = globalThis.FoodDishCategories || [];
+  view.innerHTML = `
+    <a href="#vocabulary/food" class="back-link">← Back to Food</a>
+    <div class="lesson-header">
+      <span class="file-num">Food · Dish</span>
+      <h1 style="margin-top:0.5rem">Dish</h1>
+      <p class="topics">Choose a country to identify its famous dishes in English.</p>
+    </div>
+    <div class="vocabulary-menu vocabulary-menu-expanded">
+      ${countries.map(country => `
+        <button class="vocabulary-card" type="button" data-dish-country="${escapeHTML(country.id)}">
+          <span class="vocabulary-emoji" aria-hidden="true">${country.flag}</span>
+          <strong>${escapeHTML(country.country)}</strong>
+          <small>${country.items.length} ${country.items.length === 1 ? 'dish' : 'dishes'}</small>
+        </button>
+      `).join('')}
+    </div>
+  `;
+  $$('.vocabulary-card[data-dish-country]', view).forEach(button => {
+    button.addEventListener('click', () => Router.navigate(`vocabulary/dish-${button.dataset.dishCountry}`));
+  });
+}
+
 function renderVocabularyPractice(categoryKey = 'food') {
-  if (categoryKey === 'translation' || categoryKey.startsWith('translation-')) {
+  if (categoryKey === 'food') return renderFoodSubsections();
+  if (categoryKey === 'dishes') return renderDishCountryMenu();
+  const translationSetKeys = Object.keys(globalThis.VocabularyTranslationSets || {});
+  if (categoryKey === 'translation' || categoryKey.startsWith('translation-') ||
+      translationSetKeys.some(key => categoryKey === key || categoryKey.startsWith(`${key}-`))) {
     renderTranslationPractice(categoryKey);
     return;
   }
   const view = $('#mainView');
   const isNumberPractice = categoryKey === 'numbers';
-  let collection = isNumberPractice ? createNumberVocabulary() : FILE_10_VOCABULARY.food;
-  const label = isNumberPractice ? 'Numbers' : 'Food';
+  const isFoodPractice = categoryKey === 'food-practice';
+  const dishCountryId = categoryKey.startsWith('dish-') ? categoryKey.slice('dish-'.length) : '';
+  const dishCountry = (globalThis.FoodDishCategories || []).find(country => country.id === dishCountryId);
+  const isDishPractice = Boolean(dishCountry);
+  const isCountryPractice = categoryKey === 'countries';
+  const extraPractice = globalThis.ExtraVocabulary?.[categoryKey];
+  let collection = isNumberPractice
+    ? createNumberVocabulary()
+    : isFoodPractice ? FILE_10_VOCABULARY.food
+      : isDishPractice ? dishCountry.items : extraPractice?.items || [];
+  const label = isNumberPractice ? 'Numbers' : isFoodPractice ? 'Food'
+    : isDishPractice ? `${dishCountry.country} · Dish` : extraPractice?.title || 'Vocabulary';
+  const backTarget = isFoodPractice ? '#vocabulary/food'
+    : isDishPractice ? '#vocabulary/dishes' : '#practice/vocabulary';
+  const practiceDescription = isNumberPractice
+    ? 'Practice writing numbers in words and digits.'
+    : isFoodPractice ? 'Write the name of the food shown in each picture.'
+      : isDishPractice ? `Look at each picture and write the name of this famous ${dishCountry.country} dish in English.`
+        : isCountryPractice ? 'Look at each flag and write the country or territory name in English.'
+          : extraPractice?.description || '';
+  if (!collection.length) {
+    showToast('This vocabulary category is not available yet.', 'error');
+    Router.navigate('practice/vocabulary');
+    return;
+  }
   let words = collection.map(item => ({
     ...item,
     accepted: item.accepted || [item.word, ...(item.aliases || [])],
@@ -1199,8 +1489,9 @@ function renderVocabularyPractice(categoryKey = 'food') {
   const correctlyAnswered = new Set();
   const responses = new Map();
   let advanceTimeout = null;
+  let selectedFlagPhoto = null;
 
-  const normalizeAnswer = value => String(value).trim().toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
+  const normalizeAnswer = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const normalizeNumberAnswer = value => normalizeAnswer(value.replace(/-/g, ' ')).replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
   const normalizeNumberDigits = value => {
     const trimmed = String(value).trim();
@@ -1212,17 +1503,26 @@ function renderVocabularyPractice(categoryKey = 'food') {
     : item.word;
 
   const finishVocabularySession = () => {
+    activeFlagResearchController?.abort();
+    activeFlagResearchController = null;
+    if (activeFlagPhotoPreviewUrl) URL.revokeObjectURL(activeFlagPhotoPreviewUrl);
+    activeFlagPhotoPreviewUrl = '';
     const percent = Math.round((correctCount / words.length) * 100);
+    const completedUnit = isNumberPractice ? 'number questions'
+      : isFoodPractice ? 'food words'
+        : isDishPractice ? 'dishes'
+        : isCountryPractice ? 'countries and territories'
+          : categoryKey === 'days' ? 'days' : categoryKey === 'continents' ? 'continents' : 'words';
     view.innerHTML = `
-      <a href="#practice" class="back-link">← Back to Practice</a>
+      <a href="${backTarget}" class="back-link">← Back</a>
       <div class="lesson-header text-center">
         <div style="font-size:3rem">🎉</div>
         <h1>Vocabulary · ${escapeHTML(label)}</h1>
-        <p class="topics">You completed ${words.length} ${isNumberPractice ? 'number questions' : 'words'}.</p>
+        <p class="topics">You completed ${words.length} ${completedUnit}.</p>
         <p style="font-size:1.5rem; color:var(--primary); font-weight:700;">${correctCount} / ${words.length} correct (${percent}%)</p>
         <div class="mt-2">
           <button class="btn" type="button" id="vocabRetryBtn">🔁 Try again</button>
-          <a href="#practice" class="btn btn-secondary">Back</a>
+          <a href="${backTarget}" class="btn btn-secondary">Back</a>
         </div>
       </div>
     `;
@@ -1232,12 +1532,39 @@ function renderVocabularyPractice(categoryKey = 'food') {
   const renderItem = () => {
     const item = words[currentIndex];
     const progress = `${currentIndex + 1} / ${words.length}`;
+    if (activeFlagResearchController) {
+      activeFlagResearchController.abort();
+      activeFlagResearchController = null;
+    }
+    if (activeFlagPhotoPreviewUrl) {
+      URL.revokeObjectURL(activeFlagPhotoPreviewUrl);
+      activeFlagPhotoPreviewUrl = '';
+    }
+    selectedFlagPhoto = null;
     if (advanceTimeout) {
       clearTimeout(advanceTimeout);
       advanceTimeout = null;
     }
     const card = document.createElement('div');
     card.className = 'vocabulary-practice';
+    const questionTitle = isNumberPractice
+      ? (item.direction === 'words-to-number' ? 'Write this number in digits.' : 'What is this number called?')
+      : isFoodPractice ? 'What food can you see?'
+        : isDishPractice ? 'What dish can you see?'
+        : isCountryPractice ? 'What country or territory does this flag represent?'
+          : `Translate "${escapeHTML(item.prompt)}" into English.`;
+    const questionDescription = isNumberPractice
+      ? (item.direction === 'words-to-number'
+        ? 'Enter the number shown in words. Commas are optional.'
+        : 'Write the number in English. Both British and American number forms are accepted.')
+      : isFoodPractice ? 'Write its name in English.'
+        : isDishPractice ? 'Write the dish name in English.'
+        : isCountryPractice ? 'Write the country or territory name in English.'
+          : 'Write the English translation.';
+    const answerPlaceholder = isNumberPractice
+      ? (item.direction === 'words-to-number' ? 'Write the number in digits...' : 'Write the number in English...')
+      : isCountryPractice ? 'Write the country name in English...'
+        : isDishPractice ? 'Write the dish name in English...' : 'Write the English translation...';
     card.innerHTML = `
       <div class="vocabulary-progress-bar">
         <span>Progress</span>
@@ -1249,12 +1576,8 @@ function renderVocabularyPractice(categoryKey = 'food') {
           : `<img class="vocabulary-image" src="${item.image}" alt="${escapeHTML(item.alt)}" />
             ${item.imageCredit ? `<span class="vocabulary-image-credit"><a href="${item.imageCredit.url}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.label)}</a> · <a href="${item.imageCredit.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.licenseLabel)}</a></span>` : ''}`}
         <div class="vocabulary-question">
-          <h3>${isNumberPractice ? (item.direction === 'words-to-number' ? 'Write this number in digits.' : 'What is this number called?') : 'What food can you see?'}</h3>
-          <p>${isNumberPractice
-            ? (item.direction === 'words-to-number'
-              ? 'Enter the number shown in words. Commas are optional.'
-              : 'Write the number in English. Both the British form with “and” and the American form without “and” are accepted.')
-            : 'Write its name in English.'}</p>
+          <h3>${questionTitle}</h3>
+          <p>${questionDescription}</p>
         </div>
         <div class="vocabulary-speech-control">
           <div class="vocabulary-speech-buttons">
@@ -1271,7 +1594,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
             <p>Close and reopen Chrome, then try the button again.</p>
             <button class="btn btn-secondary vocabulary-note-close" type="button">Close</button>
         </dialog>
-        <input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="${isNumberPractice && item.direction === 'words-to-number' ? 'numeric' : 'text'}" placeholder="${isNumberPractice ? (item.direction === 'words-to-number' ? 'Write the number in digits...' : 'Write the number in English...') : 'Write the word...'}" autocomplete="off" />
+        <input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="${isNumberPractice && item.direction === 'words-to-number' ? 'numeric' : 'text'}" placeholder="${answerPlaceholder}" autocomplete="off" />
         <div class="exercise-actions">
           <button class="btn btn-secondary" id="previousVocabularyBtn" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Previous question</button>
           <button class="btn" id="checkVocabularyBtn" type="button">Check</button>
@@ -1289,6 +1612,10 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const speakBtn = card.querySelector('#speakVocabularyBtn');
     const noteBtn = card.querySelector('#vocabularyNoteBtn');
     const noteDialog = card.querySelector('.vocabulary-note-dialog');
+    speakBtn.insertAdjacentElement('afterend', createPhoneticControl(() => {
+      if (!isNumberPractice) return item.word;
+      return item.direction === 'words-to-number' ? item.word : item.accepted[0];
+    }));
 
     const savedResponse = responses.get(currentIndex);
     if (savedResponse) {
@@ -1387,12 +1714,41 @@ function renderVocabularyPractice(categoryKey = 'food') {
 
     const wrap = $('#mainView');
     wrap.innerHTML = `
-      <a href="#practice" class="back-link">← Back to Practice</a>
+      <a href="${backTarget}" class="back-link">← Back</a>
       <div class="lesson-header">
-        <span class="file-num">Vocabulary · ${escapeHTML(label)}</span>
+        <span class="file-num">${isDishPractice ? 'Food · Dish' : 'Vocabulary'} · ${escapeHTML(label)}</span>
         <h1 style="margin-top:0.5rem">${escapeHTML(label)} practice</h1>
-        <p class="topics">${isNumberPractice ? 'Practice writing numbers in words and digits.' : 'Write the name of the food or item shown in the picture.'}</p>
+        <p class="topics">${escapeHTML(practiceDescription)}</p>
         <button class="btn btn-secondary" id="shuffleVocabularyBtn" type="button">🔀 Shuffle and restart</button>
+        ${isCountryPractice ? `
+          <details class="flag-assistant">
+            <summary class="flag-assistant-summary">
+              <span class="flag-assistant-icon" aria-hidden="true">🌐</span>
+              <span><strong>Flag helper</strong><small>Reveal the answer offline, find information online, or identify a photo.</small></span>
+            </summary>
+            <div class="flag-assistant-content">
+            <div class="flag-assistant-actions">
+              <button class="btn btn-secondary" id="revealCurrentFlag" type="button">🏳️ Reveal this answer</button>
+              <button class="btn btn-secondary" id="researchCurrentFlag" type="button">🔎 Find information online</button>
+              <label class="flag-photo-label" for="flagPhotoInput">📷 Choose or take a flag photo</label>
+              <input id="flagPhotoInput" class="flag-photo-input" type="file" accept="image/*" capture="environment" aria-describedby="flagPhotoHelp">
+              <button class="btn" id="identifyFlagPhoto" type="button" disabled>Identify photo online</button>
+            </div>
+            <label class="flag-consent" for="flagOnlineConsent">
+              <input id="flagOnlineConsent" type="checkbox">
+              <span>I agree to send the selected photo, or this flag's country name, to Google Gemini and use Google Search. Internet, a Gemini API key, and possible usage charges apply.</span>
+            </label>
+            <p class="flag-photo-help" id="flagPhotoHelp">Your photo stays on this device until you select “Identify photo online.” It is resized before being sent and is never saved by the page.</p>
+            <p class="flag-key-help" id="flagKeyHelp"></p>
+            <div class="flag-photo-preview" id="flagPhotoPreview" hidden>
+              <img id="flagPhotoPreviewImage" alt="Preview of the selected flag photo">
+              <span id="flagPhotoName"></span>
+            </div>
+            <p class="flag-assistant-status" id="flagAssistantStatus" role="status" aria-live="polite"></p>
+            <div id="flagInfoResult"></div>
+            </div>
+          </details>
+        ` : ''}
       </div>
     `;
     $('#shuffleVocabularyBtn').addEventListener('click', () => {
@@ -1413,6 +1769,142 @@ function renderVocabularyPractice(categoryKey = 'food') {
       renderItem();
     });
     wrap.appendChild(card);
+
+    if (isCountryPractice) {
+      const consent = $('#flagOnlineConsent', wrap);
+      const researchButton = $('#researchCurrentFlag', wrap);
+      const identifyButton = $('#identifyFlagPhoto', wrap);
+      const photoInput = $('#flagPhotoInput', wrap);
+      const status = $('#flagAssistantStatus', wrap);
+      const resultPanel = $('#flagInfoResult', wrap);
+      const preview = $('#flagPhotoPreview', wrap);
+      const service = window.GeminiTranslationService;
+      let requestInProgress = false;
+
+      const updateFlagAssistantControls = () => {
+        const hasKey = Boolean(service?.hasActiveKey());
+        researchButton.disabled = requestInProgress || !hasKey || !consent.checked;
+        identifyButton.disabled = requestInProgress || !hasKey || !consent.checked || !selectedFlagPhoto;
+        $('#flagKeyHelp', wrap).innerHTML = hasKey
+          ? 'Gemini key loaded for this tab. Online information will include any sources returned by Google Search.'
+          : 'Load your Gemini API key in the <a href="#writing/evaluate">Writing Evaluator</a> to use the online tools.';
+      };
+
+      consent.addEventListener('change', updateFlagAssistantControls);
+      photoInput.addEventListener('change', () => {
+        selectedFlagPhoto = photoInput.files?.[0] || null;
+        if (activeFlagPhotoPreviewUrl) URL.revokeObjectURL(activeFlagPhotoPreviewUrl);
+        activeFlagPhotoPreviewUrl = '';
+        preview.hidden = !selectedFlagPhoto;
+        if (selectedFlagPhoto) {
+          activeFlagPhotoPreviewUrl = URL.createObjectURL(selectedFlagPhoto);
+          $('#flagPhotoPreviewImage', wrap).src = activeFlagPhotoPreviewUrl;
+          $('#flagPhotoName', wrap).textContent = `${selectedFlagPhoto.name} · ${(selectedFlagPhoto.size / (1024 * 1024)).toFixed(1)} MB`;
+          status.textContent = 'Photo selected. It will not be uploaded unless you agree above and select “Identify photo online.”';
+        } else {
+          $('#flagPhotoPreviewImage', wrap).removeAttribute('src');
+          $('#flagPhotoName', wrap).textContent = '';
+        }
+        updateFlagAssistantControls();
+      });
+
+      $('#revealCurrentFlag', wrap).addEventListener('click', () => {
+        const code = flagCodeFromItem(item);
+        const saved = readSavedFlagInfo(code);
+        if (saved?.info) {
+          renderFlagInfoCard(resultPanel, saved.info, saved.sources, saved.savedAt);
+          status.textContent = 'Showing this flag and its previously saved online information. This works offline.';
+          return;
+        }
+        renderFlagInfoCard(resultPanel, {
+          identified: true,
+          country_english: item.word,
+          country_spanish: '',
+          country_code: code,
+          confidence: 'high',
+          capital: '',
+          continent: '',
+          official_languages: [],
+          summary_spanish: 'Identified from the flag used in this exercise. This answer is available offline.',
+          flag_meaning_spanish: '',
+        });
+        status.textContent = 'Answer revealed. For capital, continent, languages, and sourced information, connect to the internet and use “Find information online.”';
+      });
+
+      const runFlagResearch = async options => {
+        if (!consent.checked) {
+          status.textContent = 'Select the consent box before sending a request online.';
+          return;
+        }
+        if (!service?.hasActiveKey()) {
+          status.innerHTML = 'Load your Gemini API key in the <a href="#writing/evaluate">Writing Evaluator</a>, then return here.';
+          return;
+        }
+        if (navigator.onLine === false) {
+          status.textContent = 'You appear to be offline. Reveal the exercise answer or view information saved earlier on this device.';
+          return;
+        }
+
+        if (activeFlagResearchController) activeFlagResearchController.abort();
+        const controller = new AbortController();
+        activeFlagResearchController = controller;
+        const timeoutId = window.setTimeout(() => controller.abort(), 60000);
+        requestInProgress = true;
+        resultPanel.replaceChildren();
+        status.textContent = options.imageFile
+          ? 'Preparing the photo and checking the flag with Google Search…'
+          : 'Checking current information with Google Search…';
+        updateFlagAssistantControls();
+        try {
+          const response = await service.researchFlag(options, controller.signal);
+          if (activeFlagResearchController !== controller) return;
+          const info = response.result;
+          const sources = (response.groundingMetadata?.groundingChunks || [])
+            .map(chunk => chunk?.web)
+            .filter(web => web && typeof web.uri === 'string' && typeof web.title === 'string')
+            .filter((web, index, all) => all.findIndex(item => item.uri === web.uri) === index)
+            .slice(0, 5);
+          if (info.identified && info.country_english.trim()) {
+            const matchedItem = collection.find(country => [country.word, ...(country.aliases || [])]
+              .some(name => normalizeAnswer(name) === normalizeAnswer(info.country_english)));
+            const detectedCode = info.country_code.trim().toUpperCase();
+            const code = flagCodeFromItem(matchedItem) || (/^[A-Z]{2}$/.test(detectedCode) ? detectedCode : '');
+            const wasSaved = saveFlagInfo(code, info, sources);
+            renderFlagInfoCard(resultPanel, info, sources, wasSaved ? new Date().toISOString() : '');
+            status.textContent = wasSaved
+              ? 'Done. This information and its source links are saved on this device for offline review. The photo was not saved.'
+              : 'Done. Review the source links below. The photo was not saved.';
+          } else {
+            renderFlagInfoCard(resultPanel, info, sources);
+            status.textContent = 'The result was not saved because the flag could not be identified confidently. The photo was not saved.';
+          }
+        } catch (error) {
+          if (error.name !== 'AbortError' || activeFlagResearchController === controller) {
+            status.textContent = error.name === 'AbortError'
+              ? 'The request timed out. Check your connection and try again.'
+              : error.message || 'Could not identify this flag. Check your connection and API key, then try again.';
+          }
+        } finally {
+          window.clearTimeout(timeoutId);
+          if (activeFlagResearchController === controller) activeFlagResearchController = null;
+          requestInProgress = false;
+          consent.checked = false;
+          updateFlagAssistantControls();
+        }
+      };
+
+      researchButton.addEventListener('click', () => runFlagResearch({ countryName: item.word, countryCode: flagCodeFromItem(item) }));
+      identifyButton.addEventListener('click', () => {
+        if (!selectedFlagPhoto) {
+          status.textContent = 'Choose or take a flag photo first.';
+          return;
+        }
+        runFlagResearch({ imageFile: selectedFlagPhoto });
+      });
+      updateFlagAssistantControls();
+    }
+
+    focusAnswerFieldOnDesktop(input);
   };
 
   renderItem();
@@ -1420,23 +1912,54 @@ function renderVocabularyPractice(categoryKey = 'food') {
 
 function renderTranslationPractice(categoryKey = 'translation') {
   const view = $('#mainView');
-  const direction = categoryKey === 'translation-en-es' ? 'en-es' : categoryKey === 'translation-es-en' ? 'es-en' : '';
+  const translationSets = globalThis.VocabularyTranslationSets || {};
+  const setKey = Object.keys(translationSets).find(key => categoryKey === key || categoryKey.startsWith(`${key}-`));
+  const customSet = setKey ? translationSets[setKey] : null;
+  const directionKey = customSet
+    ? categoryKey === setKey ? '' : categoryKey.slice(setKey.length + 1)
+    : categoryKey === 'translation' ? '' : categoryKey.slice('translation-'.length);
+  const direction = directionKey === 'en-es' ? 'en-es' : directionKey === 'es-en' ? 'es-en' : '';
   if (!direction) {
+    const title = customSet?.title || 'Practice Translation';
     view.innerHTML = `
       <a href="#practice/vocabulary" class="back-link">← Back to Vocabulary</a>
-      <div class="lesson-header"><span class="file-num">Vocabulary practice</span><h1>Practice Translation</h1><p class="topics">Choose a translation direction.</p></div>
+      <div class="lesson-header"><span class="file-num">Vocabulary practice</span><h1>${escapeHTML(title)}</h1><p class="topics">Choose a translation direction.</p></div>
       <div class="vocabulary-menu vocabulary-menu-expanded">
         <button class="vocabulary-card" data-direction="en-es" type="button"><span class="vocabulary-emoji">🇬🇧 → 🇪🇸</span><span>English to Spanish</span></button>
         <button class="vocabulary-card" data-direction="es-en" type="button"><span class="vocabulary-emoji">🇪🇸 → 🇬🇧</span><span>Spanish to English</span></button>
       </div>`;
-    $$('.vocabulary-card', view).forEach(button => button.addEventListener('click', () => Router.navigate(`vocabulary/translation-${button.dataset.direction}`)));
+    $$('.vocabulary-card', view).forEach(button => button.addEventListener('click', () => {
+      const route = customSet ? `${setKey}-${button.dataset.direction}` : `translation-${button.dataset.direction}`;
+      Router.navigate(`vocabulary/${route}`);
+    }));
     return;
   }
 
   const suppliedPairs = Array.isArray(globalThis.VocabularyWords) ? globalThis.VocabularyWords : [];
   const foodPairs = FILE_10_VOCABULARY.food.map(item => ({ en: item.word, es: item.translation }));
-  let pairs = [...foodPairs, ...suppliedPairs.filter(pair => pair && typeof pair.en === 'string' && typeof pair.es === 'string')];
-  const previousFirstWordKey = `translation-first-word-${direction}`;
+  const pairs = customSet
+    ? customSet.items.map(item => ({
+      en: item.en,
+      es: item.es[0],
+      enAnswers: item.enAnswers || [item.en],
+      esAnswers: item.es,
+    }))
+    : [...foodPairs, ...suppliedPairs.filter(pair => pair && typeof pair.en === 'string' && typeof pair.es === 'string')];
+  const progressKey = `translation-learning-${customSet ? `${setKey}-` : ''}${direction}`;
+  const readProgress = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(progressKey) || '{}');
+      return {
+        unlocked: Math.min(pairs.length, Math.max(5, Math.ceil((Number(saved.unlocked) || 5) / 5) * 5)),
+        round: Math.max(0, Number(saved.round) || 0),
+        total: Math.max(0, Number(saved.total) || 0),
+      };
+    } catch (_) { return { unlocked: Math.min(5, pairs.length), round: 0, total: 0 }; }
+  };
+  const progress = readProgress();
+  const saveProgress = () => localStorage.setItem(progressKey, JSON.stringify(progress));
+  let activePairs;
+  const previousFirstWordKey = `translation-first-word-${customSet ? `${setKey}-` : ''}${direction}`;
   const shufflePairs = () => {
     for (let i = pairs.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -1449,25 +1972,35 @@ function renderTranslationPractice(categoryKey = 'translation') {
     sessionStorage.setItem(previousFirstWordKey, pairs[0].en);
   };
   shufflePairs();
+  activePairs = pairs.slice(0, progress.unlocked);
   let index = 0;
   let timeout;
   const render = (success = false) => {
     if (timeout) clearTimeout(timeout);
-    const pair = pairs[index];
-    const prompt = direction === 'en-es' ? pair.en : pair.es;
-    const answers = (direction === 'en-es' ? pair.es : pair.en).split(/\s*\/\s*/).map(value => value.trim());
+    const pair = activePairs[index];
+    const spanishAnswers = pair.esAnswers || pair.es.split(/\s*\/\s*/).map(value => value.trim());
+    const englishAnswers = pair.enAnswers || pair.en.split(/\s*\/\s*/).map(value => value.trim());
+    const prompt = direction === 'en-es'
+      ? pair.en
+      : spanishAnswers[Math.floor(Math.random() * spanishAnswers.length)];
+    const answers = direction === 'en-es' ? spanishAnswers : englishAnswers;
     const normalizeAnswer = value => value.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const normalizedAnswers = answers.map(normalizeAnswer);
+    const sectionTitle = customSet?.title || 'Practice Translation';
+    const directionTitle = direction === 'en-es' ? 'English to Spanish' : 'Spanish to English';
+    const backTarget = customSet ? `#vocabulary/${setKey}` : '#practice/vocabulary';
     view.innerHTML = `
-      <a href="#practice/vocabulary" class="back-link">← Back to Vocabulary</a>
-      <div class="lesson-header"><span class="file-num">Vocabulary · Practice Translation</span><h1>${direction === 'en-es' ? 'English to Spanish' : 'Spanish to English'}</h1>
-      <p class="topics">Word ${index + 1} of ${pairs.length}</p>
+      <a href="${backTarget}" class="back-link">← Back</a>
+      <div class="lesson-header"><span class="file-num">Vocabulary · ${escapeHTML(sectionTitle)}</span><h1>${customSet ? `${escapeHTML(sectionTitle)} · ` : ''}${directionTitle}</h1>
+      <p class="topics">Words ${activePairs.length} of ${pairs.length} unlocked · ${progress.round}/100 repetitions in this group · ${progress.total} total</p>
       <button class="btn btn-secondary" id="shuffleTranslationWords" type="button">🔀 Shuffle words</button>
-      <div class="vocabulary-progress-track"><span style="width:${((index + 1) / pairs.length) * 100}%"></span></div></div>
+      <button class="btn btn-secondary" id="resetTranslationProgress" type="button">↺ Reset progress</button>
+      <div class="vocabulary-progress-track"><span style="width:${progress.round}%"></span></div></div>
       <section class="translation-practice ${success ? 'translation-success' : ''}" aria-live="polite">
         <p class="translation-prompt">${escapeHTML(prompt)}</p>
+        <div id="translationPhoneticControl"></div>
         <label for="translationAnswer">${direction === 'en-es' ? 'Write the Spanish translation' : 'Write the English translation'}</label>
-        <input id="translationAnswer" class="vocabulary-input" type="text" autocomplete="off" autofocus>
+        <input id="translationAnswer" class="vocabulary-input" type="text" autocomplete="off">
         <div class="exercise-actions">
           <button class="btn btn-secondary" id="showTranslationAnswer" type="button">Show answer</button>
           <button class="btn btn-secondary" id="nextTranslationWord" type="button">Next question →</button>
@@ -1475,21 +2008,36 @@ function renderTranslationPractice(categoryKey = 'translation') {
         <p class="translation-feedback" role="status">${success ? '✓ Correct!' : ''}</p>
       </section>`;
     const input = $('#translationAnswer', view);
+    $('#translationPhoneticControl', view).appendChild(createPhoneticControl(() => direction === 'en-es' ? prompt : pair.en));
     $('#shuffleTranslationWords', view).addEventListener('click', () => {
-      shufflePairs();
+      activePairs = pairs.slice(0, progress.unlocked);
+      for (let i = activePairs.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [activePairs[i], activePairs[j]] = [activePairs[j], activePairs[i]];
+      }
       index = 0;
+      render();
+    });
+    $('#resetTranslationProgress', view).addEventListener('click', () => {
+      if (!window.confirm('Reset progress for this translation direction? You will start again with the first 5 words.')) return;
+      progress.unlocked = Math.min(5, pairs.length);
+      progress.round = 0;
+      progress.total = 0;
+      activePairs = pairs.slice(0, progress.unlocked);
+      index = 0;
+      saveProgress();
       render();
     });
     $('#nextTranslationWord', view).addEventListener('click', () => {
       if (timeout) clearTimeout(timeout);
       timeout = null;
-      index = (index + 1) % pairs.length;
+      index = (index + 1) % activePairs.length;
       render();
     });
     $('#showTranslationAnswer', view).addEventListener('click', () => {
       $('.translation-feedback', view).textContent = `Answer: ${answers.join(' / ')}`;
     });
-    input.focus();
+    focusAnswerFieldOnDesktop(input);
     const check = () => {
       if (!normalizedAnswers.includes(normalizeAnswer(input.value))) {
         $('.translation-feedback', view).textContent = 'Not quite. Try again.';
@@ -1498,7 +2046,22 @@ function renderTranslationPractice(categoryKey = 'translation') {
       }
       $('.translation-feedback', view).textContent = '✓ Correct!';
       $('.translation-practice', view).classList.add('translation-success');
-      timeout = setTimeout(() => { index = (index + 1) % pairs.length; render(); }, 350);
+      progress.round += 1;
+      progress.total += 1;
+      let unlockedMore = false;
+      if (progress.round >= 100) {
+        progress.round = 0;
+        const previousUnlocked = progress.unlocked;
+        progress.unlocked = Math.min(pairs.length, progress.unlocked + 5);
+        activePairs = pairs.slice(0, progress.unlocked);
+        unlockedMore = progress.unlocked > previousUnlocked;
+      }
+      saveProgress();
+      timeout = setTimeout(() => {
+        index = (index + 1) % activePairs.length;
+        render();
+        if (unlockedMore) $('.translation-feedback', view).textContent = `Great work! ${progress.unlocked} words are now unlocked.`;
+      }, 900);
     };
     input.addEventListener('input', () => {
       if (normalizedAnswers.includes(normalizeAnswer(input.value))) check();
@@ -1597,11 +2160,11 @@ function renderLesson(params) {
     $('#completionArea').style.display = 'none';
     const items = section === 'all'
       ? [
-          ...lesson.grammar.map(q => ({ ...q, _section: 'grammar' })),
-          ...lesson.vocabulary.map(q => ({ ...q, _section: 'vocabulary' })),
-          ...lesson.mixed.map(q => ({ ...q, _section: 'mixed' })),
+          ...lesson.grammar.map((q, qIdx) => ({ ...q, _section: 'grammar', _qIdx: qIdx })),
+          ...lesson.vocabulary.map((q, qIdx) => ({ ...q, _section: 'vocabulary', _qIdx: qIdx })),
+          ...lesson.mixed.map((q, qIdx) => ({ ...q, _section: 'mixed', _qIdx: qIdx })),
         ]
-      : lesson[section].map(q => ({ ...q, _section: section }));
+      : lesson[section].map((q, qIdx) => ({ ...q, _section: section, _qIdx: qIdx }));
     items.forEach((q, idx) => {
       Exercises.render(q, idx, c);
     });
@@ -1611,7 +2174,7 @@ function renderLesson(params) {
       const { correct, qIdx } = e.detail;
       const item = items[qIdx];
       const sectionKey = item._section;
-      STATE = Storage.recordAnswer(STATE, fileId, lessonLetter, sectionKey, qIdx, correct);
+      STATE = Storage.recordAnswer(STATE, fileId, lessonLetter, sectionKey, item._qIdx, correct);
       updateHeaderStats();
       if (correct) showToast('+10 points ⭐', 'success');
       showCompletion();
@@ -1652,7 +2215,7 @@ function renderPractice(params) {
   }
   if (params[0] === 'vocabulary') {
     view.innerHTML = `
-      <a href="#practice" class="back-link">← Back to Practice</a>
+      <a href="#practice" class="back-link">← Back</a>
       <div class="lesson-header">
         <span class="file-num">Vocabulary practice</span>
         <h1 style="margin-top:0.5rem">Vocabulary</h1>
@@ -1670,6 +2233,34 @@ function renderPractice(params) {
         <button class="vocabulary-card" data-vocabulary="translation" type="button">
           <span class="vocabulary-emoji">🔤</span>
           <span>Practice Translation</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="days" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">📅</span>
+          <span>Days of the week</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="continents" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🌎</span>
+          <span>Continents</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="countries" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🚩</span>
+          <span>Countries</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="adjectives" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">✨</span>
+          <span>Adjectives</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="jobs" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">💼</span>
+          <span>Jobs</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="family" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">👨‍👩‍👧‍👦</span>
+          <span>Family</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="places" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🏙️</span>
+          <span>Places and buildings</span>
         </button>
       </div>
     `;
@@ -1707,7 +2298,7 @@ function renderPractice(params) {
         <span class="vocabulary-emoji" aria-hidden="true">🗂️</span>
         <span>
           <strong>Vocabulary</strong>
-          <small>Practise useful English words with food and numbers.</small>
+          <small>Practise food, numbers, days, continents, countries, adjectives, jobs, family, places and buildings, and translation.</small>
         </span>
         <span aria-hidden="true">→</span>
       </button>
@@ -2387,8 +2978,10 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
 function startAllPractice() {
   const all = [];
   Files.forEach(f => f.lessons.forEach(l => {
-    [...l.grammar, ...l.vocabulary, ...l.mixed].forEach((q, i) => {
-      all.push({ ...q, _ref: { file: f.id, lesson: l.letter, section: 'all', qIdx: i } });
+    ['grammar', 'vocabulary', 'mixed'].forEach(section => {
+      l[section].forEach((q, qIdx) => {
+        all.push({ ...q, _ref: { file: f.id, lesson: l.letter, section, qIdx } });
+      });
     });
   }));
   const uniqueQuestions = new Map();
@@ -2402,36 +2995,155 @@ function startAllPractice() {
   startSession('Global Practice', shuffled, { mode: 'global' });
 }
 
+function resolveWrongQuestion(record) {
+  const file = Files.find(item => item.id === record.file);
+  const lesson = file?.lessons.find(item => item.letter === record.lesson);
+  if (!lesson) return null;
+
+  const rawIndex = Number.isInteger(record.qIdx) ? record.qIdx : record.qIndex;
+  if (!Number.isInteger(rawIndex) || rawIndex < 0) return null;
+
+  const sections = ['grammar', 'vocabulary', 'mixed'];
+  const resolveCombinedIndex = () => {
+    let remaining = rawIndex;
+    for (const section of sections) {
+      const questions = lesson[section] || [];
+      if (remaining < questions.length) {
+        return { section, qIdx: remaining, question: questions[remaining] };
+      }
+      remaining -= questions.length;
+    }
+    return null;
+  };
+
+  let resolved;
+  if (record.section === 'all') {
+    // Older global practice entries used one index across all three lesson sections.
+    resolved = resolveCombinedIndex();
+  } else {
+    const questions = lesson[record.section];
+    if (Array.isArray(questions) && questions[rawIndex]) {
+      resolved = { section: record.section, qIdx: rawIndex, question: questions[rawIndex] };
+    } else {
+      // Recover entries saved by older "All" practice, which stored the combined index.
+      resolved = resolveCombinedIndex();
+    }
+  }
+
+  if (!resolved?.question) return null;
+  return {
+    record,
+    file,
+    lesson,
+    question: resolved.question,
+    ref: { file: file.id, lesson: lesson.letter, section: resolved.section, qIdx: resolved.qIdx },
+  };
+}
+
 function startWrongReview() {
-  if (STATE.wrongQuestions.length === 0) {
+  const items = STATE.wrongQuestions.map(resolveWrongQuestion).filter(Boolean);
+  if (items.length === 0) {
     const view = $('#mainView');
     view.innerHTML = `
       <h1 class="section-title">🔁 Review Mistakes</h1>
       <div class="lesson-header" style="text-align:center">
         <p style="font-size:1.2rem">🎉 You have no questions to review!</p>
         <p class="text-muted">Keep practicing; questions you answer incorrectly will appear here.</p>
-        <a href="#home" class="btn mt-2">Back to Home</a>
+        <a href="#review" class="btn mt-2">Back to Review</a>
       </div>
     `;
     return;
   }
-  const items = [];
-  STATE.wrongQuestions.forEach(w => {
-    const file = Files.find(f => f.id === w.file);
-    if (!file) return;
-    const lesson = file.lessons.find(l => l.letter === w.lesson);
-    if (!lesson) return;
-    const pool = lesson[w.section] || lesson.grammar;
-    if (pool[w.qIdx]) items.push({ ...pool[w.qIdx], _ref: w });
-  });
-  startSession('Review Mistakes', items, { mode: 'review' });
+
+  // Shuffle the mistake queue once, then keep each original exercise's controls and grading.
+  for (let index = items.length - 1; index > 0; index--) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
+  }
+
+  const view = $('#mainView');
+  let currentIndex = 0;
+  let advanceTimeout = null;
+  const route = window.location.hash;
+  view.innerHTML = `
+    <a href="#review" class="back-link">← Back to Review</a>
+    <div class="lesson-header">
+      <span class="file-num">Review practice</span>
+      <h1 style="margin-top:0.5rem">Review Mistakes</h1>
+      <p class="topics">Answer each saved mistake correctly to move on. If you miss one, try it again.</p>
+    </div>
+    <div class="vocabulary-progress-bar" id="reviewPracticeProgress"></div>
+    <div id="reviewPracticeQuestion"></div>
+    <div class="exercise-actions hidden" id="reviewPracticeRetryActions">
+      <button class="btn" type="button" id="reviewPracticeRetry">Try this question again</button>
+    </div>
+    <div id="reviewPracticeSummary"></div>
+  `;
+
+  const progress = $('#reviewPracticeProgress');
+  const questionContainer = $('#reviewPracticeQuestion');
+  const retryActions = $('#reviewPracticeRetryActions');
+  const summary = $('#reviewPracticeSummary');
+
+  const finish = () => {
+    progress.innerHTML = `<span>Progress</span><strong>${items.length} / ${items.length}</strong>`;
+    questionContainer.innerHTML = '';
+    retryActions.classList.add('hidden');
+    summary.innerHTML = `
+      <div class="lesson-header text-center">
+        <div style="font-size:3rem">🎉</div>
+        <h2>Review complete!</h2>
+        <p class="topics">You answered all ${items.length} saved mistakes correctly.</p>
+        <a href="#review" class="btn mt-2">Return to Review</a>
+      </div>
+    `;
+  };
+
+  const renderCurrent = () => {
+    if (advanceTimeout) {
+      clearTimeout(advanceTimeout);
+      advanceTimeout = null;
+    }
+    if (currentIndex >= items.length) {
+      finish();
+      return;
+    }
+
+    const item = items[currentIndex];
+    progress.innerHTML = `<span>Progress</span><strong>${currentIndex + 1} / ${items.length}</strong>`;
+    questionContainer.innerHTML = '';
+    retryActions.classList.add('hidden');
+    summary.innerHTML = '';
+    Exercises.render(item.question, 0, questionContainer);
+    questionContainer.addEventListener('answered', event => {
+      const { correct } = event.detail;
+      STATE = Storage.recordReviewAnswer(STATE, item.ref, item.record, correct);
+      updateHeaderStats();
+      if (correct) {
+        showToast('+10 points ⭐', 'success');
+        advanceTimeout = setTimeout(() => {
+          advanceTimeout = null;
+          if (window.location.hash !== route) return;
+          currentIndex++;
+          renderCurrent();
+        }, 900);
+      } else {
+        retryActions.classList.remove('hidden');
+        $('#reviewPracticeRetry').addEventListener('click', renderCurrent, { once: true });
+      }
+    }, { once: true });
+  };
+
+  renderCurrent();
 }
 
 function startMixedPractice(file, mode) {
   const items = [];
   file.lessons.forEach(l => {
-    [...l.grammar, ...l.vocabulary, ...l.mixed].forEach((q, i) => {
-      items.push({ ...q, _ref: { file: file.id, lesson: l.letter, section: 'all', qIdx: i } });
+    ['grammar', 'vocabulary', 'mixed'].forEach(section => {
+      l[section].forEach((q, qIdx) => {
+        items.push({ ...q, _ref: { file: file.id, lesson: l.letter, section, qIdx } });
+      });
     });
   });
   items.sort(() => Math.random() - 0.5);
@@ -2468,7 +3180,7 @@ function startSession(title, items, opts = {}) {
     const item = items[qIdx];
     const r = item._ref;
     if (r) {
-      STATE = Storage.recordAnswer(STATE, r.file, r.lesson, r.section, qIdx, correct);
+      STATE = Storage.recordAnswer(STATE, r.file, r.lesson, r.section, r.qIdx, correct);
       updateHeaderStats();
       if (correct) showToast('+10 points ⭐', 'success');
     }
@@ -2522,7 +3234,11 @@ function startSession(title, items, opts = {}) {
 // --- REVIEW PAGE ---
 function renderReview() {
   const view = $('#mainView');
-  const wrong = STATE.wrongQuestions;
+  const wrong = STATE.wrongQuestions.map(resolveWrongQuestion).filter(Boolean);
+  if (wrong.length !== STATE.wrongQuestions.length) {
+    STATE.wrongQuestions = wrong.map(item => item.record);
+    Storage.save(STATE);
+  }
   view.innerHTML = `
     <h1 class="section-title">🔁 Review Mistakes (${wrong.length})</h1>
     ${wrong.length === 0 ? `
@@ -2536,19 +3252,17 @@ function renderReview() {
       <button class="btn mb-2" id="practiceWrong">🎯 Practice now</button>
       <button class="btn btn-ghost mb-2" id="clearWrong">🗑️ Clear list</button>
       <div class="review-list">
-        ${wrong.map(w => {
-          const file = Files.find(f => f.id === w.file);
-          const lesson = file?.lessons.find(l => l.letter === w.lesson);
-          const pool = lesson?.[w.section] || lesson?.grammar || [];
-          const q = pool[w.qIdx];
-          if (!q) return '';
+        ${wrong.map(item => {
+          const { record, question, ref } = item;
+          const sectionLabel = ref.section === 'grammar' ? 'Grammar' : ref.section === 'vocabulary' ? 'Vocabulary' : 'Mixed practice';
+          const date = Number.isFinite(record.ts) ? new Date(record.ts).toLocaleDateString() : '';
           return `
             <div class="review-item">
               <div class="meta">
-                <span>File ${w.file} · Lesson ${w.lesson} · ${w.section === 'grammar' ? 'Grammar' : w.section === 'vocabulary' ? 'Vocabulary' : 'Mixed practice'}</span>
-                <span>${new Date(w.ts).toLocaleDateString()}</span>
+                <span>File ${escapeHTML(item.file.id)} · Lesson ${escapeHTML(item.lesson.letter)} · ${sectionLabel}</span>
+                <span>${escapeHTML(date)}</span>
               </div>
-              <div class="q">${q.prompt}</div>
+              <div class="q">${Exercises.localizePrompt(question.prompt || 'Exercise')}</div>
             </div>
           `;
         }).join('')}

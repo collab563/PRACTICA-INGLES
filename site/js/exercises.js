@@ -1,6 +1,12 @@
 // ============== EXERCISE ENGINE ==============
 // Renders and grades all exercise types
 
+function focusAnswerFieldOnDesktop(input) {
+  if (!input || input.disabled || typeof window.matchMedia !== 'function') return;
+  const desktopWithPointer = window.matchMedia('(min-width: 768px) and (any-hover: hover) and (any-pointer: fine)').matches;
+  if (desktopWithPointer) input.focus({ preventScroll: true });
+}
+
 const Exercises = {
   // Normalize text for answer comparison
   normalize(s) {
@@ -66,6 +72,10 @@ const Exercises = {
     else if (ex.type === 'tf') body.appendChild(this.renderTF(ex, el, feedbackEl));
 
     container.appendChild(el);
+    const focusScope = container.closest('#exerciseContainer') || container;
+    if (!focusScope.querySelector('input:focus, textarea:focus')) {
+      focusAnswerFieldOnDesktop(el.querySelector('.fill-input'));
+    }
   },
 
   // --- Multiple Choice ---
@@ -152,6 +162,11 @@ const Exercises = {
       this.showFeedback(fbEl, allCorrect, ex.explanation, correctAnswerText);
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: allCorrect, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     });
+    inputs.forEach(input => input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      if (!checkBtn.disabled) checkBtn.click();
+    }));
     const revealBtn = document.createElement('button');
     revealBtn.className = 'btn btn-ghost';
     revealBtn.textContent = 'Show answer';
@@ -305,6 +320,11 @@ const Exercises = {
       this.showFeedback(fbEl, allCorrect, ex.explanation, answers.map(answer => this.escapeHTML(answer)).join(' / '));
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: allCorrect, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     });
+    inputs.forEach(input => input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      if (!checkBtn.disabled) checkBtn.click();
+    }));
 
     const revealBtn = document.createElement('button');
     revealBtn.className = 'btn btn-ghost';

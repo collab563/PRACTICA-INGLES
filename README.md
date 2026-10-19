@@ -25,7 +25,8 @@ Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicio
 - **Práctica de lectura**: 10 lecturas en cada uno de tres niveles, con preguntas de comprensión y actividades de emparejar.
 - **Práctica de escritura**: tres niveles con 10 oraciones cada uno para traducir del español al inglés.
 - **Evaluador de escritura con IA**: ofrece comentarios sobre gramática, ortografía, redundancia y orden de palabras mediante Google Gemini. También permite usar Gemini para traducir desde el traductor.
-- **Vocabulario de comida y números**, con pronunciación mediante las voces disponibles en el navegador.
+- **Vocabulario de comida, números, días, continentes, países, adjetivos, trabajos, familia y lugares**, con pronunciación mediante las voces disponibles en el navegador.
+- **Ayuda con banderas**: revela la respuesta del ejercicio sin conexión, conserva en este dispositivo los datos consultados antes y permite identificar una foto usando Gemini y Google Search.
 - **Créditos de imágenes**: las fotos locales y sus fuentes/licencias verificables están documentadas en [`site/IMAGE-CREDITS.md`](site/IMAGE-CREDITS.md); la aplicación muestra los créditos junto a cada foto.
 - **Estadísticas detalladas** con gráficos
 - **Modo oscuro** 🌙
@@ -38,7 +39,8 @@ Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicio
 - El progreso de ejercicios se guarda en el almacenamiento local del navegador (`localStorage`); no hace falta crear una cuenta para usar el sitio.
 - El traductor offline procesa el texto en el navegador. Si eliges Apertium, el texto se envía por HTTPS a ese servicio para traducirlo.
 - El evaluador de escritura y la traducción con Gemini envían el texto que escribas a Google Gemini. Para usarlos, debes proporcionar tu propia clave de API. La clave se mantiene en memoria durante la sesión de la página y la aplicación no la guarda en `localStorage`; las estadísticas de uso de tokens se guardan en `sessionStorage`.
-- La aplicación no guarda automáticamente el texto enviado ni las respuestas de IA en el almacenamiento del navegador. El tratamiento que hagan Google o Apertium está sujeto a sus propias condiciones y políticas.
+- La identificación de banderas con foto y la búsqueda de información requieren internet y la misma clave de Gemini cargada en el Evaluador de escritura. Solo se envía una foto después de marcar el consentimiento y pulsar **Identify photo online**; se reduce su tamaño antes del envío y la página no la guarda. La respuesta y los enlaces a fuentes se pueden guardar localmente para revisarlos sin conexión. Las solicitudes usan Google Search y pueden estar sujetas a límites o cargos del servicio.
+- El texto enviado al evaluador y al traductor con Gemini no se guarda en el navegador. La ayuda de banderas sí conserva los datos y enlaces consultados si el usuario lo solicita, para permitir la revisión sin conexión; nunca conserva las fotos. El tratamiento que hagan Google o Apertium está sujeto a sus propias condiciones y políticas.
 - No introduzcas información personal, confidencial ni claves de API en textos que envíes a servicios online. No publiques tu clave en el repositorio, capturas de pantalla o enlaces.
 
 ---
@@ -114,6 +116,8 @@ Abre `http://localhost:8000` en tu navegador.
 El modo offline funciona sin conexión una vez que los archivos del sitio están disponibles localmente. Su glosario está en `site/js/translator.js`; la calidad depende de las frases y palabras incluidas. El modo online de Apertium envía el texto por HTTPS al servicio; no incluyas información confidencial. El endpoint público puede tener límites o interrupciones y la calidad varía según la traducción.
 
 El evaluador de escritura y el traductor con Gemini usan una clave de API que proporciona cada usuario. La clave solo se mantiene en memoria durante la sesión de la página; no se incluye en el código ni se persiste en el almacenamiento local. El texto enviado se transmite a Google Gemini. Revisa las condiciones y políticas del proveedor antes de usarlo y no envíes información personal o confidencial.
+
+La ayuda online de banderas usa esa misma clave y puede enviar a Google Gemini la foto seleccionada o el nombre de la bandera actual, junto con una búsqueda de Google. La aplicación guarda solo los datos y enlaces devueltos, nunca la foto; la respuesta se conserva en el almacenamiento local para consulta offline. El servicio online requiere conexión y puede tener límites o cargos.
 
 Al abrir el sitio publicado con conexión, un service worker guarda la aplicación en el navegador. Espera a que termine la carga antes de desconectarte; luego vuelve a abrir la misma dirección en el mismo navegador para usar ejercicios, teoría, progreso y traducción local sin conexión. El traductor online requiere internet. Los datos de progreso permanecen en el almacenamiento local del navegador.
 
