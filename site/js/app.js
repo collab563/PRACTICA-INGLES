@@ -433,6 +433,8 @@ function init() {
   Router.add('grammar-practice', renderGrammarPractice);
   Router.add('reading', renderReadingPractice);
   Router.add('writing', renderWritingPractice);
+  Router.add('irregular-verbs', renderIrregularVerbsPractice);
+  Router.add('learning-lab', renderLearningLabPractice);
   Router.add('translate', () => renderTranslator());
   Router.add('review', renderReview);
   Router.add('stats', renderStats);
@@ -2336,6 +2338,22 @@ function renderPractice(params) {
         <span aria-hidden="true">→</span>
       </button>
     </section>
+    <section class="grammar-practice-section">
+      <h2 class="section-title">IRREGULAR VERBS</h2>
+      <button class="grammar-practice-card" id="openIrregularVerbsPractice" type="button">
+        <span class="vocabulary-emoji" aria-hidden="true">📚</span>
+        <span><strong>Irregular verbs</strong><small>Practise the past simple and past participle forms.</small></span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+    <section class="grammar-practice-section">
+      <h2 class="section-title">LEARNING LAB</h2>
+      <button class="grammar-practice-card" id="openLearningLab" type="button">
+        <span class="vocabulary-emoji" aria-hidden="true">🧠</span>
+        <span><strong>Learning Lab</strong><small>Build a spaced review plan, save words from readings, watch captioned lessons, and mix practice topics.</small></span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
   `;
   $$('.practice-mode').forEach(el => {
     el.addEventListener('click', () => {
@@ -2352,6 +2370,8 @@ function renderPractice(params) {
   $('#openGrammarPractice').addEventListener('click', () => Router.navigate('grammar-practice'));
   $('#openReadingPractice').addEventListener('click', () => Router.navigate('reading'));
   $('#openWritingPractice').addEventListener('click', () => Router.navigate('writing'));
+  $('#openIrregularVerbsPractice').addEventListener('click', () => Router.navigate('irregular-verbs'));
+  $('#openLearningLab').addEventListener('click', () => Router.navigate('learning-lab'));
 }
 
 const GRAMMAR_EXERCISE_TYPES = [

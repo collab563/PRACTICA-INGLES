@@ -89,6 +89,7 @@ function renderReadingPractice(params = []) {
     const passage = passages[passageIndex];
     const extension = ReadingExtensions[level.key]?.[passageIndex];
     const furtherDetails = ReadingFurtherDetails[level.key]?.[passageIndex];
+    let selectingWords = false;
     if (!Array.isArray(passage.questions) || passage.questions.length !== 10 ||
         !extension || typeof extension.continuation !== 'string' || !extension.continuation.trim() ||
         typeof furtherDetails !== 'string' || !furtherDetails.trim() ||
@@ -133,6 +134,10 @@ function renderReadingPractice(params = []) {
       `;
     }).join('');
 
+    const passageText = `${passage.text} ${extension.continuation} ${furtherDetails}`;
+    const renderPassageText = selectable => passageText.split(/\n\s*\n/).map(paragraph => `<p>${selectable
+      ? paragraph.replace(/[A-Za-z]+(?:['’][A-Za-z]+)?|[^A-Za-z]+/g, token => /^[A-Za-z]/.test(token) ? `<button class="reading-word" type="button" data-reading-word="${escapeHTML(token)}">${escapeHTML(token)}</button>` : escapeHTML(token))
+      : escapeHTML(paragraph)}</p>`).join('');
     view.innerHTML = `
       <a href="#reading" class="back-link">← Back to Reading levels</a>
       <div class="lesson-header">
@@ -145,7 +150,8 @@ function renderReadingPractice(params = []) {
       </div>
       <article class="reading-passage">
         <h2>${escapeHTML(passage.title)}</h2>
-        <p>${escapeHTML(`${passage.text} ${extension.continuation} ${furtherDetails}`)}</p>
+        <div class="reading-word-tools"><button class="btn btn-secondary" type="button" id="toggleReadingWordSave" aria-pressed="false">Save words from this reading</button><span id="readingWordSaveHint" hidden>Click any word in the text to save it to your Learning Lab notebook.</span></div>
+        <div id="readingPassageText">${renderPassageText(false)}</div>
       </article>
       <div class="reading-questions">
         <h2>Comprehension questions</h2>
@@ -176,6 +182,24 @@ function renderReadingPractice(params = []) {
     `;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     focusAnswerFieldOnDesktop($('.reading-match-letter', view));
+
+    $('#toggleReadingWordSave').addEventListener('click', event => {
+      selectingWords = !selectingWords;
+      event.currentTarget.setAttribute('aria-pressed', String(selectingWords));
+      event.currentTarget.textContent = selectingWords ? 'Done saving words' : 'Save words from this reading';
+      $('#readingWordSaveHint').hidden = !selectingWords;
+      $('#readingPassageText').innerHTML = renderPassageText(selectingWords);
+      if (!selectingWords) return;
+      $$('[data-reading-word]', $('#readingPassageText')).forEach(button => button.addEventListener('click', () => {
+        const word = button.dataset.readingWord;
+        const context = passageText.split(/(?<=[.!?])\s+/).find(sentence => sentence.toLowerCase().includes(word.toLowerCase())) || passage.title;
+        if (globalThis.addLearningWord?.(word, { example: context, source: `Reading · ${passage.title}` })) {
+          button.classList.add('saved');
+          button.setAttribute('aria-pressed', 'true');
+          showToast(`Saved “${word}” to your Learning Lab notebook.`, 'success');
+        }
+      }));
+    });
 
     $$('.reading-question', view).forEach(questionCard => {
       const feedback = $('.reading-question-feedback', questionCard);

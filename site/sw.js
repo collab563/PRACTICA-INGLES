@@ -1,4 +1,4 @@
-const CACHE_NAME = 'english-practice-v47';
+const CACHE_NAME = 'english-practice-v49';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ const APP_SHELL = [
   './data/phonetics.js',
   './data/vocabulary-extra.js',
   './data/vocabulary-translation-sets.js',
+  './data/video-lessons.js',
   './data/food-dishes.js',
   './js/storage.js',
   './js/router.js',
@@ -35,6 +36,7 @@ const APP_SHELL = [
   './js/app.js',
   './js/reading-practice.js',
   './js/writing-practice.js',
+  './js/learning-lab.js',
   './js/writing-evaluator.js',
   './js/register-service-worker.js',
 ];
@@ -62,6 +64,8 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
   const isLocalRequest = url.origin === self.location.origin;
+  // Stream uploaded lessons without putting large media files in the app cache.
+  if (request.destination === 'video') return;
   const isDishPhoto = request.destination === 'image' &&
     ['images.unsplash.com', 'thumb.wikimedia.org'].includes(url.hostname);
   if (request.method !== 'GET' || (!isLocalRequest && !isDishPhoto)) return;

@@ -783,6 +783,36 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   font-size: 0.88rem;
   font-weight: 600;
 }
+.reading-word-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; }
+.reading-word-tools span { color: var(--text-muted); font-size: 0.9rem; }
+.reading-word { display: inline; padding: 0 1px; color: inherit; font: inherit; background: transparent; border: 0; border-radius: 3px; cursor: pointer; }
+.reading-word:hover, .reading-word:focus-visible { color: var(--primary); background: var(--primary-light); outline: none; }
+.reading-word.saved { color: var(--success-text); background: var(--success-light); }
+.learning-search-label { display: block; margin: 1rem 0 0.4rem; font-weight: 600; }
+.learning-word-list { display: grid; gap: 0.7rem; margin: 1rem 0 2rem; }
+.learning-word-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.learning-word-row > div { display: grid; gap: 0.2rem; }
+.learning-word-row > div span { color: var(--text-muted); }
+.learning-word-row small, .learning-notebook-row small { color: var(--text-muted); }
+.learning-notebook-row { display: grid; grid-template-columns: minmax(120px, 0.8fr) repeat(2, minmax(180px, 1.2fr)) auto; align-items: end; gap: 0.8rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.learning-notebook-row > div { display: grid; gap: 0.25rem; align-self: center; }
+.learning-notebook-row label { display: grid; gap: 0.35rem; font-weight: 600; font-size: 0.9rem; }
+.learning-notebook-row .vocabulary-input { min-width: 0; }
+.learning-word-example { margin: 0.3rem 0 0; color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+.learning-video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.learning-video-card, .learning-video-empty { padding: 1.1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.learning-video-card h2, .learning-video-empty h2 { margin-bottom: 0.5rem; }
+.learning-video-card video { display: block; width: 100%; max-height: 440px; margin: 0.75rem 0; background: #000; border-radius: var(--radius-sm); }
+.learning-video-card details { margin: 0.75rem 0; }
+.learning-video-card details p { margin-top: 0.5rem; white-space: pre-wrap; line-height: 1.7; }
+.learning-video-vocab { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.learning-video-vocab h3 { flex: 0 0 100%; margin: 0.25rem 0; font-size: 1rem; }
+.learning-video-empty { max-width: 760px; margin: 1rem 0; }
+.learning-video-empty p { line-height: 1.7; }
+@media (max-width: 768px) {
+  .learning-notebook-row { grid-template-columns: 1fr; align-items: stretch; }
+  .learning-word-row { align-items: flex-start; }
+}
 .reading-progress {
   display: flex;
   justify-content: space-between;
