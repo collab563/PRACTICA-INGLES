@@ -1792,7 +1792,7 @@ globalThis.VocabularyWords = [
     "es": "él"
   },
   {
-    "en": "their su",
+    "en": "their",
     "es": "(de ellos)"
   },
   {
@@ -2012,7 +2012,7 @@ globalThis.VocabularyWords = [
     "es": "esta/esto"
   },
   {
-    "en": "her su",
+    "en": "her",
     "es": "(de ella)"
   },
   {
@@ -2644,7 +2644,7 @@ globalThis.VocabularyWords = [
     "es": "mismo"
   },
   {
-    "en": "again de",
+    "en": "again",
     "es": "nuevo/otra vez"
   },
   {
@@ -2792,7 +2792,7 @@ globalThis.VocabularyWords = [
     "es": "padre"
   },
   {
-    "en": "don&apos;t",
+    "en": "don't",
     "es": "No"
   },
   {
@@ -3328,7 +3328,7 @@ globalThis.VocabularyWords = [
     "es": "pueblo"
   },
   {
-    "en": "behinddetrás",
+    "en": "behind",
     "es": "de/por detrás"
   },
   {

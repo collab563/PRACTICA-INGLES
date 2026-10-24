@@ -388,9 +388,9 @@ function renderLearningLabPractice(params = []) {
           ? (Array.isArray(item.word.es) ? item.word.es : String(item.word.es || '').split(/\s*\/\s*/)).flatMap(text => String(text).split(/\s*\/\s*/)).filter(Boolean)
           : verb[item.formIndex];
         const label = isVocab ? 'Write the Spanish meaning' : `Write the ${item.formIndex === 1 ? 'past simple' : 'past participle'}`;
-        body.innerHTML = `<section class="writing-exercise"><h2>${label}</h2><p class="writing-prompt">${escapeHTML(prompt)}</p>${isVocab ? '' : '<div id="mixedPhonetic"></div>'}<label class="writing-answer-label" for="mixedAnswer">Your answer</label><input id="mixedAnswer" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none"><div class="writing-actions"><button class="btn" type="button" id="checkMixedAnswer">Check answer</button><button class="btn btn-secondary" type="button" id="showMixedAnswer">Show answer</button></div></section>`;
+        body.innerHTML = `<section class="writing-exercise"><h2>${label}</h2><p class="writing-prompt">${escapeHTML(prompt)}</p><div id="mixedPhonetic"></div><label class="writing-answer-label" for="mixedAnswer">Your answer</label><input id="mixedAnswer" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none"><div class="writing-actions"><button class="btn" type="button" id="checkMixedAnswer">Check answer</button><button class="btn btn-secondary" type="button" id="showMixedAnswer">Show answer</button></div></section>`;
         const input = $('#mixedAnswer', view);
-        if (!isVocab) $('#mixedPhonetic', view).appendChild(createPhoneticControl(() => verb[0]));
+        $('#mixedPhonetic', view).appendChild(createPhoneticControl(() => isVocab ? prompt : verb[0]));
         const check = () => {
           if (answered) return;
           if (!input.value.trim()) { showToast('Write an answer before checking it.', 'error'); input.focus(); return; }

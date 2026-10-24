@@ -224,6 +224,56 @@ const COMPARATIVE_SENTENCE_QUESTIONS = [
   { type: 'comparative-sentence', prompt: 'Complete with a comparative adjective: This week’s assignment is ___ than last week’s. (difficult)', answer: 'more difficult' },
 ];
 
+const COMPARATIVE_FILL_QUESTIONS = [
+  { type: 'fill', prompt: 'This shelf is ___ than the one below it. (high)', answer: 'higher' },
+  { type: 'fill', prompt: 'This box is ___ than that one. (big)', answer: 'bigger' },
+  { type: 'fill', prompt: 'July is ___ than May here. (hot)', answer: 'hotter' },
+  { type: 'fill', prompt: 'The air in the desert is ___ than near the coast. (dry)', answer: 'drier' },
+  { type: 'fill', prompt: 'The south coast is ___ than the north. (sunny)', answer: 'sunnier' },
+  { type: 'fill', prompt: 'I felt ___ during the long meeting than during the short break. (bored)', answer: 'more bored' },
+  { type: 'fill', prompt: 'She is ___ this week than last week. (stressed)', answer: 'more stressed' },
+  { type: 'fill', prompt: 'The mountain road is ___ than the main highway. (dangerous)', answer: 'more dangerous' },
+  { type: 'fill', prompt: 'The airport is ___ from town than the train station. (far)', answer: 'farther', acceptedAnswers: ['farther', 'further'] },
+  { type: 'fill', prompt: 'This apartment is ___ than our old one. (small)', answer: 'smaller' },
+  { type: 'fill', prompt: 'This exercise is ___ than the previous one. (easy)', answer: 'easier' },
+  { type: 'fill', prompt: 'The bus is ___ than a taxi. (cheap)', answer: 'cheaper' },
+  { type: 'fill', prompt: 'This film is ___ than the first one. (long)', answer: 'longer' },
+  { type: 'fill', prompt: 'These shoes are ___ than they were yesterday. (dirty)', answer: 'dirtier' },
+  { type: 'fill', prompt: 'The library is ___ to my house than the museum is. (near)', answer: 'nearer' },
+  { type: 'fill', prompt: 'This kitchen is ___ than the one upstairs. (clean)', answer: 'cleaner' },
+  { type: 'fill', prompt: 'This route is ___ than the coastal road. (short)', answer: 'shorter' },
+  { type: 'fill', prompt: 'This café is ___ with students than the one across the street. (popular)', answer: 'more popular' },
+];
+
+const SUPERLATIVE_SENTENCE_QUESTIONS = [
+  { type: 'fill', prompt: 'That is ___ street in town. (narrow)', answer: 'the narrowest' },
+  { type: 'fill', prompt: 'June was ___ month of the year. (exciting)', answer: 'the most exciting' },
+  { type: 'fill', prompt: 'This is ___ seat in the room. (good)', answer: 'the best' },
+  { type: 'fill', prompt: 'Mount Everest is ___ mountain in the world. (tall)', answer: 'the tallest' },
+  { type: 'fill', prompt: 'This is ___ film I have ever seen. (interesting)', answer: 'the most interesting' },
+  { type: 'fill', prompt: 'She is ___ student in the class. (good)', answer: 'the best' },
+  { type: 'fill', prompt: 'Of all the options on the menu, this is ___ because it costs more than the others. (expensive)', answer: 'the most expensive' },
+  { type: 'fill', prompt: 'That was ___ question in the test. (difficult)', answer: 'the most difficult' },
+  { type: 'fill', prompt: 'This is ___ café in town; everyone wants to visit it. (popular)', answer: 'the most popular' },
+  { type: 'fill', prompt: 'Of all the buildings in town, the tower is ___. (high)', answer: 'the highest' },
+  { type: 'fill', prompt: 'Of the three boxes, this one is ___. (big)', answer: 'the biggest' },
+  { type: 'fill', prompt: 'July is ___ month here; temperatures reach 40°C. (hot)', answer: 'the hottest' },
+  { type: 'fill', prompt: 'This is ___ desert in the country. (dry)', answer: 'the driest' },
+  { type: 'fill', prompt: 'Today is ___ day of the week, with no clouds at all. (sunny)', answer: 'the sunniest' },
+  { type: 'fill', prompt: 'Of all the activities, the long lecture made me feel ___. (bored)', answer: 'the most bored' },
+  { type: 'fill', prompt: 'During exam week, Mia is ___ person in her family. (stressed)', answer: 'the most stressed' },
+  { type: 'fill', prompt: 'At night, this is ___ road in the area. (dangerous)', answer: 'the most dangerous' },
+  { type: 'fill', prompt: 'Of all the towns, Lima is ___ from here. (far)', answer: 'the farthest', acceptedAnswers: ['the farthest', 'the furthest'] },
+  { type: 'fill', prompt: 'This is ___ room in the house. (small)', answer: 'the smallest' },
+  { type: 'fill', prompt: 'This is ___ exercise in the book. (easy)', answer: 'the easiest' },
+  { type: 'fill', prompt: 'This is ___ shop in the market. (cheap)', answer: 'the cheapest' },
+  { type: 'fill', prompt: 'Of the three films, this one is ___. (long)', answer: 'the longest' },
+  { type: 'fill', prompt: 'After the storm, this is ___ beach in the area. (dirty)', answer: 'the dirtiest' },
+  { type: 'fill', prompt: 'Of the three bus stops, this one is ___ to my house. (near)', answer: 'the nearest' },
+  { type: 'fill', prompt: 'After the cleaning, this is ___ room in the house. (clean)', answer: 'the cleanest' },
+  { type: 'fill', prompt: 'Of the three routes, this is ___ way home. (short)', answer: 'the shortest' },
+];
+
 const COMPARATIVE_ADJECTIVE_QUESTIONS = [
   ['high', 'higher'],
   ['dirty', 'dirtier'],
@@ -2634,7 +2684,8 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
   const seeds = collectGrammarSentenceSeeds(topicIndex, sectionIndex, questions);
   const clozeCandidates = createGrammarClozeCandidates(seeds);
 
-  const missingFill = Math.max(0, 10 - grammarQuestionCount(questions, 'write'));
+  const writeQuestionTarget = topicIndex === 8 && sectionIndex === 2 ? 28 : 10;
+  const missingFill = Math.max(0, writeQuestionTarget - grammarQuestionCount(questions, 'write'));
   clozeCandidates.slice(0, missingFill).forEach(candidate => {
     supplemental.push({
       type: 'fill',
@@ -2743,9 +2794,13 @@ function getGrammarSectionQuestions(topicIndex, sectionIndex) {
     };
   });
   const sectionQuestions = [...questions, ...conversations, ...orderedQuestions];
+  if (topicIndex === 9 && sectionIndex === 0) {
+    sectionQuestions.push(...SUPERLATIVE_SENTENCE_QUESTIONS);
+  }
   if (topicIndex === 8 && sectionIndex === 2) {
     sectionQuestions.push(
       ...COMPARATIVE_SENTENCE_QUESTIONS,
+      ...COMPARATIVE_FILL_QUESTIONS,
       ...COMPARATIVE_ADJECTIVE_QUESTIONS.map(([adjective, comparative]) => ({
         type: 'comparative-form',
         prompt: `Write the comparative form of: <strong>${escapeHTML(adjective)}</strong> → ___`,
@@ -2891,6 +2946,8 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
   let currentIndex = 0;
   let correctCount = 0;
   let advanceTimeout = null;
+  const cachedQuestions = new Map();
+  const questionResults = new Map();
   const cancelAdvanceOnNavigation = () => {
     if (window.location.hash !== route) {
       if (advanceTimeout) {
@@ -2942,6 +2999,7 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
       </div>
       <div class="grammar-practice-question" id="grammarPracticeQuestion"></div>
       <div class="exercise-actions">
+        <button class="btn btn-secondary" id="grammarPracticePreviousQuestion" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Previous question</button>
         <button class="btn btn-secondary" id="grammarPracticeNextQuestion" type="button">${currentIndex === questions.length - 1 ? 'Finish practice' : 'Next question'}</button>
       </div>
       <div class="exercise-actions hidden" id="grammarPracticeRetryActions">
@@ -2949,8 +3007,36 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
       </div>
     `;
     const questionContainer = $('#grammarPracticeQuestion');
-    Exercises.render(question, currentIndex, questionContainer);
+    if (cachedQuestions.has(currentIndex)) {
+      questionContainer.appendChild(cachedQuestions.get(currentIndex));
+    } else {
+      Exercises.render(question, currentIndex, questionContainer);
+      cachedQuestions.set(currentIndex, questionContainer.firstElementChild);
+    }
+    const showRetryAction = () => {
+      $('#grammarPracticeRetryActions').classList.remove('hidden');
+      $('#grammarPracticeRetryQuestion').addEventListener('click', () => {
+        cachedQuestions.delete(currentIndex);
+        questionResults.delete(currentIndex);
+        renderQuestion();
+      }, { once: true });
+    };
+    if (questionResults.get(currentIndex) === false) showRetryAction();
+    const previousButton = $('#grammarPracticePreviousQuestion');
+    previousButton.addEventListener('click', () => {
+      if (currentIndex === 0) return;
+      if (advanceTimeout) {
+        clearTimeout(advanceTimeout);
+        advanceTimeout = null;
+      }
+      currentIndex -= 1;
+      renderQuestion();
+    });
     $('#grammarPracticeNextQuestion').addEventListener('click', () => {
+      if (advanceTimeout) {
+        clearTimeout(advanceTimeout);
+        advanceTimeout = null;
+      }
       currentIndex += 1;
       renderQuestion();
     });
@@ -2961,10 +3047,13 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
       }
       currentIndex = 0;
       correctCount = 0;
+      cachedQuestions.clear();
+      questionResults.clear();
       renderQuestion();
     });
     questionContainer.addEventListener('answered', event => {
       const { correct } = event.detail;
+      questionResults.set(currentIndex, correct);
       if (question._ref) {
         STATE = Storage.recordAnswer(
           STATE,
@@ -2986,8 +3075,7 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
           renderQuestion();
         }, 900);
       } else {
-        $('#grammarPracticeRetryActions').classList.remove('hidden');
-        $('#grammarPracticeRetryQuestion').addEventListener('click', renderQuestion, { once: true });
+        showRetryAction();
       }
     }, { once: true });
   };

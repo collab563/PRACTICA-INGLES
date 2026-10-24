@@ -10,7 +10,7 @@ function focusAnswerFieldOnDesktop(input) {
 const Exercises = {
   // Normalize text for answer comparison
   normalize(s) {
-    return String(s).trim().toLowerCase().replace(/[.!?,'"]/g, '').replace(/\s+/g, ' ');
+    return String(s).normalize('NFKC').trim().toLocaleLowerCase('en-GB').replace(/[.!?,'"]/g, '').replace(/\s+/g, ' ');
   },
   acceptVariants(user, accepted) {
     if (Array.isArray(accepted)) {
@@ -126,6 +126,7 @@ const Exercises = {
     const row = document.createElement('div');
     row.className = 'fill-blank-row';
     const inputs = [];
+    const expectedAnswers = Array.isArray(ex.answer) ? ex.answer : [ex.answer];
     parts.forEach((part, i) => {
       if (i > 0) {
         const input = document.createElement('input');
@@ -140,7 +141,29 @@ const Exercises = {
       span.innerHTML = part;
       row.appendChild(span);
     });
+    // A fill exercise should always provide an answer field, even when its
+    // prompt was accidentally saved without a blank marker.
+    if (!inputs.length) {
+      Array.from({ length: Math.max(1, expectedAnswers.length) }).forEach((_, index) => {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'fill-input';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.setAttribute('aria-label', `Write missing answer ${index + 1}`);
+        inputs.push(input);
+        row.appendChild(input);
+      });
+    }
     wrap.appendChild(row);
+
+    let answerIndex = 0;
+    const completedPrompt = ex.prompt.includes('___')
+      ? ex.prompt.replace(/___/g, () => expectedAnswers[answerIndex++] || '')
+      : `${ex.prompt} ${expectedAnswers.filter(Boolean).join(' ')}`;
+    const phoneticText = document.createElement('span');
+    phoneticText.innerHTML = completedPrompt;
+    wrap.appendChild(createPhoneticControl(() => phoneticText.textContent));
 
     const actions = document.createElement('div');
     actions.className = 'exercise-actions';
@@ -152,7 +175,8 @@ const Exercises = {
       let allCorrect = true;
       inputs.forEach((inp, i) => {
         const ans = Array.isArray(ex.answer) ? ex.answer[i] : ex.answer;
-        const ok = this.acceptVariants(inp.value, ans);
+        const accepted = i === 0 && Array.isArray(ex.acceptedAnswers) ? ex.acceptedAnswers : ans;
+        const ok = this.acceptVariants(inp.value, accepted);
         inp.disabled = true;
         inp.classList.add(ok ? 'correct' : 'wrong');
         if (!ok) allCorrect = false;
@@ -162,11 +186,22 @@ const Exercises = {
       this.showFeedback(fbEl, allCorrect, ex.explanation, correctAnswerText);
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: allCorrect, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     });
-    inputs.forEach(input => input.addEventListener('keydown', event => {
-      if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
-      event.preventDefault();
-      if (!checkBtn.disabled) checkBtn.click();
-    }));
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        if (checkBtn.disabled) return;
+        const allCorrect = inputs.every((field, fieldIndex) => {
+          const answer = Array.isArray(ex.answer) ? ex.answer[fieldIndex] : ex.answer;
+          const accepted = fieldIndex === 0 && Array.isArray(ex.acceptedAnswers) ? ex.acceptedAnswers : answer;
+          return field.value.trim() && this.acceptVariants(field.value, accepted);
+        });
+        if (allCorrect) checkBtn.click();
+      });
+      input.addEventListener('keydown', event => {
+        if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
+        event.preventDefault();
+        if (!checkBtn.disabled) checkBtn.click();
+      });
+    });
     const revealBtn = document.createElement('button');
     revealBtn.className = 'btn btn-ghost';
     revealBtn.textContent = 'Show answer';
