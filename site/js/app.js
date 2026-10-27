@@ -73,6 +73,8 @@ const FILE_10_VOCABULARY = {
     { word: 'chilli pepper', aliases: ['chili pepper', 'chilli', 'chili'], translation: 'ají, chile', image: 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&w=900&q=80', alt: 'Fresh chilli peppers' },
     { word: 'grapes', aliases: ['grape'], translation: 'uvas', image: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=900&q=80', alt: 'A bunch of grapes' },
     { word: 'watermelon', aliases: ['watermelons'], translation: 'sandía', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=900&q=80', alt: 'Watermelon slices' },
+    { word: 'mango', aliases: ['mangoes'], translation: 'mango', image: 'https://images.unsplash.com/photo-1551649001-9c071b61f26c?auto=format&fit=crop&w=900&q=80', alt: 'Ripe mangoes', imageCredit: { label: 'Photo by Heather Gill · Unsplash', url: 'https://unsplash.com/photos/three-peach-fruits-ICVexvZjuC0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'peach', aliases: ['peaches'], translation: 'durazno', image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Cross_sections_of_peach.jpg/960px-Cross_sections_of_peach.jpg', alt: 'Peach halves showing the pit', imageCredit: { label: 'liz west · Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cross_sections_of_peach.jpg', licenseLabel: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/' } },
     { word: 'pear', aliases: ['pears'], translation: 'pera', image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/D%27anjou_pear.jpg/960px-D%27anjou_pear.jpg', alt: 'D’Anjou pear', imageCredit: { label: 'Rhododendrites · D’Anjou pear · Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:D%27anjou_pear.jpg', licenseLabel: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' } },
     { word: 'coconut', aliases: ['coconuts'], translation: 'coco', image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/A_coconut%2C_broken_in_half.jpg/960px-A_coconut%2C_broken_in_half.jpg', alt: 'A coconut broken in half', imageCredit: { label: 'Slyronit · A coconut, broken in half · Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:A_coconut,_broken_in_half.jpg', licenseLabel: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' } },
     { word: 'sweets', aliases: ['sweet'], translation: 'dulces', image: 'https://images.unsplash.com/photo-1581798459219-318e76aecc7b?auto=format&fit=crop&w=900&q=80', alt: 'Sweets' },
@@ -222,6 +224,15 @@ const COMPARATIVE_SENTENCE_QUESTIONS = [
   { type: 'comparative-sentence', prompt: 'Complete with a comparative adjective: The community centre is ___ than the old hall. (modern)', answer: 'more modern' },
   { type: 'comparative-sentence', prompt: 'Complete with a comparative adjective: The island is ___ in spring than in summer. (peaceful)', answer: 'more peaceful' },
   { type: 'comparative-sentence', prompt: 'Complete with a comparative adjective: This week’s assignment is ___ than last week’s. (difficult)', answer: 'more difficult' },
+];
+
+const COMPARATIVE_CHOICE_QUESTIONS = [
+  { prompt: 'Choose the comparative adjective: The countryside is ___ than the city centre. (quiet)', options: ['quiet', 'quieter', 'quietest', 'more quieter'], answer: 1 },
+  { prompt: 'Choose the comparative adjective: A train is ___ than a bicycle. (fast)', options: ['fast', 'faster', 'fastest', 'more fast'], answer: 1 },
+  { prompt: 'Choose the comparative adjective: This book is ___ than the film. (interesting)', options: ['interesting', 'more interesting', 'the most interesting', 'interestinger'], answer: 1 },
+  { prompt: 'Choose the comparative adjective: The blue bag is ___ than the black one. (heavy)', options: ['heaviest', 'more heavier', 'heavier', 'heavy'], answer: 2 },
+  { prompt: 'Choose the comparative adjective: This solution is ___ than the previous one. (good)', options: ['best', 'gooder', 'better', 'more good'], answer: 2 },
+  { prompt: 'Choose the comparative adjective: The new road is ___ than the old one. (wide)', options: ['wider', 'widest', 'more wider', 'wide'], answer: 0 },
 ];
 
 const COMPARATIVE_FILL_QUESTIONS = [
@@ -514,6 +525,7 @@ function renderTranslator(view = $('#mainView'), floating = false, mode = 'offli
         <label class="translator-panel">
           <span id="sourceLanguageLabel">English</span>
           <textarea id="translationSource" rows="${floating ? 4 : 8}" placeholder="Enter a word or text to translate…" spellcheck="true"></textarea>
+          ${mode === 'offline' ? '<span class="translator-phonetic" id="translationPhonetics" hidden aria-live="polite"></span><small class="translator-phonetic-hint" id="translationPhoneticHint" hidden></small>' : ''}
           <span class="translator-count"><span id="sourceCharCount">0</span> characters</span>
         </label>
         <label class="translator-panel">
@@ -610,6 +622,8 @@ function renderTranslator(view = $('#mainView'), floating = false, mode = 'offli
   const result = $('#translationResult', view);
   const direction = $('#translationDirection', view);
   const submitButton = $('#translateNow', view);
+  const phoneticOutput = mode === 'offline' ? $('#translationPhonetics', view) : null;
+  const phoneticHint = mode === 'offline' ? $('#translationPhoneticHint', view) : null;
   const geminiDetails = gemini ? $('#geminiTranslationDetails', view) : null;
   const geminiLiteralBlock = gemini ? $('#geminiLiteralBlock', view) : null;
   const geminiLiteral = gemini ? $('#geminiLiteralTranslation', view) : null;
@@ -617,6 +631,20 @@ function renderTranslator(view = $('#mainView'), floating = false, mode = 'offli
   const geminiVocabulary = gemini ? $('#geminiKeyVocabulary', view) : null;
   const translateText = () => {
     const fromEnglish = direction.value === 'en-es';
+    if (phoneticOutput) {
+      const englishText = fromEnglish ? source.value.trim() : '';
+      if (!englishText) {
+        phoneticOutput.textContent = '';
+        phoneticOutput.hidden = true;
+        phoneticHint.hidden = true;
+      } else {
+        const { transcription, missing } = transcribeEnglishIPA(englishText);
+        phoneticOutput.textContent = `UK IPA: /${transcription}/${missing.length ? ` · No dictionary entry for: ${missing.join(', ')}` : ''}`;
+        phoneticOutput.hidden = false;
+        phoneticHint.hidden = !transcription.includes('dʒ');
+        phoneticHint.innerHTML = '/dʒ/: Un sonido suave de <strong>y</strong> fuerte o <strong>ch</strong> sonora (como la <strong>j</strong> en la palabra <em>John</em> o <em>jump</em>)';
+      }
+    }
     if (mode === 'offline') result.value = OfflineTranslator.translate(source.value, direction.value);
     else {
       result.value = '';
@@ -777,12 +805,11 @@ function enableFloatingTranslatorDrag(root) {
 
   const clampPosition = (left, top) => {
     const bounds = panel.getBoundingClientRect();
-    const headerBounds = header.getBoundingClientRect();
     const visibleWidth = Math.min(80, bounds.width);
-    const visibleHeaderHeight = Math.min(32, headerBounds.height);
+    const visibleHeight = Math.min(80, bounds.height);
     return {
       left: Math.max(visibleWidth - bounds.width, Math.min(left, window.innerWidth - visibleWidth)),
-      top: Math.max(visibleHeaderHeight - headerBounds.height, Math.min(top, window.innerHeight - visibleHeaderHeight)),
+      top: Math.max(visibleHeight - bounds.height, Math.min(top, window.innerHeight - visibleHeight)),
     };
   };
   const placePanel = (left, top) => {
@@ -1722,6 +1749,9 @@ function renderVocabularyPractice(categoryKey = 'food') {
       responses.delete(currentIndex);
       feedback.className = 'vocabulary-feedback hidden';
       input.classList.remove('wrong');
+      if (isFoodPractice && normalizeAnswer(input.value) && item.accepted.some(term => normalizeAnswer(term) === normalizeAnswer(input.value))) {
+        checkBtn.click();
+      }
     });
 
     checkBtn.addEventListener('click', () => {
@@ -2686,7 +2716,13 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
 
   const writeQuestionTarget = topicIndex === 8 && sectionIndex === 2 ? 28 : 10;
   const missingFill = Math.max(0, writeQuestionTarget - grammarQuestionCount(questions, 'write'));
-  clozeCandidates.slice(0, missingFill).forEach(candidate => {
+  const writeCandidates = topicIndex === 8 && sectionIndex === 2
+    ? COMPARATIVE_SENTENCE_QUESTIONS.map(question => ({
+      prompt: question.prompt.replace(/^Complete with a comparative adjective:\s*/, ''),
+      answer: question.answer,
+    }))
+    : clozeCandidates;
+  writeCandidates.slice(0, missingFill).forEach(candidate => {
     supplemental.push({
       type: 'fill',
       prompt: candidate.prompt,
@@ -2696,25 +2732,35 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
   });
 
   const missingChoice = Math.max(0, 10 - grammarQuestionCount(questions, 'choice'));
-  const distractorPool = [...new Set(clozeCandidates.map(candidate => candidate.answer.toLowerCase()))];
-  const fallbackOptions = ['am', 'is', 'are', 'do', 'does', 'did', 'was', 'were', 'have', 'has', 'a', 'an', 'some', 'any', 'in', 'on', 'at', 'to', 'my', 'your'];
-  for (let index = 0; index < missingChoice; index += 1) {
-    const candidate = clozeCandidates[index % clozeCandidates.length];
-    const correct = candidate.answer;
-    const options = [correct];
-    [...distractorPool, ...fallbackOptions].forEach(option => {
-      if (options.length < 4 && !options.some(existing => existing.toLowerCase() === option.toLowerCase())) options.push(option);
+  if (topicIndex === 8 && sectionIndex === 2) {
+    COMPARATIVE_CHOICE_QUESTIONS.slice(0, missingChoice).forEach(question => {
+      supplemental.push({
+        ...question,
+        type: 'mc',
+        explanation: 'Choose the comparative adjective that completes the sentence.',
+      });
     });
-    const correctIndex = index % options.length;
-    [options[0], options[correctIndex]] = [options[correctIndex], options[0]];
-    supplemental.push({
-      type: 'mc',
-      prompt: candidate.prompt,
-      options,
-      answer: correctIndex,
-      answerText: correct,
-      explanation: 'Choose the word that correctly completes the sentence.',
-    });
+  } else {
+    const distractorPool = [...new Set(clozeCandidates.map(candidate => candidate.answer.toLowerCase()))];
+    const fallbackOptions = ['am', 'is', 'are', 'do', 'does', 'did', 'was', 'were', 'have', 'has', 'a', 'an', 'some', 'any', 'in', 'on', 'at', 'to', 'my', 'your'];
+    for (let index = 0; index < missingChoice; index += 1) {
+      const candidate = clozeCandidates[index % clozeCandidates.length];
+      const correct = candidate.answer;
+      const options = [correct];
+      [...distractorPool, ...fallbackOptions].forEach(option => {
+        if (options.length < 4 && !options.some(existing => existing.toLowerCase() === option.toLowerCase())) options.push(option);
+      });
+      const correctIndex = index % options.length;
+      [options[0], options[correctIndex]] = [options[correctIndex], options[0]];
+      supplemental.push({
+        type: 'mc',
+        prompt: candidate.prompt,
+        options,
+        answer: correctIndex,
+        answerText: correct,
+        explanation: 'Choose the word that correctly completes the sentence.',
+      });
+    }
   }
 
   const existingConversationCount = grammarQuestionCount(questions, 'conversation');
@@ -3011,6 +3057,41 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
       questionContainer.appendChild(cachedQuestions.get(currentIndex));
     } else {
       Exercises.render(question, currentIndex, questionContainer);
+      const exerciseEl = questionContainer.firstElementChild;
+      if (topicIndex === 8 && sectionIndex === 2 && !exerciseEl.querySelector('.phonetic-control')) {
+        const promptEl = exerciseEl.querySelector('.exercise-prompt');
+        if (promptEl) {
+          const getQuestionText = () => {
+            if (question.type === 'mc') {
+              return question.prompt
+                .replace(/^Choose the comparative adjective:\s*/, '')
+                .replace(/\s+\([^)]*\)\s*$/, '')
+                .replace(/___/g, '…');
+            }
+            if (question.type === 'reorder') {
+              const words = Array.from(exerciseEl.querySelectorAll('.word-chip'))
+                .map(chip => chip.textContent.replace(/\s*\u2715$/, ''))
+                .join(' ');
+              return [question.hint, words].filter(Boolean).join(' ');
+            }
+            if (question.type === 'conversation') {
+              return Array.from(exerciseEl.querySelectorAll('.conversation-turn-content'))
+                .map(turn => turn.textContent.trim())
+                .filter(Boolean)
+                .join(' ');
+            }
+            if (question.type === 'match') {
+              const items = Array.from(exerciseEl.querySelectorAll('.match-item'))
+                .map(item => item.textContent.trim())
+                .filter(Boolean)
+                .join('. ');
+              return `${promptEl.textContent} ${items}`;
+            }
+            return promptEl.textContent;
+          };
+          promptEl.insertAdjacentElement('afterend', createPhoneticControl(getQuestionText));
+        }
+      }
       cachedQuestions.set(currentIndex, questionContainer.firstElementChild);
     }
     const showRetryAction = () => {

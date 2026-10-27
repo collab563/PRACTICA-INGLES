@@ -639,7 +639,7 @@ const Files = [
           { type: 'fill', prompt: 'The soup is ___ than it was ten minutes ago. (cold)', answer: 'colder', explanation: 'Add -er to this short adjective.' },
           { type: 'fill', prompt: 'A bicycle is ___ than a lorry. (small)', answer: 'smaller' },
           { type: 'mc', prompt: 'This route is ___ than the old road. (bad)', options: ['badder', 'more bad', 'worse', 'worst'], answer: 2, explanation: 'Bad has the irregular comparative form worse.' },
-          { type: 'reorder', prompt: 'Put the words in order:', words: ['The', 'museum', 'is', 'older', 'than', 'the', 'library', '.'], answer: null },
+          { type: 'reorder', prompt: 'Put the words in order:', words: ['The', 'museum', 'is', 'older', 'than', 'the', 'library', '.'], answer: null, hint: 'The museum was built before the library, so the museum is older.' },
         ],
         vocabulary: [
           { type: 'mc', prompt: 'How can you say 1,500?', options: ['one thousand five hundred', 'fifteen hundred', 'one thousand and five hundred', 'Both A and C are correct'], answer: 3 },

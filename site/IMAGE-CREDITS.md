@@ -27,5 +27,6 @@ These images are not bundled in the repository. Their source and license are als
 | Salt shaker on white background | SoraZG | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Salt_shaker_on_white_background.jpg) |
 | D'Anjou pear | Rhododendrites | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:D%27anjou_pear.jpg) |
 | A coconut, broken in half | Slyronit | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:A_coconut,_broken_in_half.jpg) |
+| Cross sections of peach | liz west | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cross_sections_of_peach.jpg) |
 
 The other externally loaded food photos use Unsplash-hosted image URLs and are covered by the [Unsplash License](https://unsplash.com/license). Review each provider's current license terms before reusing these assets outside this project.

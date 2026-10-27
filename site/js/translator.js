@@ -1850,6 +1850,33 @@ your answer|tu respuesta
 your score|tu puntuación
 question number|número de pregunta
 reading number|número de lectura
+puzzle|rompecabezas
+manifest|manifiesto
+web app manifest|archivo de manifiesto web
+swap|intercambiar
+swap languages|intercambiar idiomas
+shuffle|mezclar
+shuffle and restart|mezclar y reiniciar
+restart|reiniciar
+hide|ocultar
+worst|peor
+older|más antiguo
+period|punto
+full stop|punto
+math|matemáticas
+missing|faltante
+missing word|palabra que falta
+undo|deshacer
+view|ver
+view changes|ver cambios
+peach|durazno
+peaches|duraznos
+mango|mango
+mangos|mangos
+mangoes|mangos
+pear|pera
+pears|peras
+unveils|revela
 `.trim();
 
   const enToEs = {};
