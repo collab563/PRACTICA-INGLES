@@ -1744,12 +1744,23 @@ function renderVocabularyPractice(categoryKey = 'food') {
       if (event.target === noteDialog) noteDialog.close();
     });
 
+    const inputMatchesAnswer = () => {
+      const isWordsToNumber = isNumberPractice && item.direction === 'words-to-number';
+      const value = isWordsToNumber
+        ? normalizeNumberDigits(input.value)
+        : isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
+      const accepted = item.accepted.map(term => isWordsToNumber
+        ? normalizeNumberDigits(term)
+        : isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
+      return accepted.includes(value);
+    };
+
     input.addEventListener('input', () => {
       if (responses.get(currentIndex)?.correct) return;
       responses.delete(currentIndex);
       feedback.className = 'vocabulary-feedback hidden';
       input.classList.remove('wrong');
-      if (isFoodPractice && normalizeAnswer(input.value) && item.accepted.some(term => normalizeAnswer(term) === normalizeAnswer(input.value))) {
+      if (input.value.trim() && inputMatchesAnswer()) {
         checkBtn.click();
       }
     });
@@ -2027,38 +2038,49 @@ function renderTranslationPractice(categoryKey = 'translation') {
       esAnswers: item.es,
     }))
     : [...foodPairs, ...suppliedPairs.filter(pair => pair && typeof pair.en === 'string' && typeof pair.es === 'string')];
+  const REPETITIONS_PER_GROUP = 50;
   const progressKey = `translation-learning-${customSet ? `${setKey}-` : ''}${direction}`;
+  const createWordOrder = () => {
+    const order = Array.from({ length: pairs.length }, (_, index) => index);
+    for (let index = order.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [order[index], order[randomIndex]] = [order[randomIndex], order[index]];
+    }
+    return order;
+  };
+  const isValidWordOrder = order => Array.isArray(order)
+    && order.length === pairs.length
+    && new Set(order).size === pairs.length
+    && order.every(index => Number.isInteger(index) && index >= 0 && index < pairs.length);
   const readProgress = () => {
+    let saved = {};
     try {
-      const saved = JSON.parse(localStorage.getItem(progressKey) || '{}');
-      return {
-        unlocked: Math.min(pairs.length, Math.max(5, Math.ceil((Number(saved.unlocked) || 5) / 5) * 5)),
-        round: Math.max(0, Number(saved.round) || 0),
-        total: Math.max(0, Number(saved.total) || 0),
-      };
-    } catch (_) { return { unlocked: Math.min(5, pairs.length), round: 0, total: 0 }; }
+      saved = JSON.parse(localStorage.getItem(progressKey) || '{}') || {};
+    } catch (_) { /* Start with a fresh group if saved progress is unreadable. */ }
+    const order = isValidWordOrder(saved.order) ? saved.order : createWordOrder();
+    const savedRound = Math.max(0, Number(saved.round) || 0);
+    const completedGroups = Math.floor(savedRound / REPETITIONS_PER_GROUP);
+    const progress = {
+      unlocked: Math.min(pairs.length, Math.max(5, Math.ceil((Number(saved.unlocked) || 5) / 5) * 5) + completedGroups * 5),
+      round: savedRound % REPETITIONS_PER_GROUP,
+      total: Math.max(0, Number(saved.total) || 0),
+      order,
+    };
+    if (!isValidWordOrder(saved.order) || completedGroups > 0) {
+      try { localStorage.setItem(progressKey, JSON.stringify(progress)); } catch (_) { /* Keep the session usable if storage is unavailable. */ }
+    }
+    return progress;
   };
   const progress = readProgress();
   const saveProgress = () => localStorage.setItem(progressKey, JSON.stringify(progress));
+  const orderedPairs = progress.order.map(pairIndex => pairs[pairIndex]);
   let activePairs;
-  const previousFirstWordKey = `translation-first-word-${customSet ? `${setKey}-` : ''}${direction}`;
-  const shufflePairs = () => {
-    for (let i = pairs.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
-    }
-    const previousFirstWord = sessionStorage.getItem(previousFirstWordKey);
-    if (pairs.length > 1 && pairs[0].en === previousFirstWord) {
-      [pairs[0], pairs[1]] = [pairs[1], pairs[0]];
-    }
-    sessionStorage.setItem(previousFirstWordKey, pairs[0].en);
-  };
-  shufflePairs();
-  activePairs = pairs.slice(0, progress.unlocked);
+  activePairs = orderedPairs.slice(0, progress.unlocked);
   let index = 0;
   let timeout;
   const render = (success = false) => {
     if (timeout) clearTimeout(timeout);
+    let answered = false;
     const pair = activePairs[index];
     const spanishAnswers = pair.esAnswers || pair.es.split(/\s*\/\s*/).map(value => value.trim());
     const englishAnswers = pair.enAnswers || pair.en.split(/\s*\/\s*/).map(value => value.trim());
@@ -2074,10 +2096,10 @@ function renderTranslationPractice(categoryKey = 'translation') {
     view.innerHTML = `
       <a href="${backTarget}" class="back-link">← Back</a>
       <div class="lesson-header"><span class="file-num">Vocabulary · ${escapeHTML(sectionTitle)}</span><h1>${customSet ? `${escapeHTML(sectionTitle)} · ` : ''}${directionTitle}</h1>
-      <p class="topics">Words ${activePairs.length} of ${pairs.length} unlocked · ${progress.round}/100 repetitions in this group · ${progress.total} total</p>
+      <p class="topics">Words ${activePairs.length} of ${pairs.length} unlocked · ${progress.round}/${REPETITIONS_PER_GROUP} repetitions in this group · ${progress.total} total</p>
       <button class="btn btn-secondary" id="shuffleTranslationWords" type="button">🔀 Shuffle words</button>
       <button class="btn btn-secondary" id="resetTranslationProgress" type="button">↺ Reset progress</button>
-      <div class="vocabulary-progress-track"><span style="width:${progress.round}%"></span></div></div>
+      <div class="vocabulary-progress-track"><span style="width:${Math.min(100, (progress.round / REPETITIONS_PER_GROUP) * 100)}%"></span></div></div>
       <section class="translation-practice ${success ? 'translation-success' : ''}" aria-live="polite">
         <p class="translation-prompt">${escapeHTML(prompt)}</p>
         <div id="translationPhoneticControl"></div>
@@ -2092,7 +2114,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
     const input = $('#translationAnswer', view);
     $('#translationPhoneticControl', view).appendChild(createPhoneticControl(() => direction === 'en-es' ? prompt : pair.en));
     $('#shuffleTranslationWords', view).addEventListener('click', () => {
-      activePairs = pairs.slice(0, progress.unlocked);
+      activePairs = orderedPairs.slice(0, progress.unlocked);
       for (let i = activePairs.length - 1; i > 0; i -= 1) {
         const j = Math.floor(Math.random() * (i + 1));
         [activePairs[i], activePairs[j]] = [activePairs[j], activePairs[i]];
@@ -2105,7 +2127,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
       progress.unlocked = Math.min(5, pairs.length);
       progress.round = 0;
       progress.total = 0;
-      activePairs = pairs.slice(0, progress.unlocked);
+      activePairs = orderedPairs.slice(0, progress.unlocked);
       index = 0;
       saveProgress();
       render();
@@ -2121,21 +2143,25 @@ function renderTranslationPractice(categoryKey = 'translation') {
     });
     focusAnswerFieldOnDesktop(input);
     const check = () => {
+      if (answered) return;
       if (!normalizedAnswers.includes(normalizeAnswer(input.value))) {
         $('.translation-feedback', view).textContent = 'Not quite. Try again.';
         input.classList.add('wrong');
         return;
       }
+      answered = true;
+      input.disabled = true;
+      playCorrectSound();
       $('.translation-feedback', view).textContent = '✓ Correct!';
       $('.translation-practice', view).classList.add('translation-success');
       progress.round += 1;
       progress.total += 1;
       let unlockedMore = false;
-      if (progress.round >= 100) {
+      if (progress.round >= REPETITIONS_PER_GROUP) {
         progress.round = 0;
         const previousUnlocked = progress.unlocked;
         progress.unlocked = Math.min(pairs.length, progress.unlocked + 5);
-        activePairs = pairs.slice(0, progress.unlocked);
+        activePairs = orderedPairs.slice(0, progress.unlocked);
         unlockedMore = progress.unlocked > previousUnlocked;
       }
       saveProgress();
@@ -2146,6 +2172,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
       }, 900);
     };
     input.addEventListener('input', () => {
+      if (answered) return;
       if (normalizedAnswers.includes(normalizeAnswer(input.value))) check();
       else { input.classList.remove('wrong'); $('.translation-feedback', view).textContent = ''; }
     });

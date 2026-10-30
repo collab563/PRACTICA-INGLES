@@ -182,7 +182,7 @@ const Exercises = {
         if (!ok) allCorrect = false;
       });
       checkBtn.disabled = true;
-      const correctAnswerText = Array.isArray(ex.answer) ? ex.answer.join(', ') : ex.answer;
+      const correctAnswerText = ex.answerText || (Array.isArray(ex.answer) ? ex.answer.join(', ') : ex.answer);
       this.showFeedback(fbEl, allCorrect, ex.explanation, correctAnswerText);
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: allCorrect, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     });
@@ -215,7 +215,7 @@ const Exercises = {
       });
       checkBtn.disabled = true;
       revealBtn.disabled = true;
-      const correctAnswerText = Array.isArray(ex.answer) ? ex.answer.join(', ') : ex.answer;
+      const correctAnswerText = ex.answerText || (Array.isArray(ex.answer) ? ex.answer.join(', ') : ex.answer);
       this.showFeedback(fbEl, false, ex.explanation || 'This was the correct answer.', correctAnswerText);
       exEl.dispatchEvent(new CustomEvent('answered', { detail: { correct: false, qIdx: +exEl.dataset.qidx }, bubbles: true }));
     });

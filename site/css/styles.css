@@ -1828,13 +1828,14 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   .translator-panels { grid-template-columns: 1fr; }
   #translatorOverlayRoot:not(:empty) {
     top: 108px;
-    right: 0.5rem;
-    width: calc(100vw - 1rem);
-    max-height: calc(100dvh - 116px);
+    right: 0.75rem;
+    width: min(360px, calc(100vw - 1.5rem));
+    max-height: min(68dvh, calc(100dvh - 124px));
   }
   .translator-floating .translator-panels { grid-template-columns: 1fr; }
-  .translator-floating .translator-panel textarea { min-height: 84px; max-height: 110px; }
-  .translator-floating-header { gap: 0.5rem; padding: 0.55rem 0.65rem; }
+  .translator-floating .translator-card { padding: 0.65rem; }
+  .translator-floating .translator-panel textarea { min-height: 72px; max-height: 90px; }
+  .translator-floating-header { gap: 0.5rem; padding: 0.45rem 0.55rem; }
   .translator-floating-header-actions { gap: 0.2rem; }
   .translator-floating-header-actions .btn { min-height: 42px; padding: 0.4rem 0.55rem; }
   .translator-floating .translator-actions .btn { min-height: 44px; }

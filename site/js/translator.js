@@ -1351,6 +1351,13 @@ phrase|frase
 text|texto
 paragraph|párrafo
 translation|traducción
+traslation|traducción
+update|actualizar / actualización
+empowerment|empoderamiento
+foreword|prólogo
+deal|trato / acuerdo / negociar
+to deal|tratar / negociar
+deal with|tratar con
 translate|traducir
 to review|revisar
 review|revisión
@@ -2010,6 +2017,16 @@ unveils|revela
     'revisar': 'to review',
     'repasar': 'to review',
     'repaso': 'review',
+    'actualizar': 'update',
+    'actualización': 'update',
+    'empoderamiento': 'empowerment',
+    'prólogo': 'foreword',
+    'trato': 'deal',
+    'acuerdo': 'deal',
+    'negociar': 'deal',
+    'tratar': 'to deal',
+    'tratar con': 'deal with',
+    'traducción': 'translation',
   });
 
   function normalizeLookup(value) {
