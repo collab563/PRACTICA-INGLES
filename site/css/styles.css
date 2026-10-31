@@ -680,6 +680,113 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   font-size: 0.75rem;
   text-align: right;
 }
+.vocabulary-clock {
+  width: min(100%, 360px);
+  margin: 0 auto;
+}
+.analog-clock {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--text);
+}
+.clock-face { fill: var(--bg); stroke: var(--border); stroke-width: 2; }
+.clock-tick { stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round; }
+.clock-tick-hour { stroke: var(--text); stroke-width: 2.5; }
+.clock-number { fill: var(--text); font-size: 16px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+.clock-hand { stroke: var(--text); stroke-linecap: round; }
+.clock-hand-hour { stroke-width: 8; }
+.clock-hand-minute { stroke-width: 5; }
+.clock-center { fill: var(--primary); stroke: var(--bg-card); stroke-width: 2; }
+.vocabulary-month-display {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.55rem;
+  width: min(100%, 420px);
+  min-height: clamp(160px, 35vw, 260px);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.vocabulary-month-display span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.vocabulary-month-display strong {
+  color: var(--primary);
+  font-size: clamp(2rem, 8vw, 4rem);
+  line-height: 1.1;
+}
+.vocabulary-ordinal-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: min(100%, 420px);
+  min-height: clamp(160px, 35vw, 260px);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.vocabulary-ordinal-display strong {
+  color: var(--primary);
+  font-size: clamp(4rem, 15vw, 7rem);
+  line-height: 1;
+}
+.vocabulary-ordinal-display span {
+  color: var(--text-muted);
+  font-size: clamp(2.75rem, 10vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+.date-calendar {
+  width: min(100%, 480px);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.date-calendar h2 {
+  margin: 0 0 0.8rem;
+  color: var(--text);
+  text-align: center;
+  font-size: 1.3rem;
+}
+.date-calendar h2 span { color: var(--text-muted); }
+.date-calendar table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.date-calendar th {
+  padding: 0.45rem 0.1rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.date-calendar td { padding: 0.15rem 0; text-align: center; }
+.date-calendar td span {
+  display: grid;
+  place-items: center;
+  width: min(100%, 40px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.date-calendar td .date-calendar-selected {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+.date-calendar-empty { visibility: hidden; }
 .vocabulary-number-display {
   display: grid;
   place-items: center;

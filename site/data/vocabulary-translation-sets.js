@@ -99,7 +99,7 @@ globalThis.VocabularyTranslationSets = Object.freeze({
       { en: 'couple', es: ['pareja'] },
       { en: 'grandparents', es: ['abuelos'] },
       { en: 'parents', es: ['padres'] },
-      { en: 'parents-in-law', es: ['suegros'] },
+      { en: 'parents-in-law', enAnswers: ['parents-in-law', 'parents in law'], es: ['suegros'] },
     ],
   },
   places: {

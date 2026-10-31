@@ -1913,6 +1913,86 @@ unveils|revela
     });
   });
 
+  // Include every accepted translation from the Family practice set in the
+  // offline glossary, while keeping existing dictionary choices first.
+  const familyVocabulary = globalThis.VocabularyTranslationSets?.family?.items || [];
+  const normalizeFamilyMeaning = value => String(value)
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLocaleLowerCase('es')
+    .trim();
+  const addFamilyTranslations = (englishValues, spanishValues) => {
+    const englishTerms = [...new Set(englishValues
+      .filter(term => typeof term === 'string')
+      .map(term => term.trim().toLocaleLowerCase('en'))
+      .filter(Boolean))];
+    const spanishMeanings = [...new Map(spanishValues
+      .filter(meaning => typeof meaning === 'string')
+      .map(meaning => [normalizeFamilyMeaning(meaning), meaning.trim()])
+      .filter(([key, meaning]) => key && meaning)).values()];
+    if (!englishTerms.length || !spanishMeanings.length) return;
+
+    englishTerms.forEach(english => {
+      const existingMeanings = (enToEs[english] || '').split(/\s*\/\s*/).filter(Boolean);
+      const mergedMeanings = [...existingMeanings];
+      const seenMeanings = new Set(existingMeanings.map(normalizeFamilyMeaning));
+      spanishMeanings.forEach(meaning => {
+        const key = normalizeFamilyMeaning(meaning);
+        if (!seenMeanings.has(key)) {
+          seenMeanings.add(key);
+          mergedMeanings.push(meaning);
+        }
+      });
+      enToEs[english] = mergedMeanings.join(' / ');
+    });
+
+    spanishMeanings.forEach(meaning => {
+      const key = meaning.toLocaleLowerCase('es');
+      if (!(key in esToEn)) {
+        esToEn[key] = englishTerms[0];
+        return;
+      }
+      const existingTerms = esToEn[key].split(/\s*\/\s*/).map(term => term.trim());
+      if (!existingTerms.some(term => term.toLocaleLowerCase('en') === englishTerms[0])) {
+        esToEn[key] = [...existingTerms, englishTerms[0]].join(' / ');
+      }
+    });
+  };
+
+  familyVocabulary.forEach(pair => {
+    if (typeof pair.en !== 'string' || !Array.isArray(pair.es)) return;
+    const englishAliases = Array.isArray(pair.enAnswers) ? pair.enAnswers : [];
+    addFamilyTranslations([pair.en, ...englishAliases], pair.es);
+  });
+
+  const familyNumberForms = [
+    { singular: 'family', plural: 'families', singularEs: ['familia'], pluralEs: ['familias'] },
+    { singular: 'father', plural: 'fathers', singularEs: ['padre'], pluralEs: ['padres'] },
+    { singular: 'mother', plural: 'mothers', singularEs: ['madre'], pluralEs: ['madres'] },
+    { singular: 'brother', plural: 'brothers', singularEs: ['hermano'], pluralEs: ['hermanos'] },
+    { singular: 'sister', plural: 'sisters', singularEs: ['hermana'], pluralEs: ['hermanas'] },
+    { singular: 'daughter', plural: 'daughters', singularEs: ['hija'], pluralEs: ['hijas'] },
+    { singular: 'son', plural: 'sons', singularEs: ['hijo'], pluralEs: ['hijos'] },
+    { singular: 'grandfather', plural: 'grandfathers', singularEs: ['abuelo'], pluralEs: ['abuelos'] },
+    { singular: 'grandmother', plural: 'grandmothers', singularEs: ['abuela'], pluralEs: ['abuelas'] },
+    { singular: 'aunt', plural: 'aunts', singularEs: ['tía'], pluralEs: ['tías'] },
+    { singular: 'uncle', plural: 'uncles', singularEs: ['tío'], pluralEs: ['tíos'] },
+    { singular: 'nephew', plural: 'nephews', singularEs: ['sobrino'], pluralEs: ['sobrinos'] },
+    { singular: 'niece', plural: 'nieces', singularEs: ['sobrina'], pluralEs: ['sobrinas'] },
+    { singular: 'cousin', plural: 'cousins', singularEs: ['primo', 'prima'], pluralEs: ['primos', 'primas'] },
+    { singular: 'wife', plural: 'wives', singularEs: ['esposa', 'mujer'], pluralEs: ['esposas', 'mujeres'] },
+    { singular: 'child', plural: 'children', singularEs: ['hijo', 'niño'], pluralEs: ['hijos', 'niños'] },
+    { singular: 'kid', plural: 'kids', singularEs: ['hijo', 'niño'], pluralEs: ['hijos', 'niños'] },
+    { singular: 'couple', plural: 'couples', singularEs: ['pareja'], pluralEs: ['parejas'] },
+    { singular: 'grandparent', plural: 'grandparents', singularEs: ['abuelo', 'abuela'], pluralEs: ['abuelos', 'abuelas'] },
+    { singular: 'parent', plural: 'parents', singularEs: ['padre', 'madre'], pluralEs: ['padres', 'madres'] },
+    { singular: 'parent-in-law', plural: 'parents-in-law', singularEs: ['suegro', 'suegra'], pluralEs: ['suegros', 'suegras'] },
+  ];
+  familyNumberForms.forEach(({ singular, plural, singularEs, pluralEs }) => {
+    addFamilyTranslations([singular], singularEs);
+    addFamilyTranslations([plural], pluralEs);
+  });
+
   verbForms.forEach(({ base, past, pastTranslation, futureTranslation }) => {
     const futureForm = `will ${base}`;
     const pastPhrase = `i ${past}`;

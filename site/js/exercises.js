@@ -7,10 +7,41 @@ function focusAnswerFieldOnDesktop(input) {
   if (desktopWithPointer) input.focus({ preventScroll: true });
 }
 
+const EXERCISE_CONTRACTION_EXPANSIONS = {
+  "i'm": 'i am',
+  "you're": 'you are',
+  "we're": 'we are',
+  "they're": 'they are',
+  "isn't": 'is not',
+  "aren't": 'are not',
+  "wasn't": 'was not',
+  "weren't": 'were not',
+  "don't": 'do not',
+  "doesn't": 'does not',
+  "didn't": 'did not',
+  "can't": 'cannot',
+  "couldn't": 'could not',
+  "haven't": 'have not',
+  "hasn't": 'has not',
+  "i've": 'i have',
+  "you've": 'you have',
+  "we've": 'we have',
+  "they've": 'they have',
+  "won't": 'will not',
+  "wouldn't": 'would not',
+  "shouldn't": 'should not',
+  "mustn't": 'must not',
+  "let's": 'let us',
+};
+
 const Exercises = {
   // Normalize text for answer comparison
   normalize(s) {
-    return String(s).normalize('NFKC').trim().toLocaleLowerCase('en-GB').replace(/[.!?,'"]/g, '').replace(/\s+/g, ' ');
+    const text = String(s).normalize('NFKC').trim().toLocaleLowerCase('en-GB').replace(/[’‘]/g, "'")
+      .replace(/\b(i'm|you're|we're|they're|isn't|aren't|wasn't|weren't|don't|doesn't|didn't|can't|couldn't|haven't|hasn't|i've|you've|we've|they've|won't|wouldn't|shouldn't|mustn't|let's)\b/g,
+        contraction => EXERCISE_CONTRACTION_EXPANSIONS[contraction])
+      .replace(/\bcannot\b/g, 'can not');
+    return text.replace(/[.!?,'"]/g, '').replace(/\s+/g, ' ');
   },
   acceptVariants(user, accepted) {
     if (Array.isArray(accepted)) {

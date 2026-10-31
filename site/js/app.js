@@ -14,6 +14,147 @@ window.addEventListener('hashchange', () => {
   activeFlagPhotoPreviewUrl = '';
 });
 
+function createTimeVocabularyItem(phrase, hour, minute) {
+  const capitalizedPhrase = `${phrase[0].toUpperCase()}${phrase.slice(1)}`;
+  const noArticlePhrase = phrase.replace(/^a quarter\b/, 'quarter');
+  const capitalizedNoArticlePhrase = `${noArticlePhrase[0].toUpperCase()}${noArticlePhrase.slice(1)}`;
+  return {
+    word: `It's ${phrase}.`,
+    accepted: [...new Set([`It's ${phrase}.`, `It is ${phrase}.`, `${capitalizedPhrase}.`, `${capitalizedNoArticlePhrase}.`])],
+    clockTime: { hour, minute },
+    alt: `Analog clock showing ${hour}:${String(minute).padStart(2, '0')}.`,
+  };
+}
+
+const DATE_EXERCISE_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+const DATE_EXERCISE_WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DATE_CALENDAR_MONTHS_ES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+const DATE_CALENDAR_WEEKDAYS_ES = [
+  { short: 'Lun', full: 'Lunes' },
+  { short: 'Mar', full: 'Martes' },
+  { short: 'Mié', full: 'Miércoles' },
+  { short: 'Jue', full: 'Jueves' },
+  { short: 'Vie', full: 'Viernes' },
+  { short: 'Sáb', full: 'Sábado' },
+  { short: 'Dom', full: 'Domingo' },
+];
+const DATE_EXERCISE_ORDINAL_WORDS = [
+  'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth',
+  'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth',
+  'twenty-first', 'twenty-second', 'twenty-third', 'twenty-fourth', 'twenty-fifth', 'twenty-sixth', 'twenty-seventh', 'twenty-eighth', 'twenty-ninth', 'thirtieth', 'thirty-first',
+];
+
+function createDateVocabularyItem(year, monthIndex, day) {
+  const date = new Date(Date.UTC(year, monthIndex, day));
+  const weekday = DATE_EXERCISE_WEEKDAYS[date.getUTCDay()];
+  const month = DATE_EXERCISE_MONTHS[monthIndex];
+  const lastTwoDigits = day % 100;
+  const suffix = lastTwoDigits >= 11 && lastTwoDigits <= 13
+    ? 'th'
+    : day % 10 === 1 ? 'st' : day % 10 === 2 ? 'nd' : day % 10 === 3 ? 'rd' : 'th';
+  const ordinalDay = `${day}${suffix}`;
+  const ordinalWord = DATE_EXERCISE_ORDINAL_WORDS[day - 1];
+  const yearInWords = `twenty ${numberBelowOneThousandToEnglish(year % 100)}`;
+  const britishAnswer = `${weekday}, ${ordinalDay} ${month} ${year}`;
+  const americanAnswer = `${weekday}, ${month} ${ordinalDay}, ${year}`;
+  const spokenNumericAnswer = `${weekday}, the ${ordinalDay} of ${month} ${year}`;
+  const spokenAnswer = `${weekday}, the ${ordinalWord} of ${month}, ${yearInWords}`;
+
+  return {
+    word: britishAnswer,
+    pronunciation: spokenAnswer,
+    accepted: [
+      britishAnswer,
+      `${weekday} ${ordinalDay} ${month} ${year}`,
+      americanAnswer,
+      `${weekday} ${month} ${ordinalDay} ${year}`,
+      spokenNumericAnswer,
+      `${weekday} the ${ordinalDay} of ${month} ${year}`,
+      `${weekday}, the ${ordinalDay} ${month} ${year}`,
+      `${weekday} the ${ordinalDay} ${month} ${year}`,
+      spokenAnswer,
+      `${weekday} the ${ordinalWord} of ${month} ${yearInWords}`,
+    ],
+    calendarDate: { year, monthIndex, day },
+    alt: `Calendario de ${DATE_CALENDAR_MONTHS_ES[monthIndex]} de ${year}, con el día ${day} resaltado.`,
+  };
+}
+
+function createDateVocabulary() {
+  const items = [];
+  const daysByYear = [
+    { year: 2026, days: [1, 11] },
+    { year: 2027, days: [2, 12] },
+    { year: 2028, days: [3, 13] },
+    { year: 2029, days: [21, 22] },
+  ];
+  daysByYear.forEach(({ year, days }) => {
+    DATE_EXERCISE_MONTHS.forEach((_, monthIndex) => {
+      days.forEach(day => items.push(createDateVocabularyItem(year, monthIndex, day)));
+    });
+  });
+  [
+    [2026, 9, 18],
+    [2026, 9, 25],
+    [2028, 7, 30],
+    [2029, 11, 31],
+  ].forEach(([year, monthIndex, day]) => items.push(createDateVocabularyItem(year, monthIndex, day)));
+  return items;
+}
+
+function createOrdinalVocabulary() {
+  return Array.from({ length: 31 }, (_, index) => {
+    const number = index + 1;
+    const lastTwoDigits = number % 100;
+    const suffix = lastTwoDigits >= 11 && lastTwoDigits <= 13
+      ? 'th'
+      : number % 10 === 1 ? 'st' : number % 10 === 2 ? 'nd' : number % 10 === 3 ? 'rd' : 'th';
+    return {
+      word: `${number}${suffix}`,
+      accepted: [suffix],
+      pronunciation: DATE_EXERCISE_ORDINAL_WORDS[index],
+      ordinalNumber: number,
+    };
+  });
+}
+
+function createDateCalendarMarkup({ year, monthIndex, day }) {
+  const month = DATE_CALENDAR_MONTHS_ES[monthIndex];
+  const firstDayOffset = (new Date(Date.UTC(year, monthIndex, 1)).getUTCDay() + 6) % 7;
+  const daysInMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+  const cells = [
+    ...Array.from({ length: firstDayOffset }, () => '<td class="date-calendar-empty"></td>'),
+    ...Array.from({ length: daysInMonth }, (_, index) => {
+      const calendarDay = index + 1;
+      return `<td>${calendarDay === day
+        ? `<span class="date-calendar-selected" aria-label="Día resaltado: ${day}">${calendarDay}</span>`
+        : `<span>${calendarDay}</span>`}</td>`;
+    }),
+  ];
+  while (cells.length % 7 !== 0) cells.push('<td class="date-calendar-empty"></td>');
+  const weekRows = Array.from({ length: cells.length / 7 }, (_, index) =>
+    `<tr>${cells.slice(index * 7, index * 7 + 7).join('')}</tr>`).join('');
+
+  return `<section class="date-calendar" aria-label="Calendario de ${month} de ${year}, con el día ${day} resaltado">
+    <h2>${month} de <span>${year}</span></h2>
+    <table aria-label="Calendario de ${month} de ${year}">
+      <thead><tr>${DATE_CALENDAR_WEEKDAYS_ES.map(({ short, full }) => `<th scope="col" aria-label="${full}">${short}</th>`).join('')}</tr></thead>
+      <tbody>${weekRows}</tbody>
+    </table>
+  </section>`;
+}
+
+function renderVocabularyImage(item) {
+  return `<img class="vocabulary-image" src="${item.image}" alt="${escapeHTML(item.alt)}" />
+    ${item.imageCredit ? `<span class="vocabulary-image-credit"><a href="${item.imageCredit.url}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.label)}</a> · <a href="${item.imageCredit.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.licenseLabel)}</a></span>` : ''}`;
+}
+
 const FILE_10_VOCABULARY = {
   food: [
     { word: 'apples', aliases: ['apple'], translation: 'manzanas', image: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=900&q=80', alt: 'Apples' },
@@ -78,6 +219,89 @@ const FILE_10_VOCABULARY = {
     { word: 'pear', aliases: ['pears'], translation: 'pera', image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/D%27anjou_pear.jpg/960px-D%27anjou_pear.jpg', alt: 'D’Anjou pear', imageCredit: { label: 'Rhododendrites · D’Anjou pear · Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:D%27anjou_pear.jpg', licenseLabel: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' } },
     { word: 'coconut', aliases: ['coconuts'], translation: 'coco', image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/A_coconut%2C_broken_in_half.jpg/960px-A_coconut%2C_broken_in_half.jpg', alt: 'A coconut broken in half', imageCredit: { label: 'Slyronit · A coconut, broken in half · Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:A_coconut,_broken_in_half.jpg', licenseLabel: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' } },
     { word: 'sweets', aliases: ['sweet'], translation: 'dulces', image: 'https://images.unsplash.com/photo-1581798459219-318e76aecc7b?auto=format&fit=crop&w=900&q=80', alt: 'Sweets' },
+  ],
+  time: [
+    { word: "It's a quarter to seven.", accepted: ["It's a quarter to seven.", 'It is a quarter to seven.', 'A quarter to seven.', 'Quarter to seven.'], clockTime: { hour: 6, minute: 45 }, alt: 'Analog clock showing 6:45.' },
+    { word: "It's half past six.", accepted: ["It's half past six.", 'It is half past six.', 'Half past six.'], clockTime: { hour: 6, minute: 30 }, alt: 'Analog clock showing 6:30.' },
+    { word: "It's a quarter past six.", accepted: ["It's a quarter past six.", "It's quarter past six.", 'It is a quarter past six.', 'A quarter past six.', 'Quarter past six.'], clockTime: { hour: 6, minute: 15 }, alt: 'Analog clock showing 6:15.' },
+    { word: "It's twenty-five to seven.", accepted: ["It's twenty-five to seven.", 'It is twenty-five to seven.', 'Twenty-five to seven.'], clockTime: { hour: 6, minute: 35 }, alt: 'Analog clock showing 6:35.' },
+    { word: "It's six o'clock.", accepted: ["It's six o'clock.", 'It is six o’clock.', 'Six o’clock.', 'Six oclock.'], clockTime: { hour: 6, minute: 0 }, alt: 'Analog clock showing 6:00.' },
+    { word: "It's twenty past six.", accepted: ["It's twenty past six.", 'It is twenty past six.', 'Twenty past six.'], clockTime: { hour: 6, minute: 20 }, alt: 'Analog clock showing 6:20.' },
+    { word: "It's five to seven.", accepted: ["It's five to seven.", 'It is five to seven.', 'Five to seven.'], clockTime: { hour: 6, minute: 55 }, alt: 'Analog clock showing 6:55.' },
+    { word: "It's ten past six.", accepted: ["It's ten past six.", 'It is ten past six.', 'Ten past six.'], clockTime: { hour: 6, minute: 10 }, alt: 'Analog clock showing 6:10.' },
+    { word: "It's three minutes past six.", accepted: ["It's three minutes past six.", "It's three minutes past six o'clock.", 'It is three minutes past six.', 'Three minutes past six.'], clockTime: { hour: 6, minute: 3 }, alt: 'Analog clock showing 6:03.' },
+    ...[
+      ['five past one', 1, 5],
+      ['ten past two', 2, 10],
+      ['a quarter past three', 3, 15],
+      ['twenty past four', 4, 20],
+      ['twenty-five past five', 5, 25],
+      ['twenty-five to eight', 7, 35],
+      ['twenty to nine', 8, 40],
+      ['a quarter to ten', 9, 45],
+      ['ten to eleven', 10, 50],
+      ['five to twelve', 11, 55],
+      ["twelve o'clock", 12, 0],
+      ['half past one', 1, 30],
+      ['a quarter to three', 2, 45],
+      ['ten to four', 3, 50],
+      ["four o'clock", 4, 0],
+      ['three minutes past five', 5, 3],
+      ['twenty-five past seven', 7, 25],
+      ['twenty-five to nine', 8, 35],
+      ['twenty to ten', 9, 40],
+      ['a quarter past eleven', 11, 15],
+    ].map(([phrase, hour, minute]) => createTimeVocabularyItem(phrase, hour, minute)),
+  ],
+  months: [
+    { prompt: 'enero', word: 'January' },
+    { prompt: 'febrero', word: 'February' },
+    { prompt: 'marzo', word: 'March' },
+    { prompt: 'abril', word: 'April' },
+    { prompt: 'mayo', word: 'May' },
+    { prompt: 'junio', word: 'June' },
+    { prompt: 'julio', word: 'July' },
+    { prompt: 'agosto', word: 'August' },
+    { prompt: 'septiembre', word: 'September' },
+    { prompt: 'octubre', word: 'October' },
+    { prompt: 'noviembre', word: 'November' },
+    { prompt: 'diciembre', word: 'December' },
+  ],
+  dates: createDateVocabulary(),
+  ordinalNumbers: createOrdinalVocabulary(),
+  weather: [
+    { word: 'sunny', image: 'https://images.unsplash.com/photo-1722068992302-3dd5fab7e06f?auto=format&fit=crop&w=900&q=80', alt: 'Bright sunshine over a grassy mountain meadow.', imageCredit: { label: 'Photo by Francesco Ungaro · Unsplash', url: 'https://unsplash.com/photos/the-sun-shines-brightly-over-a-grassy-field-7FcZfpFZ7sM', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'hot', image: 'https://images.unsplash.com/photo-1751889188945-f15e42becd73?auto=format&fit=crop&w=900&q=80', alt: 'Thermometer showing hot weather in the sun.', imageCredit: { label: 'Photo by Immo Wegmann · Unsplash', url: 'https://unsplash.com/de/fotos/das-thermometer-zeigt-eine-sehr-heisse-temperatur-an-qs5HR1dG7h4', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'cloudy', image: 'https://images.unsplash.com/photo-1532178910-7815d6919875?auto=format&fit=crop&w=900&q=80', alt: 'Grey and white clouds covering the sky.', imageCredit: { label: 'Photo by Tobias Stonjeck · Unsplash', url: 'https://unsplash.com/de/fotos/grauer-und-weisser-bewolkter-himmel-e_ZxKz3_2Nc', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'raining', aliases: ['rainy'], image: 'https://images.unsplash.com/photo-1611692004235-a1b7e53b039b?auto=format&fit=crop&w=900&q=80', alt: 'Rain drops on a window pane.', imageCredit: { label: 'Photo by Brad Starkey · Unsplash', url: 'https://unsplash.com/photos/water-droplets-on-glass-window-8n-54V1CusY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'windy', image: 'https://images.unsplash.com/photo-1758448183096-b26be84e2818?auto=format&fit=crop&w=900&q=80', alt: 'Trees bending in a strong wind.', imageCredit: { label: 'Photo by Sergej Karpow · Unsplash', url: 'https://unsplash.com/photos/trees-bending-in-the-wind-under-cloudy-sky-f9bSLAHht3A', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'foggy', image: 'https://images.unsplash.com/photo-1653792892136-69825f302a78?auto=format&fit=crop&w=900&q=80', alt: 'Evergreen trees fading into morning fog.', imageCredit: { label: 'Photo by Nick Martin · Unsplash', url: 'https://unsplash.com/photos/a-forest-filled-with-lots-of-trees-covered-in-fog-6wD4qUp2Fj0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'cold', image: 'https://images.unsplash.com/photo-1642333051408-68373a5b4966?auto=format&fit=crop&w=900&q=80', alt: 'Frosted plants in a snow-covered field on a cold day.', imageCredit: { label: 'Photo by Kevin Bessat · Unsplash', url: 'https://unsplash.com/photos/a-snow-covered-field-with-some-plants-in-the-middle-of-it-wLKMvQBaBBo', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'snowing', aliases: ['snowy'], image: 'https://images.unsplash.com/photo-1610972220265-d03b8073bfbb?auto=format&fit=crop&w=900&q=80', alt: 'Snow falling through the light of a streetlamp.', imageCredit: { label: 'Photo by Lawrence Krowdeed · Unsplash', url: 'https://unsplash.com/photos/snow-falls-heavily-under-the-glow-of-streetlights-Uv5GSOzCtEM', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+  ],
+  season: [
+    { word: 'spring', image: 'https://images.unsplash.com/photo-1710927865100-c95a0ab3efc8?auto=format&fit=crop&w=900&q=80', alt: 'A daisy blooming in a field of green grass in spring.', imageCredit: { label: 'Photo by Doğan Alpaslan DEMİR · Unsplash', url: 'https://unsplash.com/photos/a-single-white-flower-in-a-field-of-green-grass-SnuS6STXC0E', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'summer', image: 'https://images.unsplash.com/photo-1676456471935-b5477d73ff3b?auto=format&fit=crop&w=900&q=80', alt: 'Bright sunshine shining over the ocean and a sandy beach in summer.', imageCredit: { label: 'Photo by Shingo Matsui · Unsplash', url: 'https://unsplash.com/photos/the-sun-shines-brightly-over-the-ocean-on-a-sunny-day-GWk0LddIaE0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'autumn', aliases: ['fall'], image: 'https://images.unsplash.com/photo-1670146664451-36711d5a4723?auto=format&fit=crop&w=900&q=80', alt: 'A tree with yellow leaves in autumn.', imageCredit: { label: 'Photo by dai ishikawa · Unsplash', url: 'https://unsplash.com/photos/a-tree-with-yellow-leaves-eRykUxr7Zl8', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'winter', image: 'https://images.unsplash.com/photo-1642964358273-b3411068cc7f?auto=format&fit=crop&w=900&q=80', alt: 'A forest of pine trees covered in snow in winter.', imageCredit: { label: 'Photo by Vladimir Vishnyakov · Unsplash', url: 'https://unsplash.com/photos/a-snow-covered-forest-filled-with-lots-of-trees-CyNylTimzAo', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+  ],
+  prepositions: [
+    { word: 'in', prompt: 'The clothes are ___ the wardrobe.', image: 'https://images.unsplash.com/photo-1722942116288-7baadde0eee5?auto=format&fit=crop&w=900&q=80', alt: 'Clothes hanging inside an open wardrobe.', imageCredit: { label: 'Photo by Lisa Anna · Unsplash', url: 'https://unsplash.com/photos/a-closet-with-clothes-hanging-on-a-rail-Sx1VmfbXDV0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'in front of', prompt: 'The shadow is ___ the table.', image: 'https://images.unsplash.com/photo-1578138411957-df43c1d89fd0?auto=format&fit=crop&w=900&q=80', alt: 'A person’s shadow in front of a table.', imageCredit: { label: 'Photo by Artur Aldyrkhanov · Unsplash', url: 'https://unsplash.com/photos/a-shadow-of-a-person-standing-in-front-of-a-table-Gbtsoz1r2ic', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'on', prompt: 'The cat is ___ the chair.', image: 'https://images.unsplash.com/photo-1696499813088-35fbc85d71a7?auto=format&fit=crop&w=900&q=80', alt: 'A cat sitting on a red chair.', imageCredit: { label: 'Photo by Sindy Süßengut · Unsplash', url: 'https://unsplash.com/photos/a-cat-sitting-on-a-chair-in-a-room-6UCY5CrRZRQ', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'under', aliases: ['below'], prompt: 'The cat is ___ the bed.', image: 'https://images.unsplash.com/photo-1652042479032-5b77b76b4995?auto=format&fit=crop&w=900&q=80', alt: 'A cat hiding under a bed.', imageCredit: { label: 'Photo by Piotr Musioł · Unsplash', url: 'https://unsplash.com/photos/a-cat-lying-on-the-floor-X46eNlD9cQs', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'behind', prompt: 'The man is ___ the sofa.', image: 'https://images.unsplash.com/photo-1546830576-cf1d0ed8ea20?auto=format&fit=crop&w=900&q=80', alt: 'A man standing behind a sofa.', imageCredit: { label: 'Photo by Blake Cheek · Unsplash', url: 'https://unsplash.com/photos/man-standing-wearing-black-blazer-behind-sofa-AVPUbxEif3k', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'between', prompt: 'The lamp is ___ the windows.', image: 'https://images.unsplash.com/photo-1569542101849-a89995a96f1c?auto=format&fit=crop&w=900&q=80', alt: 'A wall lamp between two windows.', imageCredit: { label: 'Photo by Mateus Campos Felipe · Unsplash', url: 'https://unsplash.com/photos/turned-off-sconce-lamp-between-two-windows-UqFFOxfeSWw', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'opposite', aliases: ['across from'], prompt: 'One woman is sitting ___ another woman.', image: 'https://images.unsplash.com/photo-1513470270416-d3ff6f16b22f?auto=format&fit=crop&w=900&q=80', alt: 'Two women facing each other across a table.', imageCredit: { label: 'Photo by Christin Hume · Unsplash', url: 'https://unsplash.com/photos/photo-of-two-women-facing-each-other-sitting-in-front-of-table-near-glass-wall-PNWp1dZ7sO0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'next to', aliases: ['beside'], prompt: 'The side table is ___ the armchair.', image: 'https://images.unsplash.com/photo-1759722667550-81316a23d723?auto=format&fit=crop&w=900&q=80', alt: 'A side table next to a gray armchair.', imageCredit: { label: 'Photo by Costa Live · Unsplash', url: 'https://unsplash.com/photos/gray-armchair-with-throw-blanket-and-floor-lamp-PO6n1RM_pbY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'over', aliases: ['above'], prompt: 'The mirror is ___ the sink.', image: 'https://images.unsplash.com/photo-1723015749220-829f6c6bae55?auto=format&fit=crop&w=900&q=80', alt: 'A bathroom mirror over a sink.', imageCredit: { label: 'Photo by zero take · Unsplash', url: 'https://unsplash.com/photos/a-sink-with-a-faucet-and-a-mirror-above-it-klgB9CK9Y88', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'from', prompt: 'The ghost is coming ___ the bedroom.', image: 'https://images.unsplash.com/photo-1773101883552-1ea68c7b471b?auto=format&fit=crop&w=900&q=80', alt: 'A view through an open doorway into a bedroom.', imageCredit: { label: 'Photo by Franco Debartolo · Unsplash', url: 'https://unsplash.com/photos/view-through-an-open-doorway-into-a-bedroom-gteOPbtBvok', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'to', prompt: 'The woman is walking ___ the bathroom.', image: 'https://images.unsplash.com/photo-1723015749220-829f6c6bae55?auto=format&fit=crop&w=900&q=80', alt: 'A bathroom with a sink and mirror.', imageCredit: { label: 'Photo by zero take · Unsplash', url: 'https://unsplash.com/photos/a-sink-with-a-faucet-and-a-mirror-above-it-klgB9CK9Y88', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'into', prompt: 'The clothes are being put ___ the wardrobe.', image: 'https://images.unsplash.com/photo-1760124056977-36d8b8c12275?auto=format&fit=crop&w=900&q=80', alt: 'Clothes hanging inside a wardrobe.', imageCredit: { label: 'Photo by Karina Syrotiuk · Unsplash', url: 'https://unsplash.com/photos/assortment-of-clothes-hanging-in-a-closet-VNklWFsSVOY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'out of', prompt: 'The clothes are being taken ___ the wardrobe.', image: 'https://images.unsplash.com/photo-1520923179278-ee25e25e09e4?auto=format&fit=crop&w=900&q=80', alt: 'Clothes hanging in an open wardrobe.', imageCredit: { label: 'Photo by Annie Spratt · Unsplash', url: 'https://unsplash.com/photos/shallow-focus-photo-of-assorted-clothes-jXfpruvSHKk', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'through', prompt: 'The cat is looking ___ the window.', image: 'https://images.unsplash.com/photo-1505992525839-8040ffa856ed?auto=format&fit=crop&w=900&q=80', alt: 'A cat looking through a window.', imageCredit: { label: 'Photo by Aleksandar Popovski · Unsplash', url: 'https://unsplash.com/photos/cat-looking-through-window-during-daytime-b7bMiKYEMqY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'up', prompt: 'The person is walking ___ the stairs.', image: 'https://images.unsplash.com/photo-1698764474376-30ae259d7abb?auto=format&fit=crop&w=900&q=80', alt: 'A person walking up a staircase.', imageCredit: { label: 'Photo by MAK · Unsplash', url: 'https://unsplash.com/photos/a-person-walking-up-some-stairs-in-a-building-6uHojl61ee4', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'down', prompt: 'The woman is walking ___ the stairs.', image: 'https://images.unsplash.com/photo-1557218511-aac249017ec0?auto=format&fit=crop&w=900&q=80', alt: 'A woman walking down a staircase.', imageCredit: { label: 'Photo by Jack Young · Unsplash', url: 'https://unsplash.com/photos/woman-walking-down-on-stair-Jkkwm1CFYIw', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
   ],
 };
 
@@ -1471,6 +1695,43 @@ function renderFlagInfoCard(container, info, sources = [], savedAt = '') {
   container.appendChild(article);
 }
 
+function createAnalogClockSvg({ hour, minute }) {
+  const center = 160;
+  const tickMarkup = Array.from({ length: 60 }, (_, index) => {
+    const angle = (index * 6 - 90) * Math.PI / 180;
+    const outerRadius = 132;
+    const innerRadius = index % 5 === 0 ? 119 : 126;
+    const x1 = center + Math.cos(angle) * innerRadius;
+    const y1 = center + Math.sin(angle) * innerRadius;
+    const x2 = center + Math.cos(angle) * outerRadius;
+    const y2 = center + Math.sin(angle) * outerRadius;
+    return `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" class="clock-tick${index % 5 === 0 ? ' clock-tick-hour' : ''}" />`;
+  }).join('');
+  const numberMarkup = Array.from({ length: 12 }, (_, index) => {
+    const number = index === 0 ? 12 : index;
+    const angle = (number * 30 - 90) * Math.PI / 180;
+    const radius = 101;
+    const x = center + Math.cos(angle) * radius;
+    const y = center + Math.sin(angle) * radius;
+    return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" class="clock-number">${number}</text>`;
+  }).join('');
+  const hourAngle = ((hour % 12) * 30 + minute * 0.5 - 90) * Math.PI / 180;
+  const minuteAngle = (minute * 6 - 90) * Math.PI / 180;
+  const hourX = center + Math.cos(hourAngle) * 66;
+  const hourY = center + Math.sin(hourAngle) * 66;
+  const minuteX = center + Math.cos(minuteAngle) * 94;
+  const minuteY = center + Math.sin(minuteAngle) * 94;
+
+  return `<svg class="analog-clock" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+    <circle class="clock-face" cx="${center}" cy="${center}" r="146" />
+    ${tickMarkup}
+    ${numberMarkup}
+    <line class="clock-hand clock-hand-hour" x1="${center}" y1="${center}" x2="${hourX.toFixed(2)}" y2="${hourY.toFixed(2)}" />
+    <line class="clock-hand clock-hand-minute" x1="${center}" y1="${center}" x2="${minuteX.toFixed(2)}" y2="${minuteY.toFixed(2)}" />
+    <circle class="clock-center" cx="${center}" cy="${center}" r="6" />
+  </svg>`;
+}
+
 function renderFoodSubsections() {
   const view = $('#mainView');
   view.innerHTML = `
@@ -1495,6 +1756,82 @@ function renderFoodSubsections() {
   `;
   $$('.vocabulary-card[data-food-subsection]', view).forEach(button => {
     button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.foodSubsection}`));
+  });
+}
+
+function renderTimeSubsections() {
+  const view = $('#mainView');
+  view.innerHTML = `
+    <a href="#practice/vocabulary" class="back-link">← Back</a>
+    <div class="lesson-header">
+      <span class="file-num">Vocabulary practice</span>
+      <h1 style="margin-top:0.5rem">Time</h1>
+      <p class="topics">Practise reading an analogue clock and saying the time in English.</p>
+    </div>
+    <div class="vocabulary-menu vocabulary-menu-expanded">
+      <button class="vocabulary-card" type="button" data-time-subsection="time-practice">
+        <span class="vocabulary-emoji" aria-hidden="true">🕒</span>
+        <strong>Telling the time</strong>
+        <small>Read each clock and write the time in English.</small>
+      </button>
+    </div>
+  `;
+  $$('.vocabulary-card[data-time-subsection]', view).forEach(button => {
+    button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.timeSubsection}`));
+  });
+}
+
+function renderWeatherSubsections() {
+  const view = $('#mainView');
+  view.innerHTML = `
+    <a href="#practice/vocabulary" class="back-link">← Back</a>
+    <div class="lesson-header">
+      <span class="file-num">Vocabulary practice</span>
+      <h1 style="margin-top:0.5rem">Weather</h1>
+      <p class="topics">Practise describing the weather and seasons with photos.</p>
+    </div>
+    <div class="vocabulary-menu vocabulary-menu-expanded">
+      <button class="vocabulary-card" type="button" data-weather-subsection="weather-practice">
+        <span class="vocabulary-emoji" aria-hidden="true">🌦️</span>
+        <strong>Weather practice</strong>
+        <small>Look at each photo and write the weather word in English.</small>
+      </button>
+      <button class="vocabulary-card" type="button" data-weather-subsection="season-practice">
+        <span class="vocabulary-emoji" aria-hidden="true">🌱</span>
+        <strong>Season practice</strong>
+        <small>Look at each photo and write the season in English.</small>
+      </button>
+    </div>
+  `;
+  $$('.vocabulary-card[data-weather-subsection]', view).forEach(button => {
+    button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.weatherSubsection}`));
+  });
+}
+
+function renderDateSubsections() {
+  const view = $('#mainView');
+  view.innerHTML = `
+    <a href="#practice/vocabulary" class="back-link">← Back</a>
+    <div class="lesson-header">
+      <span class="file-num">Vocabulary practice</span>
+      <h1 style="margin-top:0.5rem">Ordinal Numbers and the Date</h1>
+      <p class="topics">Choose a date calendar practice or practise ordinal suffixes.</p>
+    </div>
+    <div class="vocabulary-menu vocabulary-menu-expanded">
+      <button class="vocabulary-card" type="button" data-date-subsection="date-practice">
+        <span class="vocabulary-emoji" aria-hidden="true">🗓️</span>
+        <strong>Dates</strong>
+        <small>Read a calendar and write the complete date in English.</small>
+      </button>
+      <button class="vocabulary-card" type="button" data-date-subsection="ordinal-numbers">
+        <span class="vocabulary-emoji" aria-hidden="true">🔢</span>
+        <strong>Ordinal Numbers</strong>
+        <small>Write only st, nd, rd, or th after each number.</small>
+      </button>
+    </div>
+  `;
+  $$('.vocabulary-card[data-date-subsection]', view).forEach(button => {
+    button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.dateSubsection}`));
   });
 }
 
@@ -1525,6 +1862,9 @@ function renderDishCountryMenu() {
 
 function renderVocabularyPractice(categoryKey = 'food') {
   if (categoryKey === 'food') return renderFoodSubsections();
+  if (categoryKey === 'time') return renderTimeSubsections();
+  if (categoryKey === 'weather') return renderWeatherSubsections();
+  if (categoryKey === 'dates') return renderDateSubsections();
   if (categoryKey === 'dishes') return renderDishCountryMenu();
   const translationSetKeys = Object.keys(globalThis.VocabularyTranslationSets || {});
   if (categoryKey === 'translation' || categoryKey.startsWith('translation-') ||
@@ -1535,6 +1875,13 @@ function renderVocabularyPractice(categoryKey = 'food') {
   const view = $('#mainView');
   const isNumberPractice = categoryKey === 'numbers';
   const isFoodPractice = categoryKey === 'food-practice';
+  const isTimePractice = categoryKey === 'time-practice';
+  const isWeatherPractice = categoryKey === 'weather-practice';
+  const isSeasonPractice = categoryKey === 'season-practice';
+  const isPrepositionsPractice = categoryKey === 'prepositions';
+  const isMonthPractice = categoryKey === 'months';
+  const isDatePractice = categoryKey === 'date-practice';
+  const isOrdinalPractice = categoryKey === 'ordinal-numbers';
   const dishCountryId = categoryKey.startsWith('dish-') ? categoryKey.slice('dish-'.length) : '';
   const dishCountry = (globalThis.FoodDishCategories || []).find(country => country.id === dishCountryId);
   const isDishPractice = Boolean(dishCountry);
@@ -1543,14 +1890,33 @@ function renderVocabularyPractice(categoryKey = 'food') {
   let collection = isNumberPractice
     ? createNumberVocabulary()
     : isFoodPractice ? FILE_10_VOCABULARY.food
-      : isDishPractice ? dishCountry.items : extraPractice?.items || [];
-  const label = isNumberPractice ? 'Numbers' : isFoodPractice ? 'Food'
-    : isDishPractice ? `${dishCountry.country} · Dish` : extraPractice?.title || 'Vocabulary';
+      : isTimePractice ? FILE_10_VOCABULARY.time
+          : isWeatherPractice ? FILE_10_VOCABULARY.weather
+          : isSeasonPractice ? FILE_10_VOCABULARY.season
+        : isPrepositionsPractice ? FILE_10_VOCABULARY.prepositions
+        : isMonthPractice ? FILE_10_VOCABULARY.months
+          : isDatePractice ? FILE_10_VOCABULARY.dates
+            : isOrdinalPractice ? FILE_10_VOCABULARY.ordinalNumbers
+          : isDishPractice ? dishCountry.items : extraPractice?.items || [];
+  const label = isNumberPractice ? 'Numbers' : isFoodPractice ? 'Food' : isTimePractice ? 'Time'
+    : isWeatherPractice ? 'Weather' : isSeasonPractice ? 'Season' : isPrepositionsPractice ? 'Prepositions' : isMonthPractice ? 'Months' : isDatePractice ? 'Dates'
+      : isOrdinalPractice ? 'Ordinal Numbers' : isDishPractice ? `${dishCountry.country} · Dish` : extraPractice?.title || 'Vocabulary';
   const backTarget = isFoodPractice ? '#vocabulary/food'
+    : isTimePractice ? '#vocabulary/time'
+    : isWeatherPractice ? '#vocabulary/weather'
+      : isSeasonPractice ? '#vocabulary/weather'
+      : isDatePractice || isOrdinalPractice ? '#vocabulary/dates'
     : isDishPractice ? '#vocabulary/dishes' : '#practice/vocabulary';
   const practiceDescription = isNumberPractice
     ? 'Practice writing numbers in words and digits.'
     : isFoodPractice ? 'Write the name of the food shown in each picture.'
+      : isTimePractice ? 'Read each clock and write the time in English.'
+      : isWeatherPractice ? 'Look at each photo and write the weather word in English.'
+      : isSeasonPractice ? 'Look at each photo and write the season in English.'
+      : isPrepositionsPractice ? 'Look at each photo and write the missing preposition in English.'
+      : isMonthPractice ? 'Translate each month from Spanish into English.'
+      : isDatePractice ? 'Read the calendar and write the complete date, including the year, in English.'
+      : isOrdinalPractice ? 'Write the ordinal suffix for each number.'
       : isDishPractice ? `Look at each picture and write the name of this famous ${dishCountry.country} dish in English.`
         : isCountryPractice ? 'Look at each flag and write the country or territory name in English.'
           : extraPractice?.description || '';
@@ -1571,6 +1937,14 @@ function renderVocabularyPractice(categoryKey = 'food') {
   let selectedFlagPhoto = null;
 
   const normalizeAnswer = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const normalizeDateAnswer = value => String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\b(\d+)\s+(st|nd|rd|th)\b/g, '$1$2')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   const normalizeNumberAnswer = value => normalizeAnswer(value.replace(/-/g, ' ')).replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
   const normalizeNumberDigits = value => {
     const trimmed = String(value).trim();
@@ -1589,6 +1963,13 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const percent = Math.round((correctCount / words.length) * 100);
     const completedUnit = isNumberPractice ? 'number questions'
       : isFoodPractice ? 'food words'
+        : isTimePractice ? 'time questions'
+        : isWeatherPractice ? 'weather words'
+        : isSeasonPractice ? 'seasons'
+        : isPrepositionsPractice ? 'preposition questions'
+        : isMonthPractice ? 'months'
+        : isDatePractice ? 'calendar questions'
+        : isOrdinalPractice ? 'ordinal suffixes'
         : isDishPractice ? 'dishes'
         : isCountryPractice ? 'countries and territories'
           : categoryKey === 'days' ? 'days' : categoryKey === 'continents' ? 'continents' : 'words';
@@ -1629,6 +2010,13 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const questionTitle = isNumberPractice
       ? (item.direction === 'words-to-number' ? 'Write this number in digits.' : 'What is this number called?')
       : isFoodPractice ? 'What food can you see?'
+        : isTimePractice ? 'What time does the clock show?'
+        : isWeatherPractice ? "What's the weather like?"
+        : isSeasonPractice ? 'Which season is shown in the photo?'
+        : isPrepositionsPractice ? 'Complete the sentence.'
+        : isMonthPractice ? 'Write the month in English.'
+        : isDatePractice ? 'What complete date is highlighted?'
+        : isOrdinalPractice ? 'What suffix completes this ordinal number?'
         : isDishPractice ? 'What dish can you see?'
         : isCountryPractice ? 'What country or territory does this flag represent?'
           : `Translate "${escapeHTML(item.prompt)}" into English.`;
@@ -1637,13 +2025,27 @@ function renderVocabularyPractice(categoryKey = 'food') {
         ? 'Enter the number shown in words. Commas are optional.'
         : 'Write the number in English. Both British and American number forms are accepted.')
       : isFoodPractice ? 'Write its name in English.'
+        : isTimePractice ? 'Write the time in English.'
+        : isWeatherPractice ? 'Write the weather word in English.'
+        : isSeasonPractice ? 'Write the season in English.'
+        : isPrepositionsPractice ? item.prompt
+        : isMonthPractice ? 'Write the English name of this month.'
+        : isDatePractice ? 'Write the weekday, ordinal day, month, and year in English.'
+        : isOrdinalPractice ? 'Write only st, nd, rd, or th.'
         : isDishPractice ? 'Write the dish name in English.'
         : isCountryPractice ? 'Write the country or territory name in English.'
           : 'Write the English translation.';
     const answerPlaceholder = isNumberPractice
       ? (item.direction === 'words-to-number' ? 'Write the number in digits...' : 'Write the number in English...')
       : isCountryPractice ? 'Write the country name in English...'
-        : isDishPractice ? 'Write the dish name in English...' : 'Write the English translation...';
+        : isTimePractice ? 'Write the time in English...'
+          : isWeatherPractice ? 'Write the weather word...'
+          : isSeasonPractice ? 'Write the season...'
+          : isPrepositionsPractice ? 'Write the preposition...'
+          : isMonthPractice ? 'Write the month in English...'
+            : isDatePractice ? 'e.g. Sunday, 25th October 2026...'
+              : isOrdinalPractice ? 'st / nd / rd / th'
+            : isDishPractice ? 'Write the dish name in English...' : 'Write the English translation...';
     card.innerHTML = `
       <div class="vocabulary-progress-bar">
         <span>Progress</span>
@@ -1652,8 +2054,17 @@ function renderVocabularyPractice(categoryKey = 'food') {
       <div class="vocabulary-card-panel">
         ${isNumberPractice
           ? `<div class="vocabulary-number-display${item.direction === 'words-to-number' ? ' vocabulary-number-words' : ''}" aria-label="${item.direction === 'words-to-number' ? 'Number in words' : `Number ${item.number}`}">${item.direction === 'words-to-number' ? escapeHTML(item.word) : item.number}</div>`
-          : `<img class="vocabulary-image" src="${item.image}" alt="${escapeHTML(item.alt)}" />
-            ${item.imageCredit ? `<span class="vocabulary-image-credit"><a href="${item.imageCredit.url}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.label)}</a> · <a href="${item.imageCredit.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.licenseLabel)}</a></span>` : ''}`}
+          : isTimePractice
+            ? `<div class="vocabulary-clock" role="img" aria-label="${escapeHTML(item.alt)}">${createAnalogClockSvg(item.clockTime)}</div>`
+            : isWeatherPractice
+              ? renderVocabularyImage(item)
+            : isMonthPractice
+              ? `<div class="vocabulary-month-display" role="img" aria-label="Spanish month: ${escapeHTML(item.prompt)}"><span>MONTH</span><strong>${escapeHTML(item.prompt)}</strong></div>`
+              : isDatePractice
+                ? createDateCalendarMarkup(item.calendarDate)
+                : isOrdinalPractice
+                  ? `<div class="vocabulary-ordinal-display" role="img" aria-label="Number ${item.ordinalNumber}, write its ordinal suffix"><strong>${item.ordinalNumber}</strong><span>___</span></div>`
+            : renderVocabularyImage(item)}
         <div class="vocabulary-question">
           <h3>${questionTitle}</h3>
           <p>${questionDescription}</p>
@@ -1692,6 +2103,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const noteBtn = card.querySelector('#vocabularyNoteBtn');
     const noteDialog = card.querySelector('.vocabulary-note-dialog');
     speakBtn.insertAdjacentElement('afterend', createPhoneticControl(() => {
+      if (isDatePractice || isOrdinalPractice) return item.pronunciation;
       if (!isNumberPractice) return item.word;
       return item.direction === 'words-to-number' ? item.word : item.accepted[0];
     }));
@@ -1731,7 +2143,9 @@ function renderVocabularyPractice(categoryKey = 'food') {
       renderItem();
     });
 
-    speakBtn.addEventListener('click', () => speakVocabularyWord(item.word));
+    speakBtn.addEventListener('click', () => speakVocabularyWord(
+      isDatePractice || isOrdinalPractice ? item.pronunciation : item.word,
+    ));
     noteBtn.addEventListener('click', () => noteDialog.showModal());
     $('.vocabulary-note-close', noteDialog).addEventListener('click', () => noteDialog.close());
     noteDialog.addEventListener('keydown', event => {
@@ -1748,10 +2162,12 @@ function renderVocabularyPractice(categoryKey = 'food') {
       const isWordsToNumber = isNumberPractice && item.direction === 'words-to-number';
       const value = isWordsToNumber
         ? normalizeNumberDigits(input.value)
-        : isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
+        : isDatePractice ? normalizeDateAnswer(input.value)
+          : isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
       const accepted = item.accepted.map(term => isWordsToNumber
         ? normalizeNumberDigits(term)
-        : isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
+        : isDatePractice ? normalizeDateAnswer(term)
+          : isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
       return accepted.includes(value);
     };
 
@@ -1770,10 +2186,12 @@ function renderVocabularyPractice(categoryKey = 'food') {
       const isWordsToNumber = isNumberPractice && item.direction === 'words-to-number';
       const value = isWordsToNumber
         ? normalizeNumberDigits(input.value)
-        : isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
+        : isDatePractice ? normalizeDateAnswer(input.value)
+          : isNumberPractice ? normalizeNumberAnswer(input.value) : normalizeAnswer(input.value);
       const accepted = item.accepted.map(term => isWordsToNumber
         ? normalizeNumberDigits(term)
-        : isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
+        : isDatePractice ? normalizeDateAnswer(term)
+          : isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
       const correct = accepted.includes(value);
       responses.set(currentIndex, { answer: input.value, correct });
       input.disabled = true;
@@ -2335,6 +2753,18 @@ function renderPractice(params) {
           <span class="vocabulary-emoji">🍽️</span>
           <span>Food</span>
         </button>
+        <button class="vocabulary-card" data-vocabulary="time" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🕒</span>
+          <span>Time</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="weather" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🌦️</span>
+          <span>Weather</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="prepositions" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">↔️</span>
+          <span>Prepositions</span>
+        </button>
         <button class="vocabulary-card" data-vocabulary="numbers" type="button">
           <span class="vocabulary-emoji">🔢</span>
           <span>Numbers</span>
@@ -2346,6 +2776,14 @@ function renderPractice(params) {
         <button class="vocabulary-card" data-vocabulary="days" type="button">
           <span class="vocabulary-emoji" aria-hidden="true">📅</span>
           <span>Days of the week</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="months" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🗓️</span>
+          <span>Months</span>
+        </button>
+        <button class="vocabulary-card" data-vocabulary="dates" type="button">
+          <span class="vocabulary-emoji" aria-hidden="true">🗓️</span>
+          <span>Ordinal Numbers and the Date</span>
         </button>
         <button class="vocabulary-card" data-vocabulary="continents" type="button">
           <span class="vocabulary-emoji" aria-hidden="true">🌎</span>
@@ -2407,7 +2845,7 @@ function renderPractice(params) {
         <span class="vocabulary-emoji" aria-hidden="true">🗂️</span>
         <span>
           <strong>Vocabulary</strong>
-          <small>Practise food, numbers, days, continents, countries, adjectives, jobs, family, places and buildings, and translation.</small>
+          <small>Practise food, weather and seasons, prepositions, time, months, ordinal numbers and dates, numbers, days, continents, countries, adjectives, jobs, family, places and buildings, and translation.</small>
         </span>
         <span aria-hidden="true">→</span>
       </button>
@@ -2667,6 +3105,50 @@ function collectGrammarSentenceSeeds(topicIndex, sectionIndex, questions) {
 }
 
 function createGrammarClozeCandidates(sentences) {
+  const contractionExpansions = {
+    "i'm": ['I am'],
+    "you're": ['you are'],
+    "he's": ['he is'],
+    "she's": ['she is'],
+    "it's": ['it is'],
+    "we're": ['we are'],
+    "they're": ['they are'],
+    "isn't": ['is not'],
+    "aren't": ['are not'],
+    "wasn't": ['was not'],
+    "weren't": ['were not'],
+    "don't": ['do not'],
+    "doesn't": ['does not'],
+    "didn't": ['did not'],
+    "can't": ['cannot', 'can not'],
+    "couldn't": ['could not'],
+    "haven't": ['have not'],
+    "hasn't": ['has not'],
+    "i've": ['I have'],
+    "you've": ['you have'],
+    "we've": ['we have'],
+    "they've": ['they have'],
+    "there's": ['there is'],
+    "let's": ['let us'],
+  };
+  const subjectClues = {
+    i: '“I” refers to the person speaking.',
+    you: '“You” refers to the person or people being spoken to.',
+    he: '“He” refers to one male person.',
+    she: '“She” refers to one female person.',
+    it: '“It” refers to one thing, animal, or situation.',
+    we: '“We” refers to the speaker and at least one other person.',
+    they: '“They” refers to two or more people or things.',
+  };
+  const getAnswerDetails = answer => {
+    const key = answer.toLowerCase().replace(/[’‘]/g, "'");
+    const subject = /^(i|you|he|she|it|we|they)(?:'(?:m|re|s|ve))?$/.exec(key)?.[1];
+    const expansions = contractionExpansions[key];
+    return {
+      ...(expansions ? { acceptedAnswers: [answer, ...expansions] } : {}),
+      ...(subject ? { hint: `Subject clue: ${subjectClues[subject]}` } : {}),
+    };
+  };
   const candidates = [];
   const seen = new Set();
   sentences.forEach(sentence => {
@@ -2680,7 +3162,7 @@ function createGrammarClozeCandidates(sentences) {
       const key = prompt.toLowerCase();
       if (seen.has(key)) return;
       seen.add(key);
-      candidates.push({ prompt, answer });
+      candidates.push({ prompt, answer, ...getAnswerDetails(answer) });
     });
   });
   return candidates;
@@ -2751,9 +3233,8 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
     : clozeCandidates;
   writeCandidates.slice(0, missingFill).forEach(candidate => {
     supplemental.push({
+      ...candidate,
       type: 'fill',
-      prompt: candidate.prompt,
-      answer: candidate.answer,
       explanation: 'Use the grammar pattern in this subtopic.',
     });
   });
@@ -2785,6 +3266,7 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
         options,
         answer: correctIndex,
         answerText: correct,
+        hint: candidate.hint,
         explanation: 'Choose the word that correctly completes the sentence.',
       });
     }
@@ -2820,7 +3302,7 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
     const answerKey = candidate.answer.toLowerCase();
     if (!seenMatchAnswers.has(answerKey)) {
       seenMatchAnswers.add(answerKey);
-      matchCandidates.push([candidate.prompt.replace('Complete the sentence: ', ''), candidate.answer]);
+      matchCandidates.push([candidate.prompt.replace('Complete the sentence: ', ''), candidate.answer, candidate.hint]);
     }
   });
   for (let index = 0; index < missingMatches; index += 1) {
@@ -2833,7 +3315,8 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
       supplemental.push({
         type: 'match',
         prompt: 'Match each sentence with its missing word.',
-        pairs,
+        pairs: pairs.map(([prompt, answer]) => [prompt, answer]),
+        hint: [...new Set(pairs.map(([, , hint]) => hint).filter(Boolean))].join(' '),
         explanation: 'Each word completes one of the sentences.',
       });
     }
