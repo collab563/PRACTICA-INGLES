@@ -225,6 +225,8 @@ function renderIrregularVerbsPractice(params = []) {
     const translationInput = $('#irregularVerbTranslation');
     const formTranslationInput = $('#irregularVerbFormTranslation');
     const feedback = $('#irregularVerbFeedback');
+    const formPhoneticControl = createPhoneticControl(() => answers.join(', '));
+    input.insertAdjacentElement('afterend', formPhoneticControl);
     const appendCorrectAnswerPhonetics = () => {
       const phoneticLine = document.createElement('span');
       phoneticLine.className = 'irregular-verb-answer-phonetic';
@@ -261,7 +263,9 @@ function renderIrregularVerbsPractice(params = []) {
       $('#checkIrregularVerb').disabled = true;
       renderAnswerFeedback(savedResponse);
     }
-    $('#irregularVerbPhonetic').appendChild(createPhoneticControl(() => verb[0]));
+    const phoneticControl = $('#irregularVerbPhonetic');
+    phoneticControl.appendChild(createPhoneticControl(() => verb[0]));
+    $('.writing-prompt').insertAdjacentElement('afterend', phoneticControl);
     $('#shuffleIrregularVerbs').addEventListener('click', () => {
       if (advanceTimeout) clearTimeout(advanceTimeout);
       advanceTimeout = null;

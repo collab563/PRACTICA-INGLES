@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Under</title>
+  <desc id="desc">A cat is hiding under a bed.</desc>
+  <rect width="480" height="300" rx="24" fill="#eff6ff"/>
+  <path d="M45 246h390" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <path d="M72 105h326v28H72z" fill="#9a6b45" stroke="#704a2b" stroke-width="7"/>
+  <path d="M89 133v103m290-103v103" stroke="#704a2b" stroke-width="12"/>
+  <rect x="83" y="82" width="144" height="24" rx="12" fill="#fff" stroke="#cbd5e1" stroke-width="5"/>
+  <rect x="229" y="82" width="150" height="24" rx="12" fill="#bfdbfe" stroke="#93c5fd" stroke-width="5"/>
+  <path d="M170 201l20-25 20 25q22-7 44 8l16 23h-93q-22-9-7-31z" fill="#f59e0b" stroke="#b45309" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M185 186l5-16 13 13m28 0 14-13 3 19" fill="#f59e0b" stroke="#b45309" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="205" cy="202" r="4" fill="#1e293b"/><circle cx="235" cy="202" r="4" fill="#1e293b"/>
+  <path d="M265 214q26-16 32 7" fill="none" stroke="#b45309" stroke-width="6" stroke-linecap="round"/>
+</svg>

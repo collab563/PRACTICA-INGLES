@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Two women sitting opposite each other</title>
+  <desc id="desc">Two women sit facing one another, one on each side of a table.</desc>
+  <rect width="480" height="300" rx="24" fill="#eef2ff"/>
+  <path d="M32 258h416" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <path d="M78 164v79m44-79v79m236-79v79m44-79v79" stroke="#94a3b8" stroke-width="9" stroke-linecap="round"/>
+  <path d="M69 163h62m218 0h62M101 182h68m142 0h68" stroke="#64748b" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="142" cy="93" r="25" fill="#d9a77d"/>
+  <path d="M117 94q-3-34 25-37 28 3 26 38l-10-12-29 1-12 15z" fill="#5b3b32"/>
+  <path d="M118 131q24-18 49 0l17 56h-83z" fill="#db2777"/>
+  <path d="M126 145l32 21m25-6 28 0" fill="none" stroke="#d9a77d" stroke-width="12" stroke-linecap="round"/>
+  <path d="M130 185l39 17-2 37m-7-54 23 19-4 35" fill="none" stroke="#475569" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="338" cy="93" r="25" fill="#b87953"/>
+  <path d="M313 93q-2-34 25-37 27 3 26 38l-11-12-28 1-12 15z" fill="#332622"/>
+  <path d="M314 131q24-18 49 0l17 56h-83z" fill="#0f766e"/>
+  <path d="M354 145l-32 21m-25-6-28 0" fill="none" stroke="#b87953" stroke-width="12" stroke-linecap="round"/>
+  <path d="M326 185l-39 17 2 37m7-54-23 19 4 35" fill="none" stroke="#475569" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M189 159h102" stroke="#8b5e3c" stroke-width="16" stroke-linecap="round"/>
+  <path d="M202 169v78m76-78v78" stroke="#8b5e3c" stroke-width="11" stroke-linecap="round"/>
+  <path d="M224 149h33" stroke="#f8fafc" stroke-width="7" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">From</title>
+  <desc id="desc">A person walks from inside a bedroom through its doorway.</desc>
+  <rect width="480" height="300" rx="24" fill="#f1f5f9"/>
+  <path d="M32 252h416" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <path d="M56 54h254v198H56z" fill="#dbeafe" stroke="#64748b" stroke-width="8"/>
+  <path d="M75 199h133v30H75zM89 159h105v40H89z" fill="#8b5e3c"/>
+  <rect x="96" y="141" width="86" height="19" rx="9" fill="#fff"/>
+  <path d="M310 54h78v198h-78" fill="#fff" stroke="#64748b" stroke-width="8"/>
+  <path d="M312 72l55 20v132l-55 22" fill="#fbbf24" stroke="#b45309" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="356" cy="151" r="5" fill="#713f12"/>
+  <circle cx="344" cy="129" r="18" fill="#f2c6a0"/>
+  <path d="M324 151q20-14 40 0l8 48h-54z" fill="#8b5cf6"/>
+  <path d="M327 194l-7 39m33-39 14 39" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
+  <path d="M242 118h50" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round"/>
+  <path d="M288 101l20 17-20 17" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

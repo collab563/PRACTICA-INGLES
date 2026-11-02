@@ -1,4 +1,4 @@
-const CACHE_NAME = 'english-practice-v50';
+const CACHE_NAME = 'english-practice-v66';
 const APP_SHELL = [
   './',
   './index.html',
@@ -16,6 +16,18 @@ const APP_SHELL = [
   './images/vocabulary/spices.jpg',
   './images/vocabulary/chips.jpg',
   './images/vocabulary/steak.jpg',
+  './images/prepositions/in-front-of-table.png',
+  './images/prepositions/under-cat-bed.png',
+  './images/prepositions/behind-man-sofa.png',
+  './images/prepositions/opposite-women.png',
+  './images/prepositions/over-mirror-sink.png',
+  './images/prepositions/from-bedroom.png',
+  './images/prepositions/to-woman-bathroom.png',
+  './images/prepositions/into-clothes-wardrobe.png',
+  './images/prepositions/out-of-wardrobe.png',
+  './images/prepositions/sunlight-through-window.png',
+  './images/prepositions/up-stairs.png',
+  './images/prepositions/down-stairs.png',
   './css/styles.css',
   './css/writing-evaluator.css',
   './data/files.js',
@@ -25,6 +37,7 @@ const APP_SHELL = [
   './data/writing.js',
   './data/phonetics.js',
   './data/vocabulary-extra.js',
+  './data/country-map-data.js',
   './data/vocabulary-translation-sets.js',
   './data/video-lessons.js',
   './data/food-dishes.js',

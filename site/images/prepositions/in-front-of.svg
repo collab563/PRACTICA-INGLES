@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">In front of</title>
+  <desc id="desc">A person stands in front of a table.</desc>
+  <rect width="480" height="300" rx="24" fill="#eef2ff"/>
+  <path d="M32 244h416" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <path d="M160 132h180v24H160zM176 156v78m148-78v78" fill="#b77945" stroke="#754c29" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="250" cy="93" r="26" fill="#f2c6a0"/>
+  <path d="M220 130q30-20 60 0l17 83h-94z" fill="#2563eb"/>
+  <path d="M224 207l-10 38m58-38 12 38" stroke="#334155" stroke-width="15" stroke-linecap="round"/>
+  <path d="M223 145l-29 43m86-43 26 37" stroke="#f2c6a0" stroke-width="13" stroke-linecap="round"/>
+</svg>

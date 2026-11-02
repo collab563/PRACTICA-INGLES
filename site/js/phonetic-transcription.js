@@ -1,6 +1,9 @@
 function transcribeEnglishIPA(text) {
   const dictionary = globalThis.EnglishIPADictionary || {};
   const pronunciationOverrides = {
+    ABATTOIR: 'ˈæbətwɑː',
+    README: 'ˈriːdmiː',
+    VALIDATE: 'ˈvælɪdeɪt',
     // British English forms missing from Britfone 3.0.1. Keep these in the
     // same broad IPA style as the source dictionary.
     AFFIRMATIVE: 'əˈfɜːmətɪv',

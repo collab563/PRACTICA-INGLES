@@ -1884,6 +1884,21 @@ mangoes|mangos
 pear|pera
 pears|peras
 unveils|revela
+abattoir|matadero
+dismiss|despedir; desestimar; descartar
+outline|esquema; contorno; esbozar
+timeline|línea de tiempo; cronología
+readme|archivo de instrucciones (README)
+icons|iconos
+images|imágenes
+writing|escritura; redacción
+validate|validar
+static|estático; estática
+belong|pertenecer; corresponder
+submit|enviar; presentar; entregar; someter
+fundamentally|fundamentalmente; esencialmente
+hiding|escondiendo; ocultando; ocultándose
+standing|de pie; posición; estar de pie
 `.trim();
 
   const enToEs = {};
@@ -2120,6 +2135,106 @@ unveils|revela
       .split(enyeMarker).join('ñ');
   }
 
+  const englishIrregularPluralForms = Object.freeze({
+    child: 'children', person: 'people', man: 'men', woman: 'women',
+    mouse: 'mice', goose: 'geese', foot: 'feet', tooth: 'teeth', ox: 'oxen',
+    wife: 'wives', life: 'lives', knife: 'knives', leaf: 'leaves', wolf: 'wolves',
+    loaf: 'loaves', shelf: 'shelves', half: 'halves', calf: 'calves', elf: 'elves',
+    self: 'selves', thief: 'thieves', quiz: 'quizzes',
+    analysis: 'analyses', basis: 'bases', crisis: 'crises', diagnosis: 'diagnoses',
+    thesis: 'theses', criterion: 'criteria', phenomenon: 'phenomena',
+    index: 'indices', matrix: 'matrices', appendix: 'appendices',
+  });
+
+  const englishIrregularSingularForms = new Map(
+    Object.entries(englishIrregularPluralForms).map(([singular, plural]) => [plural, singular])
+  );
+
+  function pluralizeEnglishNoun(word) {
+    if (englishIrregularPluralForms[word]) return englishIrregularPluralForms[word];
+    if (/[^aeiou]y$/i.test(word)) return `${word.slice(0, -1)}ies`;
+    if (/(?:s|x|z|ch|sh)$/i.test(word)) return `${word}es`;
+    if (/o$/i.test(word) && /^(?:echo|hero|potato|tomato|torpedo|veto)$/i.test(word)) return `${word}es`;
+    return `${word}s`;
+  }
+
+  function pluralizeSpanishPhrase(phrase) {
+    const words = String(phrase).trim().split(/\s+/);
+    if (!words[0]) return phrase;
+    const pluralArticles = { el: 'los', la: 'las', un: 'unos', una: 'unas' };
+    let headIndex = 0;
+    const article = words[0].toLocaleLowerCase('es');
+    if (pluralArticles[article] && words[1]) {
+      words[0] = pluralArticles[article];
+      headIndex = 1;
+    }
+
+    const tokenMatch = words[headIndex].match(/^([^\p{L}]*)([\p{L}]+)([^\p{L}]*)$/u);
+    if (!tokenMatch) return phrase;
+    const [, before, word, after] = tokenMatch;
+    let plural;
+    if (/ón$/i.test(word)) plural = `${word.slice(0, -2)}ones`;
+    else if (/és$/i.test(word)) plural = `${word.slice(0, -2)}eses`;
+    else if (/[áéóú]s$/i.test(word)) plural = `${word.slice(0, -2)}${word.slice(-2, -1).normalize('NFD').replace(/[\u0300-\u036f]/g, '')}ses`;
+    else if (/[íú]s$/i.test(word) || /[íú]$/i.test(word)) plural = `${word}es`;
+    else if (/z$/i.test(word)) plural = `${word.slice(0, -1)}ces`;
+    else if (/[aeiouáéóú]$/i.test(word)) plural = `${word}s`;
+    else if (/s$/i.test(word)) plural = word;
+    else plural = `${word}es`;
+    words[headIndex] = `${before}${plural}${after}`;
+    return words.join(' ');
+  }
+
+  function pluralizeSpanishTranslation(translation) {
+    return String(translation).split(/(\s*[;/]\s*)/)
+      .map(part => /^[\s;/]*$/.test(part) ? part : pluralizeSpanishPhrase(part))
+      .join('');
+  }
+
+  function expandEnglishNounPlurals(dictionary) {
+    const expanded = Object.assign(Object.create(null), dictionary);
+    const exactKeys = new Set(Object.keys(dictionary).map(normalizeLookup));
+    const dictionaryWords = new Set(Object.keys(dictionary).map(normalizeLookup));
+    const verbBases = new Set(verbForms.map(({ base }) => normalizeLookup(base)));
+    const adjectiveBases = new Set((globalThis.VocabularyTranslationSets?.adjectives?.items || [])
+      .flatMap(item => [item.en, ...(item.enAnswers || [])])
+      .filter(Boolean)
+      .map(normalizeLookup));
+    const nonNounBases = new Set([
+      ...verbBases,
+      ...adjectiveBases,
+      'belong', 'submit', 'dismiss', 'validate', 'hide', 'stand',
+      'hiding', 'standing', 'static', 'news', 'mathematics', 'physics',
+      'economics', 'politics', 'series', 'species', 'fundamentally',
+      'a', 'an', 'the', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they',
+      'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their',
+      'who', 'what', 'where', 'when', 'why', 'how', 'which', 'and', 'or', 'but', 'because',
+      'to', 'of', 'for', 'from', 'in', 'on', 'at', 'by', 'with', 'without', 'about',
+    ]);
+
+    const isAlreadyPlural = word => {
+      if (englishIrregularSingularForms.has(word)) return true;
+      const candidates = [];
+      if (/ies$/i.test(word)) candidates.push(`${word.slice(0, -3)}y`);
+      if (/ves$/i.test(word)) candidates.push(`${word.slice(0, -3)}f`, `${word.slice(0, -3)}fe`);
+      if (/(?:ches|shes|xes|zes|sses)$/i.test(word)) candidates.push(word.slice(0, -2));
+      if (/s$/i.test(word)) candidates.push(word.slice(0, -1));
+      return candidates.some(candidate => dictionaryWords.has(normalizeLookup(candidate)));
+    };
+
+    Object.entries(dictionary).forEach(([source, translation]) => {
+      const word = normalizeLookup(source);
+      if (!/^[\p{L}]+$/u.test(word) || nonNounBases.has(word) || /ly$/i.test(word) || isAlreadyPlural(word)) return;
+      const plural = pluralizeEnglishNoun(word);
+      const normalizedPlural = normalizeLookup(plural);
+      if (!plural || exactKeys.has(normalizedPlural)) return;
+      exactKeys.add(normalizedPlural);
+      expanded[plural] = pluralizeSpanishTranslation(translation);
+    });
+
+    return expanded;
+  }
+
   function createFoldedText(text) {
     let folded = '';
     const sourceRanges = [];
@@ -2172,7 +2287,7 @@ unveils|revela
   }
 
   const dictionaries = {
-    'en-es': createPattern(enToEs),
+    'en-es': createPattern(expandEnglishNounPlurals(enToEs)),
     'es-en': createPattern(esToEn),
   };
 

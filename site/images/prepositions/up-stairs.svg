@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Up</title>
+  <desc id="desc">A person walks up a staircase; the arrow points upward.</desc>
+  <rect width="480" height="300" rx="24" fill="#eff6ff"/>
+  <path d="M55 247h68v-38h70v-38h70v-38h70V95h91v152z" fill="#cbd5e1" stroke="#64748b" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M104 226h50m19-38h50m19-38h50m19-38h50" stroke="#fff" stroke-width="7"/>
+  <circle cx="206" cy="128" r="17" fill="#f2c6a0"/>
+  <path d="M190 148q17-12 34 0l10 34h-50z" fill="#2563eb"/>
+  <path d="M195 180l-13 26m34-26 15 19m-34-39-22 15m38-15 19 12" stroke="#334155" stroke-width="9" stroke-linecap="round"/>
+  <path d="M393 224V103" fill="none" stroke="#16a34a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M374 125l19-25 19 25" fill="none" stroke="#16a34a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

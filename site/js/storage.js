@@ -12,7 +12,7 @@ const defaultState = {
   fileProgress: {}, // { '1': { 'A': { answered: 0, correct: 0, completed: false } } }
   wrongQuestions: [], // [{ file, lesson, section, qIdx, ts }]
   examHistory: [],   // [{ date, score, total, mode, fileIds }]
-  theme: 'light',
+  theme: 'dark',
   soundEnabled: true,
   lastVisited: null,
 };

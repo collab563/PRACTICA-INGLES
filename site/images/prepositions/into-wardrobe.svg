@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Into</title>
+  <desc id="desc">A woman puts a shirt inside an open wardrobe.</desc>
+  <rect width="480" height="300" rx="24" fill="#f5f3ff"/>
+  <path d="M32 252h416" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <rect x="267" y="51" width="150" height="195" rx="8" fill="#d6b38a" stroke="#805b38" stroke-width="8"/>
+  <path d="M342 56v185" stroke="#805b38" stroke-width="6"/>
+  <circle cx="328" cy="148" r="4" fill="#704214"/><circle cx="356" cy="148" r="4" fill="#704214"/>
+  <path d="M287 85h108" stroke="#805b38" stroke-width="7" stroke-linecap="round"/>
+  <path d="M329 85v22m-13-7h27" fill="none" stroke="#704214" stroke-width="5" stroke-linecap="round"/>
+  <path d="M321 107l-19 9 8 15 11-4v24h32v-24l11 4 8-15-19-9-16 11z" fill="#60a5fa" stroke="#1d4ed8" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="122" cy="111" r="20" fill="#f2c6a0"/>
+  <path d="M99 138q23-15 46 0l11 58H88z" fill="#ec4899"/>
+  <path d="M99 193l-8 48m35-48 12 48" stroke="#334155" stroke-width="12" stroke-linecap="round"/>
+  <path d="M103 150l43 5m-4-1 25 3" stroke="#f2c6a0" stroke-width="11" stroke-linecap="round"/>
+  <path d="M178 169h61" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round"/>
+  <path d="M224 152l20 17-20 17" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

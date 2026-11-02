@@ -1,7 +1,7 @@
 // ============== MAIN APP ==============
 // Wires up routing, state, and views
 
-let STATE = Storage.load();
+let STATE = { ...Storage.load(), theme: 'dark' };
 let EXAM = null;
 const ONLINE_TRANSLATOR_API = 'https://apertium.org/apy/translate';
 let feedbackAudioContext = null;
@@ -287,21 +287,21 @@ const FILE_10_VOCABULARY = {
   ],
   prepositions: [
     { word: 'in', prompt: 'The clothes are ___ the wardrobe.', image: 'https://images.unsplash.com/photo-1722942116288-7baadde0eee5?auto=format&fit=crop&w=900&q=80', alt: 'Clothes hanging inside an open wardrobe.', imageCredit: { label: 'Photo by Lisa Anna · Unsplash', url: 'https://unsplash.com/photos/a-closet-with-clothes-hanging-on-a-rail-Sx1VmfbXDV0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'in front of', prompt: 'The shadow is ___ the table.', image: 'https://images.unsplash.com/photo-1578138411957-df43c1d89fd0?auto=format&fit=crop&w=900&q=80', alt: 'A person’s shadow in front of a table.', imageCredit: { label: 'Photo by Artur Aldyrkhanov · Unsplash', url: 'https://unsplash.com/photos/a-shadow-of-a-person-standing-in-front-of-a-table-Gbtsoz1r2ic', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'in front of', prompt: 'The person is standing ___ the table.', image: 'images/prepositions/in-front-of-table.png', alt: 'A person standing in front of a dining table.' },
     { word: 'on', prompt: 'The cat is ___ the chair.', image: 'https://images.unsplash.com/photo-1696499813088-35fbc85d71a7?auto=format&fit=crop&w=900&q=80', alt: 'A cat sitting on a red chair.', imageCredit: { label: 'Photo by Sindy Süßengut · Unsplash', url: 'https://unsplash.com/photos/a-cat-sitting-on-a-chair-in-a-room-6UCY5CrRZRQ', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'under', aliases: ['below'], prompt: 'The cat is ___ the bed.', image: 'https://images.unsplash.com/photo-1652042479032-5b77b76b4995?auto=format&fit=crop&w=900&q=80', alt: 'A cat hiding under a bed.', imageCredit: { label: 'Photo by Piotr Musioł · Unsplash', url: 'https://unsplash.com/photos/a-cat-lying-on-the-floor-X46eNlD9cQs', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'behind', prompt: 'The man is ___ the sofa.', image: 'https://images.unsplash.com/photo-1546830576-cf1d0ed8ea20?auto=format&fit=crop&w=900&q=80', alt: 'A man standing behind a sofa.', imageCredit: { label: 'Photo by Blake Cheek · Unsplash', url: 'https://unsplash.com/photos/man-standing-wearing-black-blazer-behind-sofa-AVPUbxEif3k', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'under', aliases: ['below'], prompt: 'The cat is hiding ___ the bed.', image: 'images/prepositions/under-cat-bed.png', alt: 'A cat hiding under a bed.' },
+    { word: 'behind', prompt: 'The man is standing ___ the sofa.', image: 'images/prepositions/behind-man-sofa.png', alt: 'A man standing behind a sofa.' },
     { word: 'between', prompt: 'The lamp is ___ the windows.', image: 'https://images.unsplash.com/photo-1569542101849-a89995a96f1c?auto=format&fit=crop&w=900&q=80', alt: 'A wall lamp between two windows.', imageCredit: { label: 'Photo by Mateus Campos Felipe · Unsplash', url: 'https://unsplash.com/photos/turned-off-sconce-lamp-between-two-windows-UqFFOxfeSWw', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'opposite', aliases: ['across from'], prompt: 'One woman is sitting ___ another woman.', image: 'https://images.unsplash.com/photo-1513470270416-d3ff6f16b22f?auto=format&fit=crop&w=900&q=80', alt: 'Two women facing each other across a table.', imageCredit: { label: 'Photo by Christin Hume · Unsplash', url: 'https://unsplash.com/photos/photo-of-two-women-facing-each-other-sitting-in-front-of-table-near-glass-wall-PNWp1dZ7sO0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'opposite', aliases: ['across from'], prompt: 'One woman is sitting ___ another woman.', image: 'images/prepositions/opposite-women.png', alt: 'Two women sit facing each other across a cafe table.' },
     { word: 'next to', aliases: ['beside'], prompt: 'The side table is ___ the armchair.', image: 'https://images.unsplash.com/photo-1759722667550-81316a23d723?auto=format&fit=crop&w=900&q=80', alt: 'A side table next to a gray armchair.', imageCredit: { label: 'Photo by Costa Live · Unsplash', url: 'https://unsplash.com/photos/gray-armchair-with-throw-blanket-and-floor-lamp-PO6n1RM_pbY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'over', aliases: ['above'], prompt: 'The mirror is ___ the sink.', image: 'https://images.unsplash.com/photo-1723015749220-829f6c6bae55?auto=format&fit=crop&w=900&q=80', alt: 'A bathroom mirror over a sink.', imageCredit: { label: 'Photo by zero take · Unsplash', url: 'https://unsplash.com/photos/a-sink-with-a-faucet-and-a-mirror-above-it-klgB9CK9Y88', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'from', prompt: 'The ghost is coming ___ the bedroom.', image: 'https://images.unsplash.com/photo-1773101883552-1ea68c7b471b?auto=format&fit=crop&w=900&q=80', alt: 'A view through an open doorway into a bedroom.', imageCredit: { label: 'Photo by Franco Debartolo · Unsplash', url: 'https://unsplash.com/photos/view-through-an-open-doorway-into-a-bedroom-gteOPbtBvok', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'to', prompt: 'The woman is walking ___ the bathroom.', image: 'https://images.unsplash.com/photo-1723015749220-829f6c6bae55?auto=format&fit=crop&w=900&q=80', alt: 'A bathroom with a sink and mirror.', imageCredit: { label: 'Photo by zero take · Unsplash', url: 'https://unsplash.com/photos/a-sink-with-a-faucet-and-a-mirror-above-it-klgB9CK9Y88', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'into', prompt: 'The clothes are being put ___ the wardrobe.', image: 'https://images.unsplash.com/photo-1760124056977-36d8b8c12275?auto=format&fit=crop&w=900&q=80', alt: 'Clothes hanging inside a wardrobe.', imageCredit: { label: 'Photo by Karina Syrotiuk · Unsplash', url: 'https://unsplash.com/photos/assortment-of-clothes-hanging-in-a-closet-VNklWFsSVOY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'out of', prompt: 'The clothes are being taken ___ the wardrobe.', image: 'https://images.unsplash.com/photo-1520923179278-ee25e25e09e4?auto=format&fit=crop&w=900&q=80', alt: 'Clothes hanging in an open wardrobe.', imageCredit: { label: 'Photo by Annie Spratt · Unsplash', url: 'https://unsplash.com/photos/shallow-focus-photo-of-assorted-clothes-jXfpruvSHKk', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'through', prompt: 'The cat is looking ___ the window.', image: 'https://images.unsplash.com/photo-1505992525839-8040ffa856ed?auto=format&fit=crop&w=900&q=80', alt: 'A cat looking through a window.', imageCredit: { label: 'Photo by Aleksandar Popovski · Unsplash', url: 'https://unsplash.com/photos/cat-looking-through-window-during-daytime-b7bMiKYEMqY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'up', prompt: 'The person is walking ___ the stairs.', image: 'https://images.unsplash.com/photo-1698764474376-30ae259d7abb?auto=format&fit=crop&w=900&q=80', alt: 'A person walking up a staircase.', imageCredit: { label: 'Photo by MAK · Unsplash', url: 'https://unsplash.com/photos/a-person-walking-up-some-stairs-in-a-building-6uHojl61ee4', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'down', prompt: 'The woman is walking ___ the stairs.', image: 'https://images.unsplash.com/photo-1557218511-aac249017ec0?auto=format&fit=crop&w=900&q=80', alt: 'A woman walking down a staircase.', imageCredit: { label: 'Photo by Jack Young · Unsplash', url: 'https://unsplash.com/photos/woman-walking-down-on-stair-Jkkwm1CFYIw', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'over', aliases: ['above'], prompt: 'The mirror is ___ the sink.', image: 'images/prepositions/over-mirror-sink.png', alt: 'A bathroom mirror mounted above a sink.' },
+    { word: 'from', prompt: 'The person is walking ___ the bedroom.', image: 'images/prepositions/from-bedroom.png', alt: 'A man walking out of a bedroom through an open doorway.' },
+    { word: 'to', prompt: 'The woman is walking ___ the bathroom.', image: 'images/prepositions/to-woman-bathroom.png', alt: 'A woman walking toward the bathroom.' },
+    { word: 'into', prompt: 'The woman is putting a shirt ___ the wardrobe.', image: 'images/prepositions/into-clothes-wardrobe.png', alt: 'A woman placing clothes into a wardrobe.' },
+    { word: 'out of', prompt: 'The woman is taking a shirt ___ the wardrobe.', image: 'images/prepositions/out-of-wardrobe.png', alt: 'A woman taking a shirt out of a wardrobe.' },
+    { word: 'through', prompt: 'Sunlight is shining ___ the window.', image: 'images/prepositions/sunlight-through-window.png', alt: 'Sunlight shines through the window and onto the living-room floor.' },
+    { word: 'up', prompt: 'The person is walking ___ the stairs.', image: 'images/prepositions/up-stairs.png', alt: 'A man walking up a flight of stairs.' },
+    { word: 'down', prompt: 'The woman is walking ___ the stairs.', image: 'images/prepositions/down-stairs.png', alt: 'A woman walking down a flight of stairs.' },
   ],
 };
 
@@ -1576,6 +1576,242 @@ function flagCodeFromItem(item) {
   return String(item?.image || '').match(/\/([a-z]{2})\.svg$/i)?.[1]?.toUpperCase() || '';
 }
 
+function openCountryMapDialog(item) {
+  const mapData = globalThis.CountryMapData;
+  const code = flagCodeFromItem(item);
+  if (!mapData?.features?.length || !code) {
+    showToast('The offline world map is not available.', 'error');
+    return;
+  }
+
+  const [,, mapWidth, mapHeight] = mapData.viewBox.split(/\s+/).map(Number);
+  const selectedFeatureExists = mapData.features.some(feature => feature.code === code);
+  const fallbackPoints = selectedFeatureExists ? [] : (mapData.fallbackPoints?.[code] || []);
+  const countryPaths = mapData.features.map(feature => `
+    <path class="country-map-shape${feature.code === code ? ' is-selected' : ''}" data-country-code="${escapeHTML(feature.code)}" d="${feature.d}" />
+  `).join('');
+  const selectedMarkers = fallbackPoints.map(([x, y]) => `
+    <circle class="country-map-marker" cx="${Number(x)}" cy="${Number(y)}" r="4.5" />
+  `).join('');
+
+  const dialog = document.createElement('dialog');
+  dialog.className = 'country-map-dialog';
+  dialog.setAttribute('aria-labelledby', 'countryMapTitle');
+  dialog.innerHTML = `
+    <section class="country-map-shell">
+      <header class="country-map-header" tabindex="0" aria-label="Move the map window with mouse, touch, or arrow keys">
+        <div>
+          <span class="country-map-eyebrow">COUNTRY LOCATION</span>
+          <h2 id="countryMapTitle">${escapeHTML(item.word)} on the world map</h2>
+          <p>Only this country or territory is highlighted.</p>
+        </div>
+        <button class="country-map-close" type="button" id="countryMapClose" aria-label="Close map">&times;</button>
+      </header>
+      <div class="country-map-toolbar" role="group" aria-label="Map zoom controls">
+        <div class="country-map-zoom-buttons">
+          <button class="btn btn-secondary" type="button" id="countryMapZoomOut" aria-label="Zoom out">&minus;</button>
+          <output id="countryMapZoomLevel" aria-live="polite">100%</output>
+          <button class="btn btn-secondary" type="button" id="countryMapZoomIn" aria-label="Zoom in">+</button>
+        </div>
+        <button class="btn btn-secondary" type="button" id="countryMapFit">Fit world</button>
+      </div>
+      <div class="country-map-stage" id="countryMapStage" tabindex="0" role="region" aria-label="Interactive map. Pinch with two fingers to zoom, drag to move, or use the zoom controls.">
+        <svg class="country-map-svg" id="countryMapSvg" viewBox="${escapeHTML(mapData.viewBox)}" role="img" aria-label="World map highlighting ${escapeHTML(item.word)}" preserveAspectRatio="xMidYMid meet">
+          <rect class="country-map-ocean" x="0" y="0" width="${mapWidth}" height="${mapHeight}" />
+          <g id="countryMapLayer">${countryPaths}${selectedMarkers}</g>
+        </svg>
+        <div class="country-map-hint" aria-hidden="true">Pinch to zoom · Drag to explore</div>
+      </div>
+      <footer class="country-map-footer">
+        <span><i class="country-map-legend-swatch"></i> ${escapeHTML(item.word)}</span>
+        <span>Map data: Natural Earth</span>
+      </footer>
+    </section>`;
+
+  document.body.appendChild(dialog);
+  const closeButton = dialog.querySelector('#countryMapClose');
+  const stage = dialog.querySelector('#countryMapStage');
+  const svg = dialog.querySelector('#countryMapSvg');
+  const layer = dialog.querySelector('#countryMapLayer');
+  const zoomLevel = dialog.querySelector('#countryMapZoomLevel');
+  const maxZoom = 100;
+  let scale = 1;
+  let translateX = 0;
+  let translateY = 0;
+  let pointers = new Map();
+  let dragState = null;
+  let pinchState = null;
+
+  const clampOffset = (offset, dimension) => Math.max(dimension * (1 - scale), Math.min(0, offset));
+  const updateMap = () => {
+    translateX = clampOffset(translateX, mapWidth);
+    translateY = clampOffset(translateY, mapHeight);
+    layer.setAttribute('transform', `translate(${translateX} ${translateY}) scale(${scale})`);
+    zoomLevel.value = `${Math.round(scale * 100)}%`;
+    svg.classList.toggle('is-zoomed', scale > 1.01);
+  };
+  const pointInMap = event => {
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    return point.matrixTransform(svg.getScreenCTM().inverse());
+  };
+  const zoomAt = (factor, point) => {
+    const nextScale = Math.max(1, Math.min(maxZoom, scale * factor));
+    const mapX = (point.x - translateX) / scale;
+    const mapY = (point.y - translateY) / scale;
+    translateX = point.x - mapX * nextScale;
+    translateY = point.y - mapY * nextScale;
+    scale = nextScale;
+    updateMap();
+  };
+  const mapCenter = () => ({ x: mapWidth / 2, y: mapHeight / 2 });
+  const setFitWorld = () => {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    updateMap();
+  };
+  const pointerDistance = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
+  const pointerCenter = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
+  dialog.showModal();
+  updateMap();
+  const mapHeader = dialog.querySelector('.country-map-header');
+  const clampWindowPosition = (left, top) => {
+    const bounds = dialog.getBoundingClientRect();
+    const visibleWidth = Math.min(80, bounds.width);
+    const visibleHeight = Math.min(80, bounds.height);
+    return {
+      left: Math.max(visibleWidth - bounds.width, Math.min(left, window.innerWidth - visibleWidth)),
+      top: Math.max(visibleHeight - bounds.height, Math.min(top, window.innerHeight - visibleHeight)),
+    };
+  };
+  const placeWindow = (left, top) => {
+    const position = clampWindowPosition(left, top);
+    dialog.style.left = `${position.left}px`;
+    dialog.style.top = `${position.top}px`;
+    dialog.style.right = 'auto';
+    dialog.style.bottom = 'auto';
+    dialog.style.transform = 'none';
+  };
+  let windowDrag = null;
+  mapHeader.addEventListener('pointerdown', event => {
+    const target = event.target instanceof Element ? event.target : null;
+    const isInteractive = target?.closest('button, a, input, select, textarea, [contenteditable="true"]');
+    if (!event.isPrimary || event.button !== 0 || isInteractive) return;
+    const bounds = dialog.getBoundingClientRect();
+    windowDrag = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - bounds.left,
+      offsetY: event.clientY - bounds.top,
+    };
+    dialog.setPointerCapture(event.pointerId);
+    dialog.classList.add('is-dragging');
+    event.preventDefault();
+  });
+  dialog.addEventListener('pointermove', event => {
+    if (!windowDrag || event.pointerId !== windowDrag.pointerId) return;
+    placeWindow(event.clientX - windowDrag.offsetX, event.clientY - windowDrag.offsetY);
+    event.preventDefault();
+  });
+  const stopWindowDrag = event => {
+    if (!windowDrag || event.pointerId !== windowDrag.pointerId) return;
+    windowDrag = null;
+    dialog.classList.remove('is-dragging');
+    if (dialog.hasPointerCapture(event.pointerId)) dialog.releasePointerCapture(event.pointerId);
+  };
+  dialog.addEventListener('pointerup', stopWindowDrag);
+  dialog.addEventListener('pointercancel', stopWindowDrag);
+  mapHeader.addEventListener('keydown', event => {
+    if (event.target !== mapHeader || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    const bounds = dialog.getBoundingClientRect();
+    const step = event.shiftKey ? 48 : 24;
+    const left = bounds.left + (event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0);
+    const top = bounds.top + (event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0);
+    placeWindow(left, top);
+    event.preventDefault();
+  });
+  closeButton.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog.addEventListener('close', () => dialog.remove(), { once: true });
+  dialog.querySelector('#countryMapZoomIn').addEventListener('click', () => zoomAt(1.35, mapCenter()));
+  dialog.querySelector('#countryMapZoomOut').addEventListener('click', () => zoomAt(1 / 1.35, mapCenter()));
+  dialog.querySelector('#countryMapFit').addEventListener('click', setFitWorld);
+
+  stage.addEventListener('wheel', event => {
+    event.preventDefault();
+    zoomAt(event.deltaY < 0 ? 1.14 : 1 / 1.14, pointInMap(event));
+  }, { passive: false });
+  stage.addEventListener('dblclick', event => {
+    zoomAt(1.8, pointInMap(event));
+  });
+  stage.addEventListener('keydown', event => {
+    if (event.key === '+' || event.key === '=') {
+      event.preventDefault();
+      zoomAt(1.35, mapCenter());
+    } else if (event.key === '-') {
+      event.preventDefault();
+      zoomAt(1 / 1.35, mapCenter());
+    } else if (event.key === '0') {
+      event.preventDefault();
+      setFitWorld();
+    }
+  });
+  stage.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    stage.setPointerCapture(event.pointerId);
+    const point = pointInMap(event);
+    pointers.set(event.pointerId, point);
+    if (pointers.size === 1) {
+      dragState = { point };
+    } else if (pointers.size === 2) {
+      const [first, second] = [...pointers.values()];
+      pinchState = {
+        distance: pointerDistance(first, second),
+        center: pointerCenter(first, second),
+        scale,
+        translateX,
+        translateY,
+      };
+      dragState = null;
+    }
+  });
+  stage.addEventListener('pointermove', event => {
+    if (!pointers.has(event.pointerId)) return;
+    const point = pointInMap(event);
+    pointers.set(event.pointerId, point);
+    if (pointers.size >= 2 && pinchState) {
+      const [first, second] = [...pointers.values()];
+      const center = pointerCenter(first, second);
+      const distanceRatio = pinchState.distance > 0 ? pointerDistance(first, second) / pinchState.distance : 1;
+      const nextScale = Math.max(1, Math.min(maxZoom, pinchState.scale * distanceRatio));
+      const mapX = (pinchState.center.x - pinchState.translateX) / pinchState.scale;
+      const mapY = (pinchState.center.y - pinchState.translateY) / pinchState.scale;
+      scale = nextScale;
+      translateX = center.x - mapX * nextScale;
+      translateY = center.y - mapY * nextScale;
+      updateMap();
+    } else if (pointers.size === 1 && dragState && scale > 1.01) {
+      translateX += point.x - dragState.point.x;
+      translateY += point.y - dragState.point.y;
+      dragState = { point };
+      updateMap();
+    }
+  });
+  const finishPointer = event => {
+    pointers.delete(event.pointerId);
+    pinchState = null;
+    if (pointers.size === 1) dragState = { point: [...pointers.values()][0] };
+    else dragState = null;
+  };
+  stage.addEventListener('pointerup', finishPointer);
+  stage.addEventListener('pointercancel', finishPointer);
+  stage.addEventListener('lostpointercapture', finishPointer);
+}
+
 function readSavedFlagInfo(code) {
   if (!/^[A-Z]{2}$/.test(code)) return null;
   try {
@@ -1913,7 +2149,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
       : isTimePractice ? 'Read each clock and write the time in English.'
       : isWeatherPractice ? 'Look at each photo and write the weather word in English.'
       : isSeasonPractice ? 'Look at each photo and write the season in English.'
-      : isPrepositionsPractice ? 'Look at each photo and write the missing preposition in English.'
+      : isPrepositionsPractice ? 'Look at each picture and complete the sentence with the missing preposition in English.'
       : isMonthPractice ? 'Translate each month from Spanish into English.'
       : isDatePractice ? 'Read the calendar and write the complete date, including the year, in English.'
       : isOrdinalPractice ? 'Write the ordinal suffix for each number.'
@@ -1925,16 +2161,59 @@ function renderVocabularyPractice(categoryKey = 'food') {
     Router.navigate('practice/vocabulary');
     return;
   }
-  let words = collection.map(item => ({
+  const COUNTRY_REPETITIONS_PER_GROUP = 50;
+  const COUNTRY_UNLOCK_BATCH_SIZE = 5;
+  const COUNTRY_PROGRESS_KEY = 'country-flag-learning-v1';
+  const createCountryOrder = () => {
+    const order = Array.from({ length: collection.length }, (_, index) => index);
+    for (let index = order.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [order[index], order[randomIndex]] = [order[randomIndex], order[index]];
+    }
+    return order;
+  };
+  const isValidCountryOrder = order => Array.isArray(order)
+    && order.length === collection.length
+    && new Set(order).size === collection.length
+    && order.every(index => Number.isInteger(index) && index >= 0 && index < collection.length);
+  const readCountryProgress = () => {
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem(COUNTRY_PROGRESS_KEY) || '{}') || {};
+    } catch (_) { /* Start with a fresh group if saved progress is unreadable. */ }
+    const order = isValidCountryOrder(saved.order) ? saved.order : createCountryOrder();
+    const savedRound = Math.max(0, Number(saved.round) || 0);
+    const completedGroups = Math.floor(savedRound / COUNTRY_REPETITIONS_PER_GROUP);
+    const progress = {
+      unlocked: Math.min(collection.length,
+        Math.max(COUNTRY_UNLOCK_BATCH_SIZE,
+          Math.ceil((Number(saved.unlocked) || COUNTRY_UNLOCK_BATCH_SIZE) / COUNTRY_UNLOCK_BATCH_SIZE) * COUNTRY_UNLOCK_BATCH_SIZE)
+          + completedGroups * COUNTRY_UNLOCK_BATCH_SIZE),
+      round: savedRound % COUNTRY_REPETITIONS_PER_GROUP,
+      total: Math.max(0, Number(saved.total) || 0),
+      order,
+    };
+    if (!isValidCountryOrder(saved.order) || completedGroups > 0) {
+      try { localStorage.setItem(COUNTRY_PROGRESS_KEY, JSON.stringify(progress)); } catch (_) { /* Keep the session usable if storage is unavailable. */ }
+    }
+    return progress;
+  };
+  let countryProgress = isCountryPractice ? readCountryProgress() : null;
+  let countryOrder = countryProgress?.order || [];
+  const createPracticeWords = items => items.map(item => ({
     ...item,
     accepted: item.accepted || [item.word, ...(item.aliases || [])],
   }));
+  let words = createPracticeWords(isCountryPractice
+    ? countryOrder.slice(0, countryProgress.unlocked).map(index => collection[index])
+    : collection);
   let currentIndex = 0;
   let correctCount = 0;
   const correctlyAnswered = new Set();
   const responses = new Map();
   let advanceTimeout = null;
   let selectedFlagPhoto = null;
+  let countryUnlockNotice = '';
 
   const normalizeAnswer = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const normalizeDateAnswer = value => String(value)
@@ -2046,6 +2325,9 @@ function renderVocabularyPractice(categoryKey = 'food') {
             : isDatePractice ? 'e.g. Sunday, 25th October 2026...'
               : isOrdinalPractice ? 'st / nd / rd / th'
             : isDishPractice ? 'Write the dish name in English...' : 'Write the English translation...';
+    const questionDescriptionMarkup = isPrepositionsPractice
+      ? escapeHTML(item.prompt).replace('___', '<input id="vocabularyAnswer" class="vocabulary-input preposition-inline-input" type="text" inputmode="text" aria-label="Write the missing preposition" autocomplete="off" spellcheck="false">')
+      : questionDescription;
     card.innerHTML = `
       <div class="vocabulary-progress-bar">
         <span>Progress</span>
@@ -2067,12 +2349,13 @@ function renderVocabularyPractice(categoryKey = 'food') {
             : renderVocabularyImage(item)}
         <div class="vocabulary-question">
           <h3>${questionTitle}</h3>
-          <p>${questionDescription}</p>
+          <p>${questionDescriptionMarkup}</p>
         </div>
         <div class="vocabulary-speech-control">
           <div class="vocabulary-speech-buttons">
             <button class="btn btn-secondary" id="speakVocabularyBtn" type="button">🔊 Listen to pronunciation</button>
             <button class="btn btn-secondary" id="vocabularyNoteBtn" type="button" aria-haspopup="dialog">📝 Note</button>
+            ${isCountryPractice ? '<button class="btn btn-secondary" id="showCountryMap" type="button">🗺️ View on map</button>' : ''}
           </div>
             <small>Works offline if an English voice is installed on your device.</small>
         </div>
@@ -2084,11 +2367,11 @@ function renderVocabularyPractice(categoryKey = 'food') {
             <p>Close and reopen Chrome, then try the button again.</p>
             <button class="btn btn-secondary vocabulary-note-close" type="button">Close</button>
         </dialog>
-        <input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="${isNumberPractice && item.direction === 'words-to-number' ? 'numeric' : 'text'}" placeholder="${answerPlaceholder}" autocomplete="off" />
+        ${isPrepositionsPractice ? '' : `<input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="${isNumberPractice && item.direction === 'words-to-number' ? 'numeric' : 'text'}" placeholder="${answerPlaceholder}" autocomplete="off" />`}
         <div class="exercise-actions">
-          <button class="btn btn-secondary" id="previousVocabularyBtn" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Previous question</button>
+          <button class="btn btn-secondary" id="previousVocabularyBtn" type="button" ${currentIndex === 0 && !isCountryPractice ? 'disabled' : ''}>← Previous question</button>
           <button class="btn" id="checkVocabularyBtn" type="button">Check</button>
-          <button class="btn btn-secondary" id="skipVocabularyBtn" type="button">${currentIndex === words.length - 1 ? 'Finish practice' : 'Next question'}</button>
+          <button class="btn btn-secondary" id="skipVocabularyBtn" type="button">${!isCountryPractice && currentIndex === words.length - 1 ? 'Finish practice' : 'Next question'}</button>
         </div>
         <div id="vocabularyFeedback" class="vocabulary-feedback hidden"> </div>
       </div>
@@ -2101,14 +2384,19 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const previousBtn = card.querySelector('#previousVocabularyBtn');
     const speakBtn = card.querySelector('#speakVocabularyBtn');
     const noteBtn = card.querySelector('#vocabularyNoteBtn');
+    const countryMapButton = card.querySelector('#showCountryMap');
     const noteDialog = card.querySelector('.vocabulary-note-dialog');
     speakBtn.insertAdjacentElement('afterend', createPhoneticControl(() => {
       if (isDatePractice || isOrdinalPractice) return item.pronunciation;
+      if (isPrepositionsPractice) {
+        return item.prompt.replace('___', input.value.trim() || item.word);
+      }
       if (!isNumberPractice) return item.word;
       return item.direction === 'words-to-number' ? item.word : item.accepted[0];
-    }));
+    }, { watchInput: isPrepositionsPractice ? input : null }));
+    countryMapButton?.addEventListener('click', () => openCountryMapDialog(item));
 
-    const savedResponse = responses.get(currentIndex);
+    const savedResponse = isCountryPractice ? null : responses.get(currentIndex);
     if (savedResponse) {
       input.value = savedResponse.answer;
       feedback.className = `vocabulary-feedback ${savedResponse.correct ? 'success' : 'error'}`;
@@ -2129,7 +2417,10 @@ function renderVocabularyPractice(categoryKey = 'food') {
         advanceTimeout = null;
       }
       window.speechSynthesis?.cancel();
-      if (currentIndex < words.length - 1) {
+      if (isCountryPractice) {
+        currentIndex = (currentIndex + 1) % words.length;
+        renderItem();
+      } else if (currentIndex < words.length - 1) {
         currentIndex += 1;
         renderItem();
       } else {
@@ -2138,8 +2429,8 @@ function renderVocabularyPractice(categoryKey = 'food') {
     };
 
     previousBtn.addEventListener('click', () => {
-      if (currentIndex === 0) return;
-      currentIndex -= 1;
+      if (currentIndex === 0 && !isCountryPractice) return;
+      currentIndex = (currentIndex - 1 + words.length) % words.length;
       renderItem();
     });
 
@@ -2172,7 +2463,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
     };
 
     input.addEventListener('input', () => {
-      if (responses.get(currentIndex)?.correct) return;
+      if (!isCountryPractice && responses.get(currentIndex)?.correct) return;
       responses.delete(currentIndex);
       feedback.className = 'vocabulary-feedback hidden';
       input.classList.remove('wrong');
@@ -2193,13 +2484,28 @@ function renderVocabularyPractice(categoryKey = 'food') {
         : isDatePractice ? normalizeDateAnswer(term)
           : isNumberPractice ? normalizeNumberAnswer(term) : normalizeAnswer(term));
       const correct = accepted.includes(value);
-      responses.set(currentIndex, { answer: input.value, correct });
+      if (!isCountryPractice) responses.set(currentIndex, { answer: input.value, correct });
       input.disabled = true;
       checkBtn.disabled = true;
       if (correct) {
         if (!correctlyAnswered.has(currentIndex)) {
           correctlyAnswered.add(currentIndex);
           correctCount += 1;
+        }
+        if (isCountryPractice) {
+          countryProgress.round += 1;
+          countryProgress.total += 1;
+          countryUnlockNotice = '';
+          if (countryProgress.round >= COUNTRY_REPETITIONS_PER_GROUP) {
+            countryProgress.round = 0;
+            const previousUnlocked = countryProgress.unlocked;
+            countryProgress.unlocked = Math.min(collection.length, countryProgress.unlocked + COUNTRY_UNLOCK_BATCH_SIZE);
+            words = createPracticeWords(countryOrder.slice(0, countryProgress.unlocked).map(index => collection[index]));
+            if (countryProgress.unlocked > previousUnlocked) {
+              countryUnlockNotice = `${countryProgress.unlocked} countries and territories are now unlocked!`;
+            }
+          }
+          try { localStorage.setItem(COUNTRY_PROGRESS_KEY, JSON.stringify(countryProgress)); } catch (_) { /* Keep the session usable if storage is unavailable. */ }
         }
         playCorrectSound();
         feedback.className = 'vocabulary-feedback success';
@@ -2230,6 +2536,12 @@ function renderVocabularyPractice(categoryKey = 'food') {
         <span class="file-num">${isDishPractice ? 'Food · Dish' : 'Vocabulary'} · ${escapeHTML(label)}</span>
         <h1 style="margin-top:0.5rem">${escapeHTML(label)} practice</h1>
         <p class="topics">${escapeHTML(practiceDescription)}</p>
+        ${isCountryPractice ? `
+          <p class="topics" id="countryLearningProgress">${words.length} of ${collection.length} countries and territories unlocked · ${countryProgress.round}/${COUNTRY_REPETITIONS_PER_GROUP} correct answers in this group · ${countryProgress.total} total</p>
+          <div class="vocabulary-progress-track"><span style="width:${Math.min(100, Math.round((countryProgress.round / COUNTRY_REPETITIONS_PER_GROUP) * 100))}%"></span></div>
+          <p class="topics" id="countryUnlockNotice" role="status">${escapeHTML(countryUnlockNotice)}</p>
+          <button class="btn btn-secondary" id="resetCountryProgress" type="button">Reset progress</button>
+        ` : ''}
         <button class="btn btn-secondary" id="shuffleVocabularyBtn" type="button">🔀 Shuffle and restart</button>
         ${isCountryPractice ? `
           <details class="flag-assistant">
@@ -2265,10 +2577,9 @@ function renderVocabularyPractice(categoryKey = 'food') {
     $('#shuffleVocabularyBtn').addEventListener('click', () => {
       window.speechSynthesis?.cancel();
       if (isNumberPractice) collection = createNumberVocabulary();
-      words = collection.map(item => ({
-        ...item,
-        accepted: item.accepted || [item.word, ...(item.aliases || [])],
-      }));
+      words = createPracticeWords(isCountryPractice
+        ? countryOrder.slice(0, countryProgress.unlocked).map(index => collection[index])
+        : collection);
       for (let index = words.length - 1; index > 0; index -= 1) {
         const randomIndex = Math.floor(Math.random() * (index + 1));
         [words[index], words[randomIndex]] = [words[randomIndex], words[index]];
@@ -2277,8 +2588,29 @@ function renderVocabularyPractice(categoryKey = 'food') {
       correctCount = 0;
       correctlyAnswered.clear();
       responses.clear();
+      countryUnlockNotice = '';
       renderItem();
     });
+    if (isCountryPractice) {
+      $('#resetCountryProgress').addEventListener('click', () => {
+        if (!window.confirm('Reset country practice progress? You will start again with the first 5 flags.')) return;
+        countryProgress = {
+          unlocked: Math.min(COUNTRY_UNLOCK_BATCH_SIZE, collection.length),
+          round: 0,
+          total: 0,
+          order: createCountryOrder(),
+        };
+        countryOrder = countryProgress.order;
+        words = createPracticeWords(countryOrder.slice(0, countryProgress.unlocked).map(index => collection[index]));
+        currentIndex = 0;
+        correctCount = 0;
+        correctlyAnswered.clear();
+        responses.clear();
+        countryUnlockNotice = '';
+        try { localStorage.setItem(COUNTRY_PROGRESS_KEY, JSON.stringify(countryProgress)); } catch (_) { /* Keep the session usable if storage is unavailable. */ }
+        renderItem();
+      });
+    }
     wrap.appendChild(card);
 
     if (isCountryPractice) {
@@ -2728,6 +3060,7 @@ function renderLesson(params) {
 // --- PRACTICE HUB ---
 function renderPractice(params) {
   const view = $('#mainView');
+  if (params[0] === 'toc') return startTOCPractice();
   if (params[0] === 'file') {
     const fileId = params[1];
     const file = Files.find(f => f.id === fileId);
@@ -2840,6 +3173,17 @@ function renderPractice(params) {
       `).join('')}
     </div>
     <section class="grammar-practice-section">
+      <h2 class="section-title">MODO TOC</h2>
+      <button class="grammar-practice-card" id="openTOCPractice" type="button">
+        <span class="vocabulary-emoji" aria-hidden="true">🔀</span>
+        <span>
+          <strong>Modo TOC (Trastorno obsesivo-compulsivo)</strong>
+          <small>100 ejercicios mezclados de Vocabulary, Grammar, Reading, Writing, verbos irregulares y más. Revisión manual: compara tu respuesta y decide si acertaste.</small>
+        </span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+    <section class="grammar-practice-section">
         <h2 class="section-title">🗂️ VOCABULARY</h2>
         <button class="grammar-practice-card" id="openVocabularyPractice" type="button">
         <span class="vocabulary-emoji" aria-hidden="true">🗂️</span>
@@ -2917,6 +3261,7 @@ function renderPractice(params) {
   $('#openWritingPractice').addEventListener('click', () => Router.navigate('writing'));
   $('#openIrregularVerbsPractice').addEventListener('click', () => Router.navigate('irregular-verbs'));
   $('#openLearningLab').addEventListener('click', () => Router.navigate('learning-lab'));
+  $('#openTOCPractice').addEventListener('click', () => Router.navigate('practice/toc'));
 }
 
 const GRAMMAR_EXERCISE_TYPES = [
@@ -3672,6 +4017,533 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
   };
 
   renderQuestion();
+}
+
+const TOC_PRACTICE_LENGTH = 100;
+const TOC_PRACTICE_SEQUENCE_KEY = 'englishPracticeTOCSequenceV1';
+
+function shuffleTOCItems(items) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const other = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[other]] = [shuffled[other], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function tocQuestionKey(question) {
+  const content = { ...question };
+  delete content._ref;
+  delete content.tocCategory;
+  return JSON.stringify(content);
+}
+
+function createTOCFillQuestion(prompt, answers, answerText = '') {
+  const acceptedAnswers = [...new Set((Array.isArray(answers) ? answers : [answers])
+    .map(answer => String(answer ?? '').trim()).filter(Boolean))];
+  if (!acceptedAnswers.length) return null;
+  const completedPrompt = String(prompt || '').includes('___') ? prompt : `${prompt} ___`;
+  return {
+    type: 'fill',
+    prompt: completedPrompt,
+    answer: acceptedAnswers[0],
+    acceptedAnswers,
+    answerText: answerText || acceptedAnswers.join(' / '),
+  };
+}
+
+function createTOCQuestionSet() {
+  const pools = { course: [], grammar: [], vocabulary: [], reading: [], writing: [], irregular: [] };
+  const poolKeys = Object.fromEntries(Object.keys(pools).map(key => [key, new Set()]));
+  const supportedTypes = new Set(['mc', 'fill', 'comparative-sentence', 'comparative-form', 'reorder', 'conversation', 'match', 'tf']);
+  const addQuestion = (poolName, question) => {
+    if (!question || !supportedTypes.has(question.type)) return;
+    const key = tocQuestionKey(question);
+    if (poolKeys[poolName].has(key)) return;
+    poolKeys[poolName].add(key);
+    pools[poolName].push(question);
+  };
+
+  Files.forEach(file => file.lessons.forEach(lesson => {
+    ['grammar', 'vocabulary', 'mixed'].forEach(section => {
+      (lesson[section] || []).forEach((question, qIdx) => addQuestion('course', {
+        ...question,
+        _ref: { file: file.id, lesson: lesson.letter, section, qIdx },
+      }));
+    });
+  }));
+
+  GrammarTheory.forEach((topic, topicIndex) => topic.sections.forEach((section, sectionIndex) => {
+    getGrammarSectionQuestions(topicIndex, sectionIndex).forEach(question => addQuestion('grammar', question));
+  }));
+
+  const addVocabularyPair = (english, spanish, aliases = []) => {
+    const en = String(english || '').trim();
+    const es = [...new Set((Array.isArray(spanish) ? spanish : String(spanish || '').split(/\s*(?:\/|,|;)\s*/))
+      .map(value => String(value).trim()).filter(Boolean))];
+    if (!en || !es.length) return;
+    const englishAnswers = [en, ...(Array.isArray(aliases) ? aliases : [])].map(value => String(value).trim()).filter(Boolean);
+    addQuestion('vocabulary', createTOCFillQuestion(
+      `Translate into Spanish: <strong>${escapeHTML(en)}</strong>`, es
+    ));
+    addQuestion('vocabulary', createTOCFillQuestion(
+      `Write the English word or phrase for <strong>${escapeHTML(es[0])}</strong>`, englishAnswers
+    ));
+  };
+
+  (globalThis.VocabularyWords || []).forEach(item => addVocabularyPair(item.en, item.es, item.aliases));
+  Object.values(globalThis.VocabularyTranslationSets || {}).forEach(set => {
+    (set.items || []).forEach(item => addVocabularyPair(item.en, item.es, item.aliases));
+  });
+
+  Object.entries(globalThis.ExtraVocabulary || {}).forEach(([setKey, set]) => {
+    const items = set.items || [];
+    items.forEach((item, index) => {
+      if (item.prompt && item.word) {
+        addQuestion('vocabulary', createTOCFillQuestion(
+          `Translate into English: <strong>${escapeHTML(item.prompt)}</strong>`,
+          [item.word, ...(item.aliases || [])]
+        ));
+      } else if (setKey === 'countries' && item.word && String(item.image || '').startsWith('images/flags/')) {
+        const options = [item.word];
+        for (let offset = 1; options.length < 4 && offset < items.length; offset += 1) {
+          const distractor = items[(index + offset * 19) % items.length]?.word;
+          if (distractor && !options.includes(distractor)) options.push(distractor);
+        }
+        const shuffledOptions = shuffleTOCItems(options);
+        addQuestion('vocabulary', {
+          type: 'mc',
+          prompt: `Name the country or territory shown by this flag:<br><img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.alt || 'Country flag')}" style="display:block;width:min(100%,220px);height:130px;object-fit:contain;margin:0.8rem auto;background:#fff;padding:0.35rem;border-radius:0.5rem">`,
+          options: shuffledOptions.map(escapeHTML),
+          answer: shuffledOptions.indexOf(item.word),
+          answerText: item.word,
+        });
+      }
+    });
+  });
+
+  FILE_10_VOCABULARY.food.forEach(item => addVocabularyPair(item.word, item.translation, item.aliases));
+  FILE_10_VOCABULARY.months.forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
+    `Write the month in English for <strong>${escapeHTML(item.prompt)}</strong>`, [item.word]
+  )));
+  FILE_10_VOCABULARY.time.forEach(item => {
+    const { hour, minute } = item.clockTime;
+    addQuestion('vocabulary', createTOCFillQuestion(
+      `Write this clock time in English: <strong>${hour}:${String(minute).padStart(2, '0')}</strong>`,
+      item.accepted || [item.word]
+    ));
+  });
+  FILE_10_VOCABULARY.dates.forEach(item => {
+    const date = item.calendarDate;
+    addQuestion('vocabulary', createTOCFillQuestion(
+      `Write the complete date in English for <strong>${date.day}/${date.monthIndex + 1}/${date.year}</strong> (include the weekday)`,
+      item.accepted || [item.word], item.accepted?.join(' / ') || item.word
+    ));
+  });
+  FILE_10_VOCABULARY.ordinalNumbers.forEach(item => {
+    addQuestion('vocabulary', createTOCFillQuestion(
+      `Write the ordinal suffix for <strong>${item.ordinalNumber}</strong>`, item.accepted
+    ));
+    addQuestion('vocabulary', createTOCFillQuestion(
+      `Write the ordinal number in words: <strong>${escapeHTML(item.word)}</strong>`, [item.pronunciation]
+    ));
+  });
+  ['weather', 'season'].forEach(setKey => {
+    FILE_10_VOCABULARY[setKey].forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
+      `Write the English ${setKey === 'weather' ? 'weather word' : 'season'} that matches this clue: <strong>${escapeHTML(item.alt || '')}</strong>`,
+      [item.word, ...(item.aliases || [])]
+    )));
+  });
+  FILE_10_VOCABULARY.prepositions.forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
+    escapeHTML(item.prompt), [item.word, ...(item.aliases || [])]
+  )));
+  createNumberVocabulary().forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
+    item.direction === 'words-to-number'
+      ? `Write this number in digits: <strong>${escapeHTML(item.word)}</strong>`
+      : `Write this number in English words: <strong>${item.number}</strong>`,
+    [item.direction === 'words-to-number' ? String(item.number) : item.word]
+  )));
+
+  Object.entries(ReadingPassages || {}).forEach(([level, passages]) => passages.forEach((passage, passageIndex) => {
+    const extension = globalThis.ReadingExtensions?.[level]?.[passageIndex];
+    const details = globalThis.ReadingFurtherDetails?.[level]?.[passageIndex];
+    const fullText = [passage.text, extension?.continuation, details].filter(Boolean).join('\n\n');
+    (passage.questions || []).forEach(([prompt, correctAnswer], questionIndex) => {
+      const distractors = shuffleTOCItems((passage.questions || [])
+        .map(([, answer]) => answer)
+        .filter(answer => answer.toLocaleLowerCase() !== correctAnswer.toLocaleLowerCase()))
+        .filter((answer, index, all) => all.findIndex(item => item.toLocaleLowerCase() === answer.toLocaleLowerCase()) === index)
+        .slice(0, 3);
+      const options = shuffleTOCItems([correctAnswer, ...distractors]);
+      addQuestion('reading', {
+        type: 'mc',
+        prompt: `<details class="toc-reading-source"><summary>Read the passage: ${escapeHTML(passage.title)}</summary><p lang="en">${escapeHTML(fullText)}</p></details><p>${escapeHTML(prompt)}</p>`,
+        options: options.map(escapeHTML),
+        answer: options.indexOf(correctAnswer),
+        answerText: correctAnswer,
+        tocSourceIndex: questionIndex,
+      });
+    });
+  }));
+
+  if (typeof WritingExercises !== 'undefined') {
+    Object.values(WritingExercises).forEach(sentences => sentences.forEach(([spanishPrompt, acceptedAnswers]) => {
+      addQuestion('writing', createTOCFillQuestion(
+        `Translate into English: <strong>${escapeHTML(spanishPrompt)}</strong>`,
+        acceptedAnswers,
+        acceptedAnswers.join(' / ')
+      ));
+    }));
+  }
+
+  if (typeof IRREGULAR_VERBS !== 'undefined') {
+    IRREGULAR_VERBS.forEach(([base, pastSimple, pastParticiple]) => {
+      [[1, pastSimple, 'past simple'], [2, pastParticiple, 'past participle']].forEach(([, forms, formLabel]) => {
+        if (!forms.length) return;
+        addQuestion('irregular', createTOCFillQuestion(
+          `Write the ${formLabel} of <strong>${escapeHTML(base)}</strong>`, forms
+        ));
+      });
+    });
+  }
+
+  const buckets = [
+    ['course', 'Course practice', 20],
+    ['grammar', 'Grammar', 20],
+    ['vocabulary', 'Vocabulary', 20],
+    ['reading', 'Reading', 15],
+    ['writing', 'Writing', 15],
+    ['irregular', 'Irregular verbs', 10],
+  ];
+  const selected = [];
+  const selectedKeys = new Set();
+  buckets.forEach(([poolName, tocCategory, count]) => {
+    shuffleTOCItems(pools[poolName])
+      .filter(question => !selectedKeys.has(tocQuestionKey(question)))
+      .slice(0, count)
+      .forEach(question => {
+        selectedKeys.add(tocQuestionKey(question));
+        selected.push({ ...question, tocCategory });
+      });
+  });
+  const remaining = shuffleTOCItems(Object.values(pools).flat()
+    .filter(question => !selectedKeys.has(tocQuestionKey(question))));
+  while (selected.length < TOC_PRACTICE_LENGTH && remaining.length) {
+    const question = remaining.pop();
+    selectedKeys.add(tocQuestionKey(question));
+    selected.push({ ...question, tocCategory: 'Mixed practice' });
+  }
+  return selected.length === TOC_PRACTICE_LENGTH ? shuffleTOCItems(selected) : [];
+}
+
+function startTOCPractice(startNewSequence = false) {
+  let questions = null;
+  if (!startNewSequence) {
+    try {
+      const savedQuestions = JSON.parse(sessionStorage.getItem(TOC_PRACTICE_SEQUENCE_KEY) || 'null');
+      if (Array.isArray(savedQuestions) && savedQuestions.length === TOC_PRACTICE_LENGTH) {
+        questions = savedQuestions;
+      }
+    } catch (_) { /* Generate a new sequence if saved data is unavailable. */ }
+  }
+  if (!questions) questions = createTOCQuestionSet();
+  if (questions.length !== TOC_PRACTICE_LENGTH) {
+    showToast('The 100-question mixed practice is not available right now.', 'error');
+    Router.navigate('practice');
+    return;
+  }
+  try { sessionStorage.setItem(TOC_PRACTICE_SEQUENCE_KEY, JSON.stringify(questions)); } catch (_) { /* Keep the session usable if storage is unavailable. */ }
+
+  const view = $('#mainView');
+  let currentIndex = 0;
+  let correctCount = 0;
+  let restartCount = 0;
+
+  const renderSummary = () => {
+    view.innerHTML = `
+      <a href="#practice" class="back-link">← Back to Practice</a>
+      <div class="lesson-header text-center">
+        <div style="font-size:3rem" aria-hidden="true">🎉</div>
+        <span class="file-num">Modo TOC</span>
+        <h1 style="margin-top:0.5rem">100 exercises complete!</h1>
+        <p class="topics">You checked every answer manually and completed one full run without restarting.</p>
+        <p class="writing-score">100 / 100 correct</p>
+        <p class="text-muted">Restarts during this session: ${restartCount}</p>
+        <button class="btn" id="restartTOCPractice" type="button">Start a new mixed run</button>
+      </div>
+    `;
+    $('#restartTOCPractice').addEventListener('click', () => startTOCPractice(true));
+  };
+
+  const renderCurrentQuestion = () => {
+    if (currentIndex >= questions.length) {
+      renderSummary();
+      return;
+    }
+    const question = questions[currentIndex];
+    view.innerHTML = `
+      <a href="#practice" class="back-link">← Back to Practice</a>
+      <div class="lesson-header">
+        <span class="file-num">Modo TOC · ${escapeHTML(question.tocCategory)}</span>
+        <h1 style="margin-top:0.5rem">Mixed practice</h1>
+        <p class="topics">100 exercises, shuffled from across Practice. Click Check when you are ready. If an answer is incorrect, review it here and use Return to restart at question 1.</p>
+      </div>
+      <div class="reading-progress"><span>Exercise ${currentIndex + 1} of ${TOC_PRACTICE_LENGTH}</span><strong>${correctCount} correct · ${restartCount} restarts</strong></div>
+      <div class="vocabulary-progress-track"><span style="width:${Math.round((currentIndex / TOC_PRACTICE_LENGTH) * 100)}%"></span></div>
+      <div id="tocQuestion" class="toc-question"></div>
+      <div class="exercise-actions"><button class="btn" id="checkTOCAnswer" type="button">Check</button></div>
+    `;
+
+    const questionContainer = $('#tocQuestion', view);
+    const answerControl = renderTOCManualQuestion(question, currentIndex, questionContainer);
+    $('#checkTOCAnswer').addEventListener('click', () => {
+      const result = answerControl.check();
+      if (result === null) {
+        showToast('Enter or select an answer before checking.', 'error');
+        return;
+      }
+      const ref = question._ref;
+      if (ref) STATE = Storage.recordAnswer(STATE, ref.file, ref.lesson, ref.section, ref.qIdx, result);
+      else STATE = Storage.recordActivity(STATE, result);
+      updateHeaderStats();
+
+      if (result) {
+        correctCount += 1;
+        currentIndex += 1;
+        renderCurrentQuestion();
+        return;
+      }
+
+      restartCount += 1;
+      const missedNumber = currentIndex + 1;
+      const feedback = document.createElement('div');
+      feedback.className = 'toc-restart-notice';
+      feedback.setAttribute('role', 'alert');
+      feedback.innerHTML = `Incorrect answer to exercise ${missedNumber}. Correct answer: <strong>${escapeHTML(answerControl.answerText())}</strong>. Click Return to question 1 to restart the run.`;
+
+      $$('input, textarea, select, button.option, button.tf-btn', questionContainer)
+        .forEach(control => { control.disabled = true; });
+      $('.reading-progress strong', view).textContent = `${correctCount} correct · ${restartCount} restarts`;
+      const actions = $('.exercise-actions', view);
+      $('.exercise', questionContainer).append(feedback);
+      actions.replaceChildren();
+      const returnButton = document.createElement('button');
+      returnButton.className = 'btn';
+      returnButton.type = 'button';
+      returnButton.textContent = 'Return to question 1';
+      returnButton.addEventListener('click', () => {
+        currentIndex = 0;
+        correctCount = 0;
+        renderCurrentQuestion();
+      });
+      actions.appendChild(returnButton);
+    });
+  };
+
+  renderCurrentQuestion();
+}
+
+function renderTOCManualQuestion(question, questionIndex, container) {
+  const answerValues = [];
+  const acceptsTOCVariants = (userAnswer, acceptedAnswers) => {
+    const normalize = value => Exercises.normalize(String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, ''));
+    return Array.isArray(acceptedAnswers)
+      ? acceptedAnswers.some(answer => normalize(answer) === normalize(userAnswer))
+      : normalize(acceptedAnswers) === normalize(userAnswer);
+  };
+  const card = document.createElement('section');
+  card.className = 'exercise';
+  card.innerHTML = `<div class="exercise-num">Exercise ${questionIndex + 1}</div><div class="exercise-prompt"></div><div class="toc-manual-response"></div>`;
+  container.replaceChildren(card);
+  const prompt = $('.exercise-prompt', card);
+  const response = $('.toc-manual-response', card);
+  const isInlineFill = ['fill', 'comparative-sentence', 'comparative-form'].includes(question.type);
+  prompt.innerHTML = isInlineFill ? '' : question.type === 'conversation'
+    ? escapeHTML(question.prompt || 'Complete the conversation.')
+    : (question.prompt || 'Answer the question.');
+
+  const addTextInput = (host = response, label = 'Write your answer here') => {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'fill-input toc-manual-input';
+    input.autocomplete = 'off';
+    input.setAttribute('aria-label', label);
+    host.appendChild(input);
+    answerValues.push(input);
+    return input;
+  };
+
+  const addInlineBlanks = (host, template, answers) => {
+    const parts = String(template || '').split('___');
+    const blankCount = Math.max(parts.length - 1, answers.length, 0);
+    const line = document.createElement('div');
+    line.className = 'fill-blank-row';
+    let addedInputs = 0;
+    parts.forEach((part, partIndex) => {
+      const textPart = document.createElement('span');
+      textPart.innerHTML = part;
+      line.appendChild(textPart);
+      if (partIndex < blankCount && addedInputs < blankCount) {
+        addTextInput(line, `Answer ${answerValues.length + 1}`);
+        addedInputs += 1;
+      }
+    });
+    while (addedInputs < blankCount) {
+      addTextInput(line, `Answer ${answerValues.length + 1}`);
+      addedInputs += 1;
+    }
+    host.appendChild(line);
+  };
+
+  if (question.type === 'mc') {
+    const options = document.createElement('div');
+    options.className = 'options';
+    let selectedIndex = null;
+    (question.options || []).forEach((option, optionIndex) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option';
+      button.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + optionIndex)}</span><span>${option}</span>`;
+      button.addEventListener('click', () => {
+        selectedIndex = optionIndex;
+        $$('.option', options).forEach((item, index) => item.classList.toggle('selected', index === selectedIndex));
+      });
+      options.appendChild(button);
+    });
+    response.appendChild(options);
+    return {
+      check: () => selectedIndex === null ? null : selectedIndex === Number(question.answer),
+      answerText: () => question.answerText || question.options?.[question.answer] || '',
+    };
+  }
+
+  if (question.type === 'tf') {
+    let selectedValue = null;
+    const row = document.createElement('div');
+    row.className = 'tf-row';
+    [['true', 'True'], ['false', 'False']].forEach(([value, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `tf-btn ${value}`;
+      button.textContent = label;
+      button.addEventListener('click', () => {
+        selectedValue = value === 'true';
+        $$('.tf-btn', row).forEach(item => item.classList.toggle('selected', item === button));
+      });
+      row.appendChild(button);
+    });
+    response.appendChild(row);
+    return {
+      check: () => selectedValue === null ? null : selectedValue === Boolean(question.answer),
+      answerText: () => question.answer ? 'True' : 'False',
+    };
+  }
+
+  if (question.type === 'conversation') {
+    const turns = document.createElement('div');
+    turns.className = 'conversation-exercise';
+    (question.turns || []).forEach(turn => {
+      const row = document.createElement('div');
+      row.className = `conversation-turn${turn.speaker === 'A' ? ' conversation-question' : ''}`;
+      row.innerHTML = `<strong class="conversation-speaker">${escapeHTML(turn.speaker || '')}</strong><div class="conversation-turn-content"></div>`;
+      const answers = turn.answers || [];
+      addInlineBlanks($('.conversation-turn-content', row), turn.text, answers);
+      turns.appendChild(row);
+    });
+    response.appendChild(turns);
+    const fields = [...answerValues];
+    const flatAnswers = (question.turns || []).flatMap(turn => turn.answers || []);
+    return {
+      check: () => {
+        if (!fields.length || fields.some(input => !input.value.trim())) return null;
+        return fields.every((input, index) => acceptsTOCVariants(input.value, flatAnswers[index]));
+      },
+      answerText: () => (question.turns || []).map(turn => {
+        let answerIndex = 0;
+        const filled = String(turn.text || '').replace(/___/g, () => turn.answers?.[answerIndex++] || '');
+        return `${turn.speaker || ''}: ${filled}`;
+      }).join('\n'),
+    };
+  }
+
+  if (question.type === 'match') {
+    const pairs = question.pairs || [];
+    const rightItems = shuffleTOCItems(pairs.map((pair, index) => ({ text: pair[1], index })));
+    const matchList = document.createElement('div');
+    matchList.className = 'toc-match-list';
+    pairs.forEach(([left], pairIndex) => {
+      const row = document.createElement('label');
+      row.className = 'toc-match-row';
+      const text = document.createElement('span');
+      text.textContent = `${String.fromCharCode(65 + pairIndex)}. ${left}`;
+      const select = document.createElement('select');
+      select.className = 'translator-direction toc-match-select';
+      select.setAttribute('aria-label', `Match for ${left}`);
+      select.innerHTML = '<option value="">Choose a match</option>' + rightItems.map((item, rightIndex) =>
+        `<option value="${rightIndex}">${String(rightIndex + 1)}. ${escapeHTML(item.text)}</option>`).join('');
+      row.append(text, select);
+      matchList.appendChild(row);
+      answerValues.push(select);
+    });
+    const rightList = document.createElement('p');
+    rightList.className = 'text-muted toc-match-choices';
+    rightList.innerHTML = rightItems.map((item, index) => `<span><strong>${index + 1}.</strong> ${escapeHTML(item.text)}</span>`).join('');
+    response.append(matchList, rightList);
+    const expectedIndexes = pairs.map((_, pairIndex) => rightItems.findIndex(item => item.index === pairIndex));
+    return {
+      check: () => {
+        if (!answerValues.length || answerValues.some(select => select.value === '')) return null;
+        return answerValues.every((select, index) => Number(select.value) === expectedIndexes[index]);
+      },
+      answerText: () => pairs.map(([left], index) => `${left} → ${rightItems[expectedIndexes[index]].text}`).join('\n'),
+    };
+  }
+
+  if (question.type === 'reorder') {
+    const wordPool = document.createElement('div');
+    wordPool.className = 'word-pool';
+    shuffleTOCItems(question.words || []).forEach(word => {
+      const chip = document.createElement('span');
+      chip.className = 'word-chip';
+      chip.textContent = word;
+      wordPool.appendChild(chip);
+    });
+    response.appendChild(wordPool);
+    const input = document.createElement('textarea');
+    input.className = 'writing-answer-input toc-long-answer';
+    input.rows = 2;
+    input.placeholder = 'Write the words in the correct order...';
+    response.appendChild(input);
+    return {
+      check: () => input.value.trim() ? acceptsTOCVariants(input.value, (question.words || []).join(' ')) : null,
+      answerText: () => (question.words || []).join(' '),
+    };
+  }
+
+  if (question.type === 'fill' || question.type === 'comparative-sentence' || question.type === 'comparative-form') {
+    const answers = Array.isArray(question.answer) ? question.answer : [question.answer];
+    addInlineBlanks(response, question.prompt, answers);
+    return {
+      check: () => {
+        if (!answerValues.length || answerValues.some(input => !input.value.trim())) return null;
+        return answerValues.every((input, index) => {
+          const accepted = index === 0 && Array.isArray(question.acceptedAnswers)
+            ? question.acceptedAnswers
+            : answers[index];
+          return acceptsTOCVariants(input.value, accepted);
+        });
+      },
+      answerText: () => question.answerText || answers.join(' / '),
+    };
+  }
+
+  const input = addTextInput();
+  return {
+    check: () => input.value.trim() ? acceptsTOCVariants(input.value, question.answer) : null,
+    answerText: () => question.answerText || String(question.answer ?? ''),
+  };
 }
 
 function startAllPractice() {

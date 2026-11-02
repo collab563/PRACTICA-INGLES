@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Out of</title>
+  <desc id="desc">A woman takes a shirt out of an open wardrobe.</desc>
+  <rect width="480" height="300" rx="24" fill="#f5f3ff"/>
+  <path d="M32 252h416" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <rect x="63" y="51" width="150" height="195" rx="8" fill="#d6b38a" stroke="#805b38" stroke-width="8"/>
+  <path d="M138 56v185" stroke="#805b38" stroke-width="6"/>
+  <circle cx="124" cy="148" r="4" fill="#704214"/><circle cx="152" cy="148" r="4" fill="#704214"/>
+  <path d="M83 85h108" stroke="#805b38" stroke-width="7" stroke-linecap="round"/>
+  <path d="M125 85v22m-13-7h27" fill="none" stroke="#704214" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="333" cy="111" r="20" fill="#f2c6a0"/>
+  <path d="M310 138q23-15 46 0l11 58h-68z" fill="#ec4899"/>
+  <path d="M310 193l-9 48m36-48 12 48" stroke="#334155" stroke-width="12" stroke-linecap="round"/>
+  <path d="M319 150l-44 5m4-1-24 3" stroke="#f2c6a0" stroke-width="11" stroke-linecap="round"/>
+  <path d="M159 119l19-9 19 9-8 15-11-4v25h-32v-25l-11 4-8-15 19-9z" fill="#60a5fa" stroke="#1d4ed8" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M239 169h-61" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round"/>
+  <path d="M193 152l-20 17 20 17" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

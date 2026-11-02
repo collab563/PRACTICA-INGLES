@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Behind</title>
+  <desc id="desc">A man stands behind a sofa, which hides the lower part of his body.</desc>
+  <rect width="480" height="300" rx="24" fill="#eef2ff"/>
+  <path d="M32 256h416" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="241" cy="72" r="25" fill="#d9a77d"/>
+  <path d="M216 71q2-35 29-34 25 3 26 34l-12-10-28 1z" fill="#334155"/>
+  <path d="M205 105q36-22 72 0l17 91h-106z" fill="#2563eb"/>
+  <path d="M207 120l-27 53m99-53 28 53" stroke="#d9a77d" stroke-width="14" stroke-linecap="round"/>
+  <path d="M222 192l-12 49m48-49 14 49" stroke="#334155" stroke-width="17" stroke-linecap="round"/>
+  <rect x="72" y="188" width="336" height="54" rx="22" fill="#64748b" stroke="#475569" stroke-width="7"/>
+  <rect x="54" y="222" width="372" height="48" rx="18" fill="#475569" stroke="#334155" stroke-width="7"/>
+  <path d="M82 264v18m316-18v18" stroke="#334155" stroke-width="12" stroke-linecap="round"/>
+  <path d="M102 203h75m126 0h75" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+</svg>

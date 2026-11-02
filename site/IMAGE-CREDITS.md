@@ -33,7 +33,7 @@ The other externally loaded food photos use Unsplash-hosted image URLs and are c
 
 ## Weather, seasons, and prepositions
 
-These photos are loaded remotely from Unsplash. The photographer, source page, and license are also linked below each exercise image.
+Photos still loaded remotely from Unsplash include the photographer, source page, and license below each exercise image.
 
 | Section | Word | Photographer | Source |
 | --- | --- | --- | --- |
@@ -50,20 +50,12 @@ These photos are loaded remotely from Unsplash. The photographer, source page, a
 | Season | autumn | dai ishikawa | [Unsplash photo](https://unsplash.com/photos/a-tree-with-yellow-leaves-eRykUxr7Zl8) |
 | Season | winter | Vladimir Vishnyakov | [Unsplash photo](https://unsplash.com/photos/a-snow-covered-forest-filled-with-lots-of-trees-CyNylTimzAo) |
 | Prepositions | in | Lisa Anna | [Unsplash photo](https://unsplash.com/photos/a-closet-with-clothes-hanging-on-a-rail-Sx1VmfbXDV0) |
-| Prepositions | in front of | Artur Aldyrkhanov | [Unsplash photo](https://unsplash.com/photos/a-shadow-of-a-person-standing-in-front-of-a-table-Gbtsoz1r2ic) |
 | Prepositions | on | Sindy Süßengut | [Unsplash photo](https://unsplash.com/photos/a-cat-sitting-on-a-chair-in-a-room-6UCY5CrRZRQ) |
-| Prepositions | under | Piotr Musioł | [Unsplash photo](https://unsplash.com/photos/a-cat-lying-on-the-floor-X46eNlD9cQs) |
-| Prepositions | behind | Blake Cheek | [Unsplash photo](https://unsplash.com/photos/man-standing-wearing-black-blazer-behind-sofa-AVPUbxEif3k) |
 | Prepositions | between | Mateus Campos Felipe | [Unsplash photo](https://unsplash.com/photos/turned-off-sconce-lamp-between-two-windows-UqFFOxfeSWw) |
-| Prepositions | opposite | Christin Hume | [Unsplash photo](https://unsplash.com/photos/photo-of-two-women-facing-each-other-sitting-in-front-of-table-near-glass-wall-PNWp1dZ7sO0) |
 | Prepositions | next to | Costa Live | [Unsplash photo](https://unsplash.com/photos/gray-armchair-with-throw-blanket-and-floor-lamp-PO6n1RM_pbY) |
-| Prepositions | over | zero take | [Unsplash photo](https://unsplash.com/photos/a-sink-with-a-faucet-and-a-mirror-above-it-klgB9CK9Y88) |
-| Prepositions | from | Franco Debartolo | [Unsplash photo](https://unsplash.com/photos/view-through-an-open-doorway-into-a-bedroom-gteOPbtBvok) |
-| Prepositions | to | zero take | [Unsplash photo](https://unsplash.com/photos/a-sink-with-a-faucet-and-a-mirror-above-it-klgB9CK9Y88) |
-| Prepositions | into | Karina Syrotiuk | [Unsplash photo](https://unsplash.com/photos/assortment-of-clothes-hanging-in-a-closet-VNklWFsSVOY) |
-| Prepositions | out of | Annie Spratt | [Unsplash photo](https://unsplash.com/photos/shallow-focus-photo-of-assorted-clothes-jXfpruvSHKk) |
-| Prepositions | through | Aleksandar Popovski | [Unsplash photo](https://unsplash.com/photos/cat-looking-through-window-during-daytime-b7bMiKYEMqY) |
 | Prepositions | up | MAK | [Unsplash photo](https://unsplash.com/photos/a-person-walking-up-some-stairs-in-a-building-6uHojl61ee4) |
 | Prepositions | down | Jack Young | [Unsplash photo](https://unsplash.com/photos/woman-walking-down-on-stair-Jkkwm1CFYIw) |
 
 All photos in this section are covered by the [Unsplash License](https://unsplash.com/license).
+
+The images for **opposite**, **over**, **from**, **under**, **behind**, **to**, **into**, **out of**, **through**, **up**, **down**, and **in front of** were provided by the project owner.
