@@ -152,8 +152,24 @@ function renderIrregularVerbsPractice(params = []) {
   }
   const exercise = modes[mode];
   if (!exercise) { Router.navigate('irregular-verbs'); return; }
+  const practiceType = params[1];
+  if (!practiceType) {
+    view.innerHTML = `
+      <a href="#irregular-verbs" class="back-link">← Back to verb forms</a>
+      <div class="lesson-header"><span class="file-num">Irregular verbs · ${exercise.title}</span><h1 style="margin-top:0.5rem">${exercise.title}</h1><p class="topics">Choose how you want to practise this verb form.</p></div>
+      <div class="grammar-practice-grid">
+        <button class="grammar-practice-card" type="button" data-verb-practice-type="complete"><span class="vocabulary-emoji">✍️</span><strong>Complete</strong><small>Write the complete verb form and its Spanish meanings, as in the current exercise.</small><span>Start practice →</span></button>
+        <button class="grammar-practice-card" type="button" data-verb-practice-type="incomplete"><span class="vocabulary-emoji">🔤</span><strong>Incomplete</strong><small>Complete only the missing letters in the past simple or past participle form.</small><span>Start practice →</span></button>
+      </div>`;
+    $$('[data-verb-practice-type]', view).forEach(button => {
+      button.addEventListener('click', () => Router.navigate(`irregular-verbs/${mode}/${button.dataset.verbPracticeType}`));
+    });
+    return;
+  }
+  if (!['complete', 'incomplete'].includes(practiceType)) { Router.navigate(`irregular-verbs/${mode}`); return; }
+  const isIncomplete = practiceType === 'incomplete';
   const verbs = IRREGULAR_VERBS.filter(verb => verb[exercise.formIndex].length);
-  const progressKey = `irregular-verbs-${mode}`;
+  const progressKey = isIncomplete ? `irregular-verbs-${mode}-incomplete` : `irregular-verbs-${mode}`;
   let progress;
   try {
     const saved = JSON.parse(localStorage.getItem(progressKey) || '{}');
@@ -208,6 +224,8 @@ function renderIrregularVerbsPractice(params = []) {
     const verb = questions[index];
     const answers = verb[exercise.formIndex];
     const formLabel = exercise.formIndex === 1 ? 'past simple' : 'past participle';
+    const visibleLetterCount = answer => Math.min(answer.length - 1, Math.max(1, Math.ceil(answer.length / 2)));
+    const missingAnswerParts = answers.map(answer => answer.slice(visibleLetterCount(answer)));
     const meanings = IRREGULAR_VERB_TRANSLATIONS[verb[0]] || [];
     const formTranslationSet = IRREGULAR_VERB_FORM_TRANSLATIONS[verb[0]]?.[exercise.formIndex === 1 ? 'pastSimple' : 'pastParticiple'];
     const meaningsForForm = form => Array.isArray(formTranslationSet) ? formTranslationSet : (formTranslationSet?.[form] || []);
@@ -216,11 +234,17 @@ function renderIrregularVerbsPractice(params = []) {
     const savedResponse = answerHistory.get(answerHistoryKey);
     const progressPercent = Math.min(100, Math.round((progress.round / IRREGULAR_VERB_REPETITIONS_PER_GROUP) * 100));
     checked = Boolean(savedResponse?.checked);
+    const translationFieldsMarkup = isIncomplete ? '' : `
+      <label class="writing-answer-label" for="irregularVerbTranslation">Spanish meaning of the present verb</label>
+      <input id="irregularVerbTranslation" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Translate the present verb into Spanish...">`;
+    const formTranslationFieldMarkup = isIncomplete ? '' : `
+      <label class="writing-answer-label" for="irregularVerbFormTranslation">Spanish meaning of the ${formLabel} form</label>
+      <input id="irregularVerbFormTranslation" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Translate the ${formLabel} form into Spanish...">`;
     view.innerHTML = `
-      <a href="#irregular-verbs" class="back-link">← Back to verb forms</a>
-      <div class="lesson-header"><span class="file-num">Irregular verbs · ${exercise.title}</span><h1 style="margin-top:0.5rem">Write the ${exercise.formIndex === 1 ? 'past simple' : 'past participle'}</h1><p class="topics">Write the ${formLabel} form, its Spanish meaning, and the present verb's meaning.</p><p class="topics">${progress.unlocked} of ${verbs.length} verbs unlocked · ${progress.round}/${IRREGULAR_VERB_REPETITIONS_PER_GROUP} repetitions in this group · ${progress.total} total</p><div class="vocabulary-progress-track"><span style="width:${progressPercent}%"></span></div><button class="btn btn-secondary" type="button" id="shuffleIrregularVerbs">🔀 Shuffle and restart</button> <button class="btn btn-secondary" type="button" id="resetIrregularVerbProgress">↺ Reset progress</button></div>
+      <a href="#irregular-verbs/${mode}" class="back-link">← Back to practice type</a>
+      <div class="lesson-header"><span class="file-num">Irregular verbs · ${exercise.title} · ${practiceType}</span><h1 style="margin-top:0.5rem">Write the ${formLabel}</h1><p class="topics">${isIncomplete ? `Write the ${formLabel} form.` : `Write the ${formLabel} form, its Spanish meaning, and the present verb's meaning.`}</p><p class="topics">${progress.unlocked} of ${verbs.length} verbs unlocked · ${progress.round}/${IRREGULAR_VERB_REPETITIONS_PER_GROUP} repetitions in this group · ${progress.total} total</p><div class="vocabulary-progress-track"><span style="width:${progressPercent}%"></span></div><button class="btn btn-secondary" type="button" id="shuffleIrregularVerbs">🔀 Shuffle and restart</button> <button class="btn btn-secondary" type="button" id="resetIrregularVerbProgress">↺ Reset progress</button></div>
       <div class="reading-progress"><span>Question ${index + 1} of ${questions.length} unlocked verbs</span><strong>${progress.round}/${IRREGULAR_VERB_REPETITIONS_PER_GROUP} reps</strong></div>
-      <section class="writing-exercise"><h2>Present</h2><p class="writing-prompt">${escapeHTML(verb[0])}</p><label class="writing-answer-label" for="irregularVerbTranslation">Spanish meaning of the present verb</label><input id="irregularVerbTranslation" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Translate the present verb into Spanish..."><div id="irregularVerbPhonetic"></div><label class="writing-answer-label" for="irregularVerbAnswer">Write the ${formLabel} form</label><input id="irregularVerbAnswer" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Write the ${formLabel} form here..."><label class="writing-answer-label" for="irregularVerbFormTranslation">Spanish meaning of the ${formLabel} form</label><input id="irregularVerbFormTranslation" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Translate the ${formLabel} form into Spanish..."><div id="irregularVerbFeedback" class="writing-feedback hidden" role="status" aria-live="polite"></div><div class="writing-actions"><button class="btn btn-secondary" type="button" id="previousIrregularVerb" ${index === 0 ? 'disabled' : ''}>← Previous question</button><button class="btn" type="button" id="checkIrregularVerb">Check answer</button><button class="btn btn-secondary" type="button" id="showIrregularVerbAnswer">Show answer</button><button class="btn btn-secondary" type="button" id="nextIrregularVerb">Next question</button></div></section>`;
+      <section class="writing-exercise"><h2>Present</h2><p class="writing-prompt">${escapeHTML(verb[0])}</p><div id="irregularVerbPhonetic"></div>${translationFieldsMarkup}<label class="writing-answer-label" for="irregularVerbAnswer">Write the ${formLabel} form</label><input id="irregularVerbAnswer" class="writing-answer-input" style="min-height:0" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Write the ${formLabel} form here...">${formTranslationFieldMarkup}<div id="irregularVerbFeedback" class="writing-feedback hidden" role="status" aria-live="polite"></div><div class="writing-actions"><button class="btn btn-secondary" type="button" id="previousIrregularVerb" ${index === 0 ? 'disabled' : ''}>← Previous question</button><button class="btn" type="button" id="checkIrregularVerb">Check answer</button><button class="btn btn-secondary" type="button" id="showIrregularVerbAnswer">Show answer</button><button class="btn btn-secondary" type="button" id="nextIrregularVerb">Next question</button></div></section>`;
     const input = $('#irregularVerbAnswer');
     const translationInput = $('#irregularVerbTranslation');
     const formTranslationInput = $('#irregularVerbFormTranslation');
@@ -246,26 +270,30 @@ function renderIrregularVerbsPractice(params = []) {
       feedback.className = response.revealed
         ? 'writing-feedback'
         : `writing-feedback ${response.correct ? 'correct' : 'incorrect'}`;
-      feedback.innerHTML = response.revealed
-        ? `<strong>Answers:</strong><span>${formLabel}: <strong>${answerText}</strong></span><span>Present verb meaning in Spanish: <strong>${meaningText}</strong></span><span>${formLabel} meaning in Spanish: <strong>${formMeaningText}</strong></span>`
-        : `<strong>${response.correct ? 'All three answers are correct!' : 'Not quite.'}</strong><span>${response.formCorrect ? `${formLabel}: correct.` : `${formLabel}: correct answer is <strong>${answerText}</strong>`}</span><span>${response.meaningCorrect ? 'Present verb meaning: correct.' : `Present verb meaning in Spanish: <strong>${meaningText}</strong>`}</span><span>${response.formMeaningCorrect ? `${formLabel} meaning: correct.` : `${formLabel} meaning in Spanish: <strong>${formMeaningText}</strong>`}</span>`;
+      feedback.innerHTML = isIncomplete
+        ? response.revealed
+          ? `<strong>Answer:</strong><span>${formLabel}: <strong>${answerText}</strong></span>`
+          : `<strong>${response.correct ? 'Correct!' : 'Not quite.'}</strong><span>${response.formCorrect ? `${formLabel}: correct.` : `${formLabel}: <strong>${answerText}</strong>`}</span>`
+        : response.revealed
+          ? `<strong>Answers:</strong><span>${formLabel}: <strong>${answerText}</strong></span><span>Present verb meaning in Spanish: <strong>${meaningText}</strong></span><span>${formLabel} meaning in Spanish: <strong>${formMeaningText}</strong></span>`
+          : `<strong>${response.correct ? 'All three answers are correct!' : 'Not quite.'}</strong><span>${response.formCorrect ? `${formLabel}: correct.` : `${formLabel}: correct answer is <strong>${answerText}</strong>`}</span><span>${response.meaningCorrect ? 'Present verb meaning: correct.' : `Present verb meaning in Spanish: <strong>${meaningText}</strong>`}</span><span>${response.formMeaningCorrect ? `${formLabel} meaning: correct.` : `${formLabel} meaning in Spanish: <strong>${formMeaningText}</strong>`}</span>`;
       appendCorrectAnswerPhonetics();
     };
     if (savedResponse) {
       input.value = savedResponse.value || '';
-      translationInput.value = savedResponse.translationValue || '';
-      formTranslationInput.value = savedResponse.formTranslationValue || '';
+      if (translationInput) translationInput.value = savedResponse.translationValue || '';
+      if (formTranslationInput) formTranslationInput.value = savedResponse.formTranslationValue || '';
     }
     if (savedResponse?.checked) {
       input.disabled = true;
-      translationInput.disabled = true;
-      formTranslationInput.disabled = true;
+      if (translationInput) translationInput.disabled = true;
+      if (formTranslationInput) formTranslationInput.disabled = true;
       $('#checkIrregularVerb').disabled = true;
       renderAnswerFeedback(savedResponse);
     }
     const phoneticControl = $('#irregularVerbPhonetic');
     phoneticControl.appendChild(createPhoneticControl(() => verb[0]));
-    $('.writing-prompt').insertAdjacentElement('afterend', phoneticControl);
+    $('.writing-prompt', view).insertAdjacentElement('afterend', phoneticControl);
     $('#shuffleIrregularVerbs').addEventListener('click', () => {
       if (advanceTimeout) clearTimeout(advanceTimeout);
       advanceTimeout = null;
@@ -292,8 +320,8 @@ function renderIrregularVerbsPractice(params = []) {
       checked = true;
       const response = {
         value: input.value,
-        translationValue: translationInput.value,
-        formTranslationValue: formTranslationInput.value,
+        translationValue: translationInput?.value || '',
+        formTranslationValue: formTranslationInput?.value || '',
         checked: true,
         revealed: true,
         correct: false,
@@ -303,30 +331,34 @@ function renderIrregularVerbsPractice(params = []) {
       };
       answerHistory.set(answerHistoryKey, response);
       input.disabled = true;
-      translationInput.disabled = true;
-      formTranslationInput.disabled = true;
+      if (translationInput) translationInput.disabled = true;
+      if (formTranslationInput) formTranslationInput.disabled = true;
       $('#checkIrregularVerb').disabled = true;
       renderAnswerFeedback(response);
     });
     const checkAnswer = () => {
       if (checked) return;
-      const emptyInput = [translationInput, input, formTranslationInput].find(field => !field.value.trim());
+      const requiredInputs = isIncomplete ? [input] : [translationInput, input, formTranslationInput];
+      const emptyInput = requiredInputs.find(field => !field.value.trim());
       if (emptyInput) {
-        showToast('Write all three answers before checking.', 'error');
+        showToast(isIncomplete ? 'Write the missing letters before checking.' : 'Write all three answers before checking.', 'error');
         emptyInput.focus();
         return;
       }
       checked = true;
-      const formCorrect = answers.includes(normalize(input.value));
-      const meaningCorrect = meanings.some(meaning => normalizeSpanish(meaning) === normalizeSpanish(translationInput.value));
+      const formCorrect = isIncomplete
+        ? answers.some(answer => normalize(answer) === normalize(input.value))
+          || missingAnswerParts.some(answer => normalize(answer) === normalize(input.value))
+        : answers.includes(normalize(input.value));
+      const meaningCorrect = isIncomplete || meanings.some(meaning => normalizeSpanish(meaning) === normalizeSpanish(translationInput.value));
       const submittedForm = answers.find(answer => normalize(answer) === normalize(input.value));
       const acceptedFormMeanings = submittedForm ? meaningsForForm(submittedForm) : formTranslationAnswers;
-      const formMeaningCorrect = acceptedFormMeanings.some(meaning => normalizeSpanish(meaning) === normalizeSpanish(formTranslationInput.value));
+      const formMeaningCorrect = isIncomplete || acceptedFormMeanings.some(meaning => normalizeSpanish(meaning) === normalizeSpanish(formTranslationInput.value));
       const isCorrect = formCorrect && meaningCorrect && formMeaningCorrect;
       const response = {
         value: input.value,
-        translationValue: translationInput.value,
-        formTranslationValue: formTranslationInput.value,
+        translationValue: translationInput?.value || '',
+        formTranslationValue: formTranslationInput?.value || '',
         checked: true,
         revealed: false,
         correct: isCorrect,
@@ -338,8 +370,8 @@ function renderIrregularVerbsPractice(params = []) {
       STATE = Storage.recordActivity(STATE, isCorrect);
       updateHeaderStats();
       input.disabled = true;
-      translationInput.disabled = true;
-      formTranslationInput.disabled = true;
+      if (translationInput) translationInput.disabled = true;
+      if (formTranslationInput) formTranslationInput.disabled = true;
       $('#checkIrregularVerb').disabled = true;
       renderAnswerFeedback(response);
       if (isCorrect) {
@@ -385,8 +417,8 @@ function renderIrregularVerbsPractice(params = []) {
       if (checked) return;
       answerHistory.set(answerHistoryKey, {
         value: input.value,
-        translationValue: translationInput.value,
-        formTranslationValue: formTranslationInput.value,
+        translationValue: translationInput?.value || '',
+        formTranslationValue: formTranslationInput?.value || '',
         checked: false,
         revealed: false,
         correct: false,
@@ -395,10 +427,12 @@ function renderIrregularVerbsPractice(params = []) {
         formMeaningCorrect: false,
       });
     };
-    const hasAllAnswers = () => Boolean(input.value.trim() && translationInput.value.trim() && formTranslationInput.value.trim());
+    const hasAllAnswers = () => isIncomplete
+      ? Boolean(input.value.trim())
+      : Boolean(input.value.trim() && translationInput.value.trim() && formTranslationInput.value.trim());
     const autoCheckIfCorrect = () => {
       saveDraft();
-      if (!hasAllAnswers()) return;
+      if (isIncomplete || !hasAllAnswers()) return;
       const formCorrect = answers.includes(normalize(input.value));
       const meaningCorrect = meanings.some(meaning => normalizeSpanish(meaning) === normalizeSpanish(translationInput.value));
       const submittedForm = answers.find(answer => normalize(answer) === normalize(input.value));
@@ -411,15 +445,23 @@ function renderIrregularVerbsPractice(params = []) {
       if (hasAllAnswers()) checkAnswer();
     };
     input.addEventListener('input', autoCheckIfCorrect);
-    translationInput.addEventListener('input', autoCheckIfCorrect);
-    formTranslationInput.addEventListener('input', autoCheckIfCorrect);
+    translationInput?.addEventListener('input', autoCheckIfCorrect);
+    formTranslationInput?.addEventListener('input', autoCheckIfCorrect);
     input.addEventListener('change', checkOnFieldCommit);
-    translationInput.addEventListener('change', checkOnFieldCommit);
-    formTranslationInput.addEventListener('change', checkOnFieldCommit);
+    translationInput?.addEventListener('change', checkOnFieldCommit);
+    formTranslationInput?.addEventListener('change', checkOnFieldCommit);
     input.addEventListener('keydown', event => { if (event.key === 'Enter') checkAnswer(); });
-    translationInput.addEventListener('keydown', event => { if (event.key === 'Enter') checkAnswer(); });
-    formTranslationInput.addEventListener('keydown', event => { if (event.key === 'Enter') checkAnswer(); });
-    focusAnswerFieldOnDesktop(translationInput);
+    translationInput?.addEventListener('keydown', event => { if (event.key === 'Enter') checkAnswer(); });
+    formTranslationInput?.addEventListener('keydown', event => { if (event.key === 'Enter') checkAnswer(); });
+    const answerFields = [translationInput, input, formTranslationInput].filter(Boolean);
+    answerFields.forEach((field, fieldIndex) => {
+      field.addEventListener('keydown', event => {
+        if (event.key !== 'ArrowDown' || !answerFields[fieldIndex + 1]) return;
+        event.preventDefault();
+        answerFields[fieldIndex + 1].focus();
+      });
+    });
+    focusAnswerFieldOnDesktop(isIncomplete ? input : translationInput);
   };
   renderQuestion();
 }

@@ -50,6 +50,29 @@ const DATE_EXERCISE_ORDINAL_WORDS = [
   'twenty-first', 'twenty-second', 'twenty-third', 'twenty-fourth', 'twenty-fifth', 'twenty-sixth', 'twenty-seventh', 'twenty-eighth', 'twenty-ninth', 'thirtieth', 'thirty-first',
 ];
 
+const COMMON_US_VERB_PHRASES = [
+  { prompt: 'despertarse', answers: ['wake up'] },
+  { prompt: 'levantarse de la cama', answers: ['get up'] },
+  { prompt: 'vestirse', answers: ['get dressed'] },
+  { prompt: 'ir al trabajo', answers: ['go to work'] },
+  { prompt: 'regresar / volver', answers: ['come back', 'go back'] },
+  { prompt: 'salir (para divertirse)', answers: ['go out'] },
+  { prompt: 'pasar el rato con alguien', answers: ['hang out with someone', 'hang out'] },
+  { prompt: 'averiguar / descubrir', answers: ['find out'] },
+  { prompt: 'buscar', answers: ['look for'] },
+  { prompt: 'cuidar', answers: ['look after', 'take care of'] },
+  { prompt: 'recoger (a alguien o algo)', answers: ['pick up'] },
+  { prompt: 'dejar / llevar a alguien a un lugar', answers: ['drop off'] },
+  { prompt: 'encender', answers: ['turn on'] },
+  { prompt: 'apagar', answers: ['turn off'] },
+  { prompt: 'ponerse (ropa)', answers: ['put on'] },
+  { prompt: 'quitarse (ropa)', answers: ['take off'] },
+  { prompt: 'quedarse sin algo', answers: ['run out of'] },
+  { prompt: 'rendirse / dejar de intentarlo', answers: ['give up'] },
+  { prompt: 'llenar (un formulario)', answers: ['fill out', 'fill in'] },
+  { prompt: 'devolver una llamada', answers: ['call back'] },
+];
+
 function createDateVocabularyItem(year, monthIndex, day) {
   const date = new Date(Date.UTC(year, monthIndex, day));
   const weekday = DATE_EXERCISE_WEEKDAYS[date.getUTCDay()];
@@ -151,8 +174,23 @@ function createDateCalendarMarkup({ year, monthIndex, day }) {
 }
 
 function renderVocabularyImage(item) {
+  const creditLabel = item.imageCredit ? getImageCreditDisplayLabel(item.imageCredit) : '';
   return `<img class="vocabulary-image" src="${item.image}" alt="${escapeHTML(item.alt)}" />
-    ${item.imageCredit ? `<span class="vocabulary-image-credit"><a href="${item.imageCredit.url}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.label)}</a> · <a href="${item.imageCredit.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.licenseLabel)}</a></span>` : ''}`;
+    ${item.imageCredit ? `<span class="vocabulary-image-credit"><a href="${item.imageCredit.url}" target="_blank" rel="noopener noreferrer">${escapeHTML(creditLabel)}</a> · <a href="${item.imageCredit.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.imageCredit.licenseLabel)}</a></span>` : ''}`;
+}
+
+function getImageCreditDisplayLabel(credit) {
+  const label = String(credit.label || '');
+  const source = /wikimedia\.org/i.test(credit.url) ? 'Wikimedia Commons'
+    : /unsplash\.com/i.test(credit.url) ? 'Unsplash'
+      : 'Image source';
+  const labelParts = label.split(' · ');
+  const creator = label.startsWith('Photo by ')
+    ? label.slice('Photo by '.length).split(' · ')[0]
+    : source === 'Wikimedia Commons' && labelParts.length >= 3
+      ? labelParts[0]
+      : '';
+  return creator ? `${creator} · ${source}` : `Image source · ${source}`;
 }
 
 const FILE_10_VOCABULARY = {
@@ -270,14 +308,14 @@ const FILE_10_VOCABULARY = {
   dates: createDateVocabulary(),
   ordinalNumbers: createOrdinalVocabulary(),
   weather: [
-    { word: 'sunny', image: 'https://images.unsplash.com/photo-1722068992302-3dd5fab7e06f?auto=format&fit=crop&w=900&q=80', alt: 'Bright sunshine over a grassy mountain meadow.', imageCredit: { label: 'Photo by Francesco Ungaro · Unsplash', url: 'https://unsplash.com/photos/the-sun-shines-brightly-over-a-grassy-field-7FcZfpFZ7sM', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'sunny', image: './images/weather/sunny.png', alt: 'Sunny mountain lake surrounded by trees beneath a clear blue sky.' },
     { word: 'hot', image: 'https://images.unsplash.com/photo-1751889188945-f15e42becd73?auto=format&fit=crop&w=900&q=80', alt: 'Thermometer showing hot weather in the sun.', imageCredit: { label: 'Photo by Immo Wegmann · Unsplash', url: 'https://unsplash.com/de/fotos/das-thermometer-zeigt-eine-sehr-heisse-temperatur-an-qs5HR1dG7h4', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
     { word: 'cloudy', image: 'https://images.unsplash.com/photo-1532178910-7815d6919875?auto=format&fit=crop&w=900&q=80', alt: 'Grey and white clouds covering the sky.', imageCredit: { label: 'Photo by Tobias Stonjeck · Unsplash', url: 'https://unsplash.com/de/fotos/grauer-und-weisser-bewolkter-himmel-e_ZxKz3_2Nc', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
     { word: 'raining', aliases: ['rainy'], image: 'https://images.unsplash.com/photo-1611692004235-a1b7e53b039b?auto=format&fit=crop&w=900&q=80', alt: 'Rain drops on a window pane.', imageCredit: { label: 'Photo by Brad Starkey · Unsplash', url: 'https://unsplash.com/photos/water-droplets-on-glass-window-8n-54V1CusY', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
     { word: 'windy', image: 'https://images.unsplash.com/photo-1758448183096-b26be84e2818?auto=format&fit=crop&w=900&q=80', alt: 'Trees bending in a strong wind.', imageCredit: { label: 'Photo by Sergej Karpow · Unsplash', url: 'https://unsplash.com/photos/trees-bending-in-the-wind-under-cloudy-sky-f9bSLAHht3A', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
     { word: 'foggy', image: 'https://images.unsplash.com/photo-1653792892136-69825f302a78?auto=format&fit=crop&w=900&q=80', alt: 'Evergreen trees fading into morning fog.', imageCredit: { label: 'Photo by Nick Martin · Unsplash', url: 'https://unsplash.com/photos/a-forest-filled-with-lots-of-trees-covered-in-fog-6wD4qUp2Fj0', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'cold', image: 'https://images.unsplash.com/photo-1642333051408-68373a5b4966?auto=format&fit=crop&w=900&q=80', alt: 'Frosted plants in a snow-covered field on a cold day.', imageCredit: { label: 'Photo by Kevin Bessat · Unsplash', url: 'https://unsplash.com/photos/a-snow-covered-field-with-some-plants-in-the-middle-of-it-wLKMvQBaBBo', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
-    { word: 'snowing', aliases: ['snowy'], image: 'https://images.unsplash.com/photo-1610972220265-d03b8073bfbb?auto=format&fit=crop&w=900&q=80', alt: 'Snow falling through the light of a streetlamp.', imageCredit: { label: 'Photo by Lawrence Krowdeed · Unsplash', url: 'https://unsplash.com/photos/snow-falls-heavily-under-the-glow-of-streetlights-Uv5GSOzCtEM', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
+    { word: 'cold', image: './images/weather/cold.png', alt: 'Frozen river and frost-covered trees on a cold winter day.' },
+    { word: 'snowing', aliases: ['snowy'], image: './images/weather/snowing.png', alt: 'Snow falling in a forest of snow-covered evergreen trees.' },
   ],
   season: [
     { word: 'spring', image: 'https://images.unsplash.com/photo-1710927865100-c95a0ab3efc8?auto=format&fit=crop&w=900&q=80', alt: 'A daisy blooming in a field of green grass in spring.', imageCredit: { label: 'Photo by Doğan Alpaslan DEMİR · Unsplash', url: 'https://unsplash.com/photos/a-single-white-flower-in-a-field-of-green-grass-SnuS6STXC0E', licenseLabel: 'Unsplash License', licenseUrl: 'https://unsplash.com/license' } },
@@ -424,9 +462,9 @@ const GRAMMAR_PRACTICE_QUESTIONS = {
     { type: 'tf', prompt: '<em>Who’s</em> means “who is”, while <em>whose</em> asks about possession.', answer: true },
   ],
   '3-1': [
-    { type: 'fill', prompt: 'The meeting starts ___ 9:30.', answer: 'at' },
+    { type: 'fill', prompt: 'Complete the sentence: The meeting starts ___ 9:30.', answer: 'at', hint: 'Complete with: in, on, at, to, between, or under.' },
     { type: 'mc', prompt: 'We usually travel ___ July.', options: ['at', 'on', 'in', 'to'], answer: 2 },
-    { type: 'fill', prompt: 'Her birthday is ___ Monday.', answer: 'on' },
+    { type: 'fill', prompt: 'Complete the sentence: Her birthday is ___ Monday.', answer: 'on', hint: 'Complete with: in, on, at, to, between, or under.' },
     { type: 'mc', prompt: 'The café is ___ the bank and the library.', options: ['between', 'during', 'at', 'to'], answer: 0 },
   ],
   '3-2': [
@@ -436,6 +474,101 @@ const GRAMMAR_PRACTICE_QUESTIONS = {
     { type: 'fill', prompt: '___ often do you exercise?', answer: 'How' },
   ],
 };
+
+const PREPOSITION_FILL_QUESTIONS = [
+  { prompt: 'Complete the sentence: The class starts ___ half past eight.', answer: 'at' },
+  { prompt: 'Complete the sentence: We travel ___ October.', answer: 'in' },
+  { prompt: 'Complete the sentence: The pharmacy is ___ the café and the bank.', answer: 'between' },
+  { prompt: 'Complete the sentence: The library is closed ___ Sundays.', answer: 'on' },
+  { prompt: 'Complete the sentence: The children are playing ___ the garden.', answer: 'in' },
+  { prompt: 'Complete the sentence: Please walk ___ the station.', answer: 'to' },
+  { prompt: 'Complete the sentence: The cat is sleeping ___ the table.', answer: 'under' },
+  { prompt: 'Complete the sentence: The bus leaves ___ 7:15.', answer: 'at' },
+  { prompt: 'Complete the sentence: The train arrives ___ 6:45.', answer: 'at' },
+  { prompt: 'Complete the sentence: We have English ___ Monday morning.', answer: 'on' },
+  { prompt: 'Complete the sentence: My family moved here ___ 2020.', answer: 'in' },
+  { prompt: 'Complete the sentence: The keys are ___ the drawer.', answer: 'in' },
+  { prompt: 'Complete the sentence: The picture hangs ___ the wall.', answer: 'on' },
+  { prompt: 'Complete the sentence: Walk ___ the end of the road.', answer: 'to' },
+  { prompt: 'Complete the sentence: The shoes are ___ the bed.', answer: 'under' },
+  { prompt: 'Complete the sentence: The shop opens ___ noon.', answer: 'at' },
+  { prompt: 'Complete the sentence: The festival takes place ___ August.', answer: 'in' },
+  { prompt: 'Complete the sentence: We have a test ___ Wednesday.', answer: 'on' },
+  { prompt: 'Complete the sentence: I am ___ home today because I feel sick.', answer: 'at' },
+  { prompt: 'Complete the sentence: She is ___ work right now; please call her later.', answer: 'at' },
+  { prompt: "Complete the sentence: The children are ___ school until three o'clock.", answer: 'at' },
+  { prompt: 'Complete the sentence: My brother is studying biology ___ university.', answer: 'at' },
+  { prompt: 'Complete the sentence: We go to pray ___ church every Sunday morning.', answer: 'at' },
+  { prompt: 'Complete the sentence: I need to buy some milk ___ the supermarket.', answer: 'at' },
+  { prompt: 'Complete the sentence: We are watching a movie ___ the cinema tonight.', answer: 'at' },
+  { prompt: 'Complete the sentence: He is working out ___ the gym to stay healthy.', answer: 'at' },
+  { prompt: "Complete the sentence: I have an appointment ___ the doctor's at 4 PM.", answer: 'at' },
+  { prompt: 'Complete the sentence: She is getting a haircut ___ the hair salon.', answer: 'at' },
+  { prompt: 'Complete the sentence: My parents are waiting for their flight ___ the airport.', answer: 'at' },
+  { prompt: 'Complete the sentence: I will meet you ___ the train station near the entrance.', answer: 'at' },
+  { prompt: 'Complete the sentence: The passengers are standing ___ the bus stop.', answer: 'at' },
+  { prompt: 'Complete the sentence: We can talk comfortably ___ the car while I drive.', answer: 'in' },
+  { prompt: 'Complete the sentence: I forgot my umbrella ___ a taxi yesterday.', answer: 'in' },
+  { prompt: 'Complete the sentence: The rescue team arrived ___ a helicopter.', answer: 'in' },
+  { prompt: 'Complete the sentence: I usually read a book ___ the bus to work.', answer: 'on' },
+  { prompt: 'Complete the sentence: They are traveling to Madrid ___ a train.', answer: 'on' },
+  { prompt: 'Complete the sentence: Please turn off your phone ___ the plane.', answer: 'on' },
+  { prompt: 'Complete the sentence: He loves to ride ___ his motorcycle during weekends.', answer: 'on' },
+];
+
+const ADVERB_MANNER_FILL_QUESTIONS = [
+  { prompt: 'Complete the sentence: The driver stopped ___. (careful)', answer: 'carefully' },
+  { prompt: 'Complete the sentence: Maya read the instructions ___. (slow)', answer: 'slowly' },
+  { prompt: 'Complete the sentence: The nurse spoke to the child ___. (gentle)', answer: 'gently' },
+  { prompt: 'Complete the sentence: Please listen ___ to the announcement. (careful)', answer: 'carefully' },
+  { prompt: 'Complete the sentence: The old dog walked ___ across the room. (quiet)', answer: 'quietly' },
+  { prompt: 'Complete the sentence: The students worked ___ to finish the project. (hard)', answer: 'hard' },
+  { prompt: 'Complete the sentence: He answered the question ___. (confident)', answer: 'confidently' },
+  { prompt: 'Complete the sentence: The children waited ___ for their turn. (patient)', answer: 'patiently' },
+  { prompt: 'Complete the sentence: She opened the gift ___. (excited)', answer: 'excitedly' },
+  { prompt: 'Complete the sentence: The guide explained the route ___. (clear)', answer: 'clearly' },
+  { prompt: 'Complete the sentence: The baby slept ___ through the night. (peaceful)', answer: 'peacefully' },
+  { prompt: 'Complete the sentence: Our team played ___ in the final match. (good)', answer: 'well' },
+  { prompt: 'Complete the sentence: The car moved ___ along the icy road. (slow)', answer: 'slowly' },
+  { prompt: 'Complete the sentence: The audience clapped ___ after the performance. (enthusiastic)', answer: 'enthusiastically' },
+  { prompt: 'Complete the sentence: She finished the puzzle ___. (easy)', answer: 'easily' },
+  { prompt: 'Complete the sentence: The rain fell ___ on the roof. (heavy)', answer: 'heavily' },
+  { prompt: 'Complete the sentence: He carried the glass ___. (careful)', answer: 'carefully' },
+  { prompt: 'Complete the sentence: The children laughed ___ at the funny story. (loud)', answer: 'loudly' },
+  { prompt: 'Complete the sentence: The athlete ran ___ to the finish line. (fast)', answer: 'fast' },
+  { prompt: 'Complete the sentence: They welcomed the visitors ___. (warm)', answer: 'warmly' },
+  { prompt: 'Complete the sentence: The teacher wrote the new words ___. (neat)', answer: 'neatly' },
+  { prompt: 'Complete the sentence: He searched ___ for his missing keys. (careful)', answer: 'carefully' },
+  { prompt: 'Complete the sentence: The birds sang ___ in the trees. (beautiful)', answer: 'beautifully' },
+  { prompt: 'Complete the sentence: She completed the task ___. (successful)', answer: 'successfully' },
+  { prompt: 'Complete the sentence: The man waved ___ to his friends. (cheerful)', answer: 'cheerfully' },
+  { prompt: 'Complete the sentence: Please speak ___ so everyone can hear you. (loud)', answer: 'loudly' },
+  { prompt: 'Complete the sentence: The cat crept ___ toward the mouse. (quiet)', answer: 'quietly' },
+  { prompt: 'Complete the sentence: He drives ___ in bad weather. (safe)', answer: 'safely' },
+];
+
+const ADVERB_MODIFIER_FILL_QUESTIONS = [
+  { prompt: 'Complete the sentence: It is ___ expensive.', answer: 'very' },
+  { prompt: 'Complete the sentence: The final exam was ___ difficult.', answer: 'quite' },
+  { prompt: 'Complete the sentence: The train is moving ___ fast.', answer: 'incredibly' },
+  { prompt: 'Complete the sentence: They speak ___ slowly.', answer: 'really' },
+  { prompt: 'Complete the sentence: The soup is ___ hot.', answer: 'very' },
+  { prompt: 'Complete the sentence: This room is ___ small.', answer: 'quite' },
+  { prompt: 'Complete the sentence: She sings ___ beautifully.', answer: 'incredibly' },
+  { prompt: 'Complete the sentence: The instructions are ___ clear.', answer: 'really' },
+  { prompt: 'Complete the sentence: I am ___ tired after the long trip.', answer: 'very' },
+  { prompt: 'Complete the sentence: The children behaved ___ well.', answer: 'quite' },
+  { prompt: 'Complete the sentence: The mountain path is ___ steep.', answer: 'incredibly' },
+  { prompt: 'Complete the sentence: He answered ___ politely.', answer: 'really' },
+  { prompt: 'Complete the sentence: The water feels ___ cold.', answer: 'very' },
+  { prompt: 'Complete the sentence: Her new apartment is ___ spacious.', answer: 'quite' },
+  { prompt: 'Complete the sentence: The rescue team worked ___ quickly.', answer: 'incredibly' },
+  { prompt: 'Complete the sentence: Your explanation was ___ helpful.', answer: 'really' },
+  { prompt: 'Complete the sentence: The baby is ___ quiet today.', answer: 'very' },
+  { prompt: 'Complete the sentence: This coffee is ___ strong.', answer: 'quite' },
+  { prompt: 'Complete the sentence: The dancers moved ___ gracefully.', answer: 'incredibly' },
+  { prompt: 'Complete the sentence: The documentary was ___ interesting.', answer: 'really' },
+];
 
 const COMPARATIVE_SENTENCE_QUESTIONS = [
   { type: 'comparative-sentence', prompt: 'Complete with a comparative adjective: The greenhouse is ___ than the garden shed. (warm)', answer: 'warmer' },
@@ -1991,7 +2124,38 @@ function renderFoodSubsections() {
     </div>
   `;
   $$('.vocabulary-card[data-food-subsection]', view).forEach(button => {
-    button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.foodSubsection}`));
+    const destinations = {
+      'food-practice': 'food-practice-mode',
+      dishes: 'dishes-mode',
+    };
+    button.addEventListener('click', () => Router.navigate(`vocabulary/${destinations[button.dataset.foodSubsection]}`));
+  });
+}
+
+function renderFoodPracticeModeMenu({ title, description, backTarget, normalTarget, tocTarget }) {
+  const view = $('#mainView');
+  view.innerHTML = `
+    <a href="${backTarget}" class="back-link">← Back</a>
+    <div class="lesson-header">
+      <span class="file-num">Vocabulary practice · Food</span>
+      <h1 style="margin-top:0.5rem">${escapeHTML(title)}</h1>
+      <p class="topics">${escapeHTML(description)}</p>
+    </div>
+    <div class="vocabulary-menu vocabulary-menu-expanded">
+      <button class="vocabulary-card" type="button" data-practice-mode="${normalTarget}">
+        <span class="vocabulary-emoji" aria-hidden="true">✍️</span>
+        <strong>Modo normal</strong>
+        <small>Practice as usual. An incorrect answer does not restart the exercise.</small>
+      </button>
+      <button class="vocabulary-card" type="button" data-practice-mode="${tocTarget}">
+        <span class="vocabulary-emoji" aria-hidden="true">🔀</span>
+        <strong>Modo TOC</strong>
+        <small>Answer a shuffled set. If you make a mistake, review the answer and restart from question 1.</small>
+      </button>
+    </div>
+  `;
+  $$('.vocabulary-card[data-practice-mode]', view).forEach(button => {
+    button.addEventListener('click', () => Router.navigate(`vocabulary/${button.dataset.practiceMode}`));
   });
 }
 
@@ -2071,15 +2235,15 @@ function renderDateSubsections() {
   });
 }
 
-function renderDishCountryMenu() {
+function renderDishCountryMenu(tocMode = false) {
   const view = $('#mainView');
   const countries = globalThis.FoodDishCategories || [];
   view.innerHTML = `
-    <a href="#vocabulary/food" class="back-link">← Back to Food</a>
+    <a href="${tocMode ? '#vocabulary/dishes-mode' : '#vocabulary/food'}" class="back-link">← ${tocMode ? 'Back to modes' : 'Back to Food'}</a>
     <div class="lesson-header">
       <span class="file-num">Food · Dish</span>
       <h1 style="margin-top:0.5rem">Dish</h1>
-      <p class="topics">Choose a country to identify its famous dishes in English.</p>
+      <p class="topics">Choose a country to identify its famous dishes in English${tocMode ? ' in Modo TOC' : ''}.</p>
     </div>
     <div class="vocabulary-menu vocabulary-menu-expanded">
       ${countries.map(country => `
@@ -2092,16 +2256,37 @@ function renderDishCountryMenu() {
     </div>
   `;
   $$('.vocabulary-card[data-dish-country]', view).forEach(button => {
-    button.addEventListener('click', () => Router.navigate(`vocabulary/dish-${button.dataset.dishCountry}`));
+    button.addEventListener('click', () => Router.navigate(
+      `vocabulary/dish-${button.dataset.dishCountry}${tocMode ? '-toc' : ''}`
+    ));
   });
 }
 
 function renderVocabularyPractice(categoryKey = 'food') {
   if (categoryKey === 'food') return renderFoodSubsections();
+  if (categoryKey === 'food-practice-mode') {
+    return renderFoodPracticeModeMenu({
+      title: 'Food practice',
+      description: 'Choose how you want to practise identifying the food in each picture.',
+      backTarget: '#vocabulary/food',
+      normalTarget: 'food-practice',
+      tocTarget: 'food-practice-toc',
+    });
+  }
+  if (categoryKey === 'dishes-mode') {
+    return renderFoodPracticeModeMenu({
+      title: 'Dish',
+      description: 'Choose how you want to practise identifying famous dishes by country.',
+      backTarget: '#vocabulary/food',
+      normalTarget: 'dishes',
+      tocTarget: 'dishes-toc',
+    });
+  }
   if (categoryKey === 'time') return renderTimeSubsections();
   if (categoryKey === 'weather') return renderWeatherSubsections();
   if (categoryKey === 'dates') return renderDateSubsections();
   if (categoryKey === 'dishes') return renderDishCountryMenu();
+  if (categoryKey === 'dishes-toc') return renderDishCountryMenu(true);
   const translationSetKeys = Object.keys(globalThis.VocabularyTranslationSets || {});
   if (categoryKey === 'translation' || categoryKey.startsWith('translation-') ||
       translationSetKeys.some(key => categoryKey === key || categoryKey.startsWith(`${key}-`))) {
@@ -2109,8 +2294,10 @@ function renderVocabularyPractice(categoryKey = 'food') {
     return;
   }
   const view = $('#mainView');
+  const isTOCMode = categoryKey.endsWith('-toc');
+  const practiceCategoryKey = isTOCMode ? categoryKey.slice(0, -'-toc'.length) : categoryKey;
   const isNumberPractice = categoryKey === 'numbers';
-  const isFoodPractice = categoryKey === 'food-practice';
+  const isFoodPractice = practiceCategoryKey === 'food-practice';
   const isTimePractice = categoryKey === 'time-practice';
   const isWeatherPractice = categoryKey === 'weather-practice';
   const isSeasonPractice = categoryKey === 'season-practice';
@@ -2118,7 +2305,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
   const isMonthPractice = categoryKey === 'months';
   const isDatePractice = categoryKey === 'date-practice';
   const isOrdinalPractice = categoryKey === 'ordinal-numbers';
-  const dishCountryId = categoryKey.startsWith('dish-') ? categoryKey.slice('dish-'.length) : '';
+  const dishCountryId = practiceCategoryKey.startsWith('dish-') ? practiceCategoryKey.slice('dish-'.length) : '';
   const dishCountry = (globalThis.FoodDishCategories || []).find(country => country.id === dishCountryId);
   const isDishPractice = Boolean(dishCountry);
   const isCountryPractice = categoryKey === 'countries';
@@ -2160,6 +2347,13 @@ function renderVocabularyPractice(categoryKey = 'food') {
     showToast('This vocabulary category is not available yet.', 'error');
     Router.navigate('practice/vocabulary');
     return;
+  }
+  if (isTOCMode && (isFoodPractice || isDishPractice)) {
+    return startTOCVocabularyPractice(collection, label, {
+      backTarget: isFoodPractice ? '#vocabulary/food-practice-mode' : '#vocabulary/dishes-toc',
+      itemLabel: isFoodPractice ? 'food' : 'dish',
+      acceptPluralAnswers: isFoodPractice,
+    });
   }
   const COUNTRY_REPETITIONS_PER_GROUP = 50;
   const COUNTRY_UNLOCK_BATCH_SIZE = 5;
@@ -2328,6 +2522,11 @@ function renderVocabularyPractice(categoryKey = 'food') {
     const questionDescriptionMarkup = isPrepositionsPractice
       ? escapeHTML(item.prompt).replace('___', '<input id="vocabularyAnswer" class="vocabulary-input preposition-inline-input" type="text" inputmode="text" aria-label="Write the missing preposition" autocomplete="off" spellcheck="false">')
       : questionDescription;
+    const answerInputMarkup = isPrepositionsPractice
+      ? ''
+      : isWeatherPractice
+        ? `<div class="weather-answer-sentence"><span>It's</span><input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="text" placeholder="Write the weather word..." aria-label="Complete It's with the weather word" autocomplete="off" spellcheck="false"><span>.</span></div>`
+        : `<input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="${isNumberPractice && item.direction === 'words-to-number' ? 'numeric' : 'text'}" placeholder="${answerPlaceholder}" autocomplete="off" />`;
     card.innerHTML = `
       <div class="vocabulary-progress-bar">
         <span>Progress</span>
@@ -2367,7 +2566,7 @@ function renderVocabularyPractice(categoryKey = 'food') {
             <p>Close and reopen Chrome, then try the button again.</p>
             <button class="btn btn-secondary vocabulary-note-close" type="button">Close</button>
         </dialog>
-        ${isPrepositionsPractice ? '' : `<input id="vocabularyAnswer" class="vocabulary-input" type="text" inputmode="${isNumberPractice && item.direction === 'words-to-number' ? 'numeric' : 'text'}" placeholder="${answerPlaceholder}" autocomplete="off" />`}
+        ${answerInputMarkup}
         <div class="exercise-actions">
           <button class="btn btn-secondary" id="previousVocabularyBtn" type="button" ${currentIndex === 0 && !isCountryPractice ? 'disabled' : ''}>← Previous question</button>
           <button class="btn" id="checkVocabularyBtn" type="button">Check</button>
@@ -2856,6 +3055,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
         <label for="translationAnswer">${direction === 'en-es' ? 'Write the Spanish translation' : 'Write the English translation'}</label>
         <input id="translationAnswer" class="vocabulary-input" type="text" autocomplete="off">
         <div class="exercise-actions">
+          <button class="btn btn-secondary" id="previousTranslationWord" type="button" ${index === 0 ? 'disabled' : ''}>← Previous question</button>
           <button class="btn btn-secondary" id="showTranslationAnswer" type="button">Show answer</button>
           <button class="btn btn-secondary" id="nextTranslationWord" type="button">Next question →</button>
         </div>
@@ -2880,6 +3080,13 @@ function renderTranslationPractice(categoryKey = 'translation') {
       activePairs = orderedPairs.slice(0, progress.unlocked);
       index = 0;
       saveProgress();
+      render();
+    });
+    $('#previousTranslationWord', view).addEventListener('click', () => {
+      if (index === 0) return;
+      if (timeout) clearTimeout(timeout);
+      timeout = null;
+      index -= 1;
       render();
     });
     $('#nextTranslationWord', view).addEventListener('click', () => {
@@ -3058,9 +3265,112 @@ function renderLesson(params) {
 }
 
 // --- PRACTICE HUB ---
+function startVerbPhrasePractice() {
+  const view = $('#mainView');
+  let order = COMMON_US_VERB_PHRASES.map((_, index) => index);
+  let currentIndex = 0;
+
+  const shuffle = () => {
+    for (let index = order.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [order[index], order[swapIndex]] = [order[swapIndex], order[index]];
+    }
+    currentIndex = 0;
+  };
+  const normalize = value => String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[’']/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const render = () => {
+    const phrase = COMMON_US_VERB_PHRASES[order[currentIndex]];
+    let answered = false;
+    view.innerHTML = `
+      <a href="#practice" class="back-link">← Back to Practice</a>
+      <div class="lesson-header">
+        <span class="file-num">Practice · Verb phrases</span>
+        <h1 style="margin-top:0.5rem">Verb phrases</h1>
+        <p class="topics">Translate the Spanish phrase into everyday English.</p>
+        <button class="btn btn-secondary" id="shuffleVerbPhrases" type="button">🔀 Shuffle and restart</button>
+      </div>
+      <div class="reading-progress">
+        <span>Question ${currentIndex + 1} of ${order.length}</span>
+        <strong>${currentIndex + 1} / ${order.length}</strong>
+      </div>
+      <section class="translation-practice" aria-live="polite">
+        <p class="translation-prompt" id="verbPhrasePrompt">${escapeHTML(phrase.prompt)}</p>
+        <label for="verbPhraseAnswer">Write the English verb phrase</label>
+        <input id="verbPhraseAnswer" class="vocabulary-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <div class="exercise-actions">
+          <button class="btn btn-secondary" id="previousVerbPhrase" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Previous question</button>
+          <button class="btn" id="checkVerbPhrase" type="button">Check answer</button>
+          <button class="btn btn-secondary" id="showVerbPhraseAnswer" type="button">Show answer</button>
+          <button class="btn btn-secondary" id="nextVerbPhrase" type="button">Next question →</button>
+        </div>
+        <p class="translation-feedback" id="verbPhraseFeedback" role="status"></p>
+      </section>
+    `;
+
+    $('#verbPhrasePrompt', view).insertAdjacentElement(
+      'afterend',
+      createPhoneticControl(() => phrase.answers[0])
+    );
+    const input = $('#verbPhraseAnswer', view);
+    const feedback = $('#verbPhraseFeedback', view);
+    const answers = phrase.answers.map(normalize);
+    const check = () => {
+      if (answered) return;
+      if (!answers.includes(normalize(input.value))) {
+        feedback.textContent = 'Not quite. Try again.';
+        input.classList.add('wrong');
+        return;
+      }
+      answered = true;
+      input.disabled = true;
+      input.classList.remove('wrong');
+      input.classList.add('correct');
+      feedback.textContent = '✓ Correct!';
+      playCorrectSound();
+    };
+
+    $('#shuffleVerbPhrases', view).addEventListener('click', () => {
+      shuffle();
+      render();
+    });
+    $('#previousVerbPhrase', view).addEventListener('click', () => {
+      if (currentIndex === 0) return;
+      currentIndex -= 1;
+      render();
+    });
+    $('#nextVerbPhrase', view).addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % order.length;
+      render();
+    });
+    $('#checkVerbPhrase', view).addEventListener('click', check);
+    $('#showVerbPhraseAnswer', view).addEventListener('click', () => {
+      feedback.textContent = `Answer: ${phrase.answers.join(' / ')}`;
+    });
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        check();
+      }
+    });
+    focusAnswerFieldOnDesktop(input);
+  };
+
+  shuffle();
+  render();
+}
+
 function renderPractice(params) {
   const view = $('#mainView');
   if (params[0] === 'toc') return startTOCPractice();
+  if (params[0] === 'verb-phrases') return startVerbPhrasePractice();
   if (params[0] === 'file') {
     const fileId = params[1];
     const file = Files.find(f => f.id === fileId);
@@ -3195,6 +3505,17 @@ function renderPractice(params) {
       </button>
     </section>
     <section class="grammar-practice-section">
+      <h2 class="section-title">🗣️ VERB PHRASES</h2>
+      <button class="grammar-practice-card" id="openVerbPhrases" type="button">
+        <span class="vocabulary-emoji" aria-hidden="true">🗣️</span>
+        <span>
+          <strong>Verb phrases</strong>
+          <small>Translate 20 common everyday verb phrases into English.</small>
+        </span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+    <section class="grammar-practice-section">
       <h2 class="section-title">📐 GRAMMAR PRACTICE</h2>
       <button class="grammar-practice-card" id="openGrammarPractice" type="button">
         <span class="vocabulary-emoji">✍️</span>
@@ -3256,6 +3577,7 @@ function renderPractice(params) {
   if (openVocabularyPractice) {
     openVocabularyPractice.addEventListener('click', () => Router.navigate('practice/vocabulary'));
   }
+  $('#openVerbPhrases').addEventListener('click', () => Router.navigate('practice/verb-phrases'));
   $('#openGrammarPractice').addEventListener('click', () => Router.navigate('grammar-practice'));
   $('#openReadingPractice').addEventListener('click', () => Router.navigate('reading'));
   $('#openWritingPractice').addEventListener('click', () => Router.navigate('writing'));
@@ -3568,9 +3890,19 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
   const seeds = collectGrammarSentenceSeeds(topicIndex, sectionIndex, questions);
   const clozeCandidates = createGrammarClozeCandidates(seeds);
 
-  const writeQuestionTarget = topicIndex === 8 && sectionIndex === 2 ? 28 : 10;
+  const writeQuestionTarget = topicIndex === 3 && sectionIndex === 1
+    ? 40
+    : topicIndex === 10 && sectionIndex === 0
+    ? 50
+    : topicIndex === 8 && sectionIndex === 2
+    ? 28
+    : 10;
   const missingFill = Math.max(0, writeQuestionTarget - grammarQuestionCount(questions, 'write'));
-  const writeCandidates = topicIndex === 8 && sectionIndex === 2
+  const writeCandidates = topicIndex === 3 && sectionIndex === 1
+    ? PREPOSITION_FILL_QUESTIONS
+    : topicIndex === 10 && sectionIndex === 0
+    ? [...ADVERB_MANNER_FILL_QUESTIONS, ...ADVERB_MODIFIER_FILL_QUESTIONS]
+    : topicIndex === 8 && sectionIndex === 2
     ? COMPARATIVE_SENTENCE_QUESTIONS.map(question => ({
       prompt: question.prompt.replace(/^Complete with a comparative adjective:\s*/, ''),
       answer: question.answer,
@@ -3580,6 +3912,15 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
     supplemental.push({
       ...candidate,
       type: 'fill',
+      ...(topicIndex === 3 && sectionIndex === 1
+        ? { hint: 'Complete with: in, on, at, to, between, or under.' }
+        : topicIndex === 10 && sectionIndex === 0
+        ? {
+          hint: ADVERB_MODIFIER_FILL_QUESTIONS.includes(candidate)
+            ? 'Modifier: complete with very, quite, really, or incredibly before the adjective or adverb.'
+            : 'Adverb of manner: use the adverb form of the word in parentheses.',
+        }
+        : {}),
       explanation: 'Use the grammar pattern in this subtopic.',
     });
   });
@@ -4234,6 +4575,180 @@ function createTOCQuestionSet() {
     selected.push({ ...question, tocCategory: 'Mixed practice' });
   }
   return selected.length === TOC_PRACTICE_LENGTH ? shuffleTOCItems(selected) : [];
+}
+
+const INVARIANT_FOOD_NOUNS = new Set(['fish', 'seafood', 'rice', 'bread', 'butter', 'cheese', 'coffee', 'sugar', 'meat', 'milk', 'pasta', 'lettuce', 'oil', 'jam', 'tea', 'toast', 'cereal']);
+
+function pluralizeFoodAnswer(answer) {
+  const words = String(answer || '').trim().split(/\s+/);
+  const noun = words.pop() || '';
+  const normalizedNoun = noun.toLocaleLowerCase('en');
+  if (!noun || INVARIANT_FOOD_NOUNS.has(normalizedNoun) || /s$/i.test(noun)) return '';
+
+  const plural = /[^aeiou]y$/i.test(noun)
+    ? noun.slice(0, -1) + 'ies'
+    : /(?:s|x|z|ch|sh)$/i.test(noun)
+      ? `${noun}es`
+      : /(?:potato|tomato)$/i.test(noun)
+        ? `${noun}es`
+        : `${noun}s`;
+  words.push(plural);
+  return words.join(' ');
+}
+
+function startTOCVocabularyPractice(items, label, {
+  backTarget,
+  itemLabel,
+  acceptPluralAnswers = false,
+  startNewSequence = false,
+}) {
+  const sequenceKey = `englishPracticeTOCVocabularySequenceV1:${encodeURIComponent(label.toLocaleLowerCase('en'))}`;
+  let orderedItems = null;
+  if (!startNewSequence) {
+    try {
+      const savedOrder = JSON.parse(sessionStorage.getItem(sequenceKey) || 'null');
+      if (Array.isArray(savedOrder)
+        && savedOrder.length === items.length
+        && new Set(savedOrder).size === items.length
+        && savedOrder.every(index => Number.isInteger(index) && index >= 0 && index < items.length)) {
+        orderedItems = savedOrder.map(index => items[index]);
+      }
+    } catch (_) { /* Create a new stable sequence if saved data is unreadable. */ }
+  }
+  if (!orderedItems) {
+    const order = shuffleTOCItems(items.map((_, index) => index));
+    orderedItems = order.map(index => items[index]);
+    try { sessionStorage.setItem(sequenceKey, JSON.stringify(order)); } catch (_) { /* Keep the practice usable if session storage is unavailable. */ }
+  }
+
+  const questions = orderedItems.map(item => createTOCFillQuestion(
+    `${renderVocabularyImage(item)}<p>What ${itemLabel} can you see? ___</p>`,
+    [
+      item.word,
+      ...(item.aliases || []),
+      ...(acceptPluralAnswers ? [item.word, ...(item.aliases || [])].map(pluralizeFoodAnswer).filter(Boolean) : []),
+    ],
+    item.word
+  ));
+  if (!questions.length || questions.some(question => !question)) {
+    showToast('This picture practice is not available right now.', 'error');
+    Router.navigate(backTarget);
+    return;
+  }
+
+  const view = $('#mainView');
+  let currentIndex = 0;
+  let correctCount = 0;
+  let restartCount = 0;
+  let advanceTimeout = null;
+
+  const renderSummary = () => {
+    view.innerHTML = `
+      <a href="${backTarget}" class="back-link">← Back</a>
+      <div class="lesson-header text-center">
+        <div style="font-size:3rem" aria-hidden="true">🎉</div>
+        <span class="file-num">Modo TOC · ${escapeHTML(label)}</span>
+        <h1 style="margin-top:0.5rem">Practice complete!</h1>
+        <p class="topics">You identified every ${escapeHTML(itemLabel)} picture in this run.</p>
+        <p class="writing-score">${questions.length} / ${questions.length} correct</p>
+        <p class="text-muted">Restarts during this session: ${restartCount}</p>
+        <button class="btn" id="restartTOCVocabularyPractice" type="button">Start a new shuffled run</button>
+      </div>
+    `;
+    $('#restartTOCVocabularyPractice').addEventListener('click', () => {
+      startTOCVocabularyPractice(items, label, { backTarget, itemLabel, acceptPluralAnswers, startNewSequence: true });
+    });
+  };
+
+  const renderQuestion = () => {
+    if (currentIndex >= questions.length) {
+      renderSummary();
+      return;
+    }
+
+    view.innerHTML = `
+      <a href="${backTarget}" class="back-link">← Back</a>
+      <div class="lesson-header">
+        <span class="file-num">Modo TOC · ${escapeHTML(label)}</span>
+        <h1 style="margin-top:0.5rem">${escapeHTML(label)} practice</h1>
+        <p class="topics">Identify all ${questions.length} pictures in a shuffled order. An incorrect answer shows the correct name and lets you restart from question 1.</p>
+      </div>
+      <div class="reading-progress"><span>Exercise ${currentIndex + 1} of ${questions.length}</span><strong>${correctCount} correct · ${restartCount} restarts</strong></div>
+      <div class="vocabulary-progress-track"><span style="width:${Math.round((currentIndex / questions.length) * 100)}%"></span></div>
+      <div id="tocVocabularyQuestion" class="toc-question"></div>
+      <div class="exercise-actions"><button class="btn" id="checkTOCVocabularyAnswer" type="button">Check</button></div>
+    `;
+
+    const questionContainer = $('#tocVocabularyQuestion', view);
+    const answerControl = renderTOCManualQuestion(questions[currentIndex], currentIndex, questionContainer);
+    const answerInput = $('.toc-manual-input', questionContainer);
+    const exercise = $('.exercise', questionContainer);
+    const feedback = document.createElement('div');
+    feedback.className = 'vocabulary-feedback hidden';
+    feedback.setAttribute('role', 'status');
+    feedback.setAttribute('aria-live', 'polite');
+    exercise.appendChild(feedback);
+    const actions = $('.exercise-actions', view);
+    actions.prepend(createPhoneticControl(
+      () => answerInput.value.trim() || answerControl.answerText(),
+      { watchInput: answerInput }
+    ));
+    if (acceptPluralAnswers) {
+      answerInput.addEventListener('keydown', event => {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        $('#checkTOCVocabularyAnswer').click();
+      });
+    }
+
+    $('#checkTOCVocabularyAnswer').addEventListener('click', () => {
+      const result = answerControl.check();
+      if (result === null) {
+        showToast('Enter or select an answer before checking.', 'error');
+        return;
+      }
+      STATE = Storage.recordActivity(STATE, result);
+      updateHeaderStats();
+
+      if (result) {
+        correctCount += 1;
+        playCorrectSound();
+        feedback.className = 'vocabulary-feedback success';
+        feedback.innerHTML = `<strong>✅ Correct!</strong><span>The answer is <strong>${escapeHTML(answerControl.answerText())}</strong>.</span>`;
+        answerInput.disabled = true;
+        $('#checkTOCVocabularyAnswer').disabled = true;
+        $('.reading-progress strong', view).textContent = `${correctCount} correct · ${restartCount} restarts`;
+        advanceTimeout = setTimeout(() => {
+          if (!feedback.isConnected) return;
+          currentIndex += 1;
+          renderQuestion();
+        }, 1500);
+        return;
+      }
+
+      restartCount += 1;
+      feedback.className = 'toc-restart-notice';
+      feedback.setAttribute('role', 'alert');
+      feedback.innerHTML = `Incorrect answer. Correct answer: <strong>${escapeHTML(answerControl.answerText())}</strong>. Click Return to question 1 to restart the run.`;
+      $$('input, textarea, select, button.option, button.tf-btn', questionContainer)
+        .forEach(control => { control.disabled = true; });
+      $('.reading-progress strong', view).textContent = `${correctCount} correct · ${restartCount} restarts`;
+      const phoneticControl = $('.phonetic-control', actions);
+      actions.replaceChildren(...(phoneticControl ? [phoneticControl] : []));
+      const returnButton = document.createElement('button');
+      returnButton.className = 'btn';
+      returnButton.type = 'button';
+      returnButton.textContent = 'Return to question 1';
+      returnButton.addEventListener('click', () => {
+        currentIndex = 0;
+        correctCount = 0;
+        renderQuestion();
+      });
+      actions.appendChild(returnButton);
+    });
+  };
+
+  renderQuestion();
 }
 
 function startTOCPractice(startNewSequence = false) {

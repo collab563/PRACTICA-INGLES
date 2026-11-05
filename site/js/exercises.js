@@ -152,8 +152,16 @@ const Exercises = {
   // --- Fill in the blank ---
   renderFill(ex, exEl, fbEl) {
     const wrap = document.createElement('div');
+    const instructionMatch = /^Complete the sentence:\s*/i.exec(ex.prompt);
+    const sentencePrompt = instructionMatch ? ex.prompt.slice(instructionMatch[0].length) : ex.prompt;
+    if (instructionMatch) {
+      const instruction = document.createElement('div');
+      instruction.className = 'fill-instruction';
+      instruction.textContent = instructionMatch[0].trim();
+      wrap.appendChild(instruction);
+    }
     // Split prompt by ___ into segments
-    const parts = ex.prompt.split('___');
+    const parts = sentencePrompt.split('___');
     const row = document.createElement('div');
     row.className = 'fill-blank-row';
     const inputs = [];
@@ -170,6 +178,7 @@ const Exercises = {
       }
       const span = document.createElement('span');
       span.innerHTML = part;
+      if (i > 0 && /^\s*[.,!?;:]/.test(part)) span.className = 'fill-blank-punctuation';
       row.appendChild(span);
     });
     // A fill exercise should always provide an answer field, even when its
@@ -189,9 +198,9 @@ const Exercises = {
     wrap.appendChild(row);
 
     let answerIndex = 0;
-    const completedPrompt = ex.prompt.includes('___')
-      ? ex.prompt.replace(/___/g, () => expectedAnswers[answerIndex++] || '')
-      : `${ex.prompt} ${expectedAnswers.filter(Boolean).join(' ')}`;
+    const completedPrompt = sentencePrompt.includes('___')
+      ? sentencePrompt.replace(/___/g, () => expectedAnswers[answerIndex++] || '')
+      : `${sentencePrompt} ${expectedAnswers.filter(Boolean).join(' ')}`;
     const phoneticText = document.createElement('span');
     phoneticText.innerHTML = completedPrompt;
     wrap.appendChild(createPhoneticControl(() => phoneticText.textContent));

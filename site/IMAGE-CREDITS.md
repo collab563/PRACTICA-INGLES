@@ -33,18 +33,15 @@ The other externally loaded food photos use Unsplash-hosted image URLs and are c
 
 ## Weather, seasons, and prepositions
 
-Photos still loaded remotely from Unsplash include the photographer, source page, and license below each exercise image.
+The sunny, snowing, and cold weather images were provided by the project owner and are stored locally at `images/weather/sunny.png`, `images/weather/snowing.png`, and `images/weather/cold.png`. Other photos still loaded remotely from Unsplash include the photographer, source page, and license below each exercise image.
 
 | Section | Word | Photographer | Source |
 | --- | --- | --- | --- |
-| Weather | sunny | Francesco Ungaro | [Unsplash photo](https://unsplash.com/photos/the-sun-shines-brightly-over-a-grassy-field-7FcZfpFZ7sM) |
 | Weather | hot | Immo Wegmann | [Unsplash photo](https://unsplash.com/de/fotos/das-thermometer-zeigt-eine-sehr-heisse-temperatur-an-qs5HR1dG7h4) |
 | Weather | cloudy | Tobias Stonjeck | [Unsplash photo](https://unsplash.com/de/fotos/grauer-und-weisser-bewolkter-himmel-e_ZxKz3_2Nc) |
 | Weather | raining | Brad Starkey | [Unsplash photo](https://unsplash.com/photos/water-droplets-on-glass-window-8n-54V1CusY) |
 | Weather | windy | Sergej Karpow | [Unsplash photo](https://unsplash.com/photos/trees-bending-in-the-wind-under-cloudy-sky-f9bSLAHht3A) |
 | Weather | foggy | Nick Martin | [Unsplash photo](https://unsplash.com/photos/a-forest-filled-with-lots-of-trees-covered-in-fog-6wD4qUp2Fj0) |
-| Weather | cold | Kevin Bessat | [Unsplash photo](https://unsplash.com/photos/a-snow-covered-field-with-some-plants-in-the-middle-of-it-wLKMvQBaBBo) |
-| Weather | snowing | Lawrence Krowdeed | [Unsplash photo](https://unsplash.com/photos/snow-falls-heavily-under-the-glow-of-streetlights-Uv5GSOzCtEM) |
 | Season | spring | Doğan Alpaslan DEMİR | [Unsplash photo](https://unsplash.com/photos/a-single-white-flower-in-a-field-of-green-grass-SnuS6STXC0E) |
 | Season | summer | Shingo Matsui | [Unsplash photo](https://unsplash.com/photos/the-sun-shines-brightly-over-the-ocean-on-a-sunny-day-GWk0LddIaE0) |
 | Season | autumn | dai ishikawa | [Unsplash photo](https://unsplash.com/photos/a-tree-with-yellow-leaves-eRykUxr7Zl8) |

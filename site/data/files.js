@@ -760,8 +760,8 @@ const Files = [
         grammar: [
           { type: 'mc', prompt: 'She speaks English ___. (good)', options: ['good', 'well', 'nice', 'fast'], answer: 1, explanation: 'Well is the adverb form of good.' },
           { type: 'mc', prompt: 'He drives ___. (quick)', options: ['quick', 'quickly', 'quicker', 'most quick'], answer: 1, explanation: 'Add -ly to many adjectives to form adverbs.' },
-          { type: 'fill', prompt: 'The children play ___. (noisy)', answer: 'noisily', explanation: 'Noisy → noisily (y → i + ly).' },
-          { type: 'fill', prompt: 'He works ___. (hard)', answer: 'hard' },
+          { type: 'fill', prompt: 'The children play ___. (noisy)', answer: 'noisily', hint: 'Adverb of manner: use the adverb form of the word in parentheses.', explanation: 'Noisy → noisily (y → i + ly).' },
+          { type: 'fill', prompt: 'He works ___. (hard)', answer: 'hard', hint: 'Adverb of manner: use the adverb form of the word in parentheses.' },
           { type: 'mc', prompt: 'She sings ___. (beautiful)', options: ['beautiful', 'beautifully', 'beautifuly', 'beauty'], answer: 1 },
           { type: 'mc', prompt: '"She is a ___ driver" (adjective)', options: ['careful', 'carefully', 'care', 'caring'], answer: 0, explanation: 'After "a", use an adjective to describe the noun driver.' },
           { type: 'reorder', prompt: 'Ordena:', words: ['He', 'speaks', 'Spanish', 'very', 'well', '.'], answer: null },
