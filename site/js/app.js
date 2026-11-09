@@ -2353,6 +2353,8 @@ function renderVocabularyPractice(categoryKey = 'food') {
       backTarget: isFoodPractice ? '#vocabulary/food-practice-mode' : '#vocabulary/dishes-toc',
       itemLabel: isFoodPractice ? 'food' : 'dish',
       acceptPluralAnswers: isFoodPractice,
+      allowPreviousQuestion: isFoodPractice,
+      autoFocusAnswer: isFoodPractice,
     });
   }
   const COUNTRY_REPETITIONS_PER_GROUP = 50;
@@ -4600,6 +4602,8 @@ function startTOCVocabularyPractice(items, label, {
   backTarget,
   itemLabel,
   acceptPluralAnswers = false,
+  allowPreviousQuestion = false,
+  autoFocusAnswer = false,
   startNewSequence = false,
 }) {
   const sequenceKey = `englishPracticeTOCVocabularySequenceV1:${encodeURIComponent(label.toLocaleLowerCase('en'))}`;
@@ -4639,6 +4643,7 @@ function startTOCVocabularyPractice(items, label, {
   const view = $('#mainView');
   let currentIndex = 0;
   let correctCount = 0;
+  const correctQuestionIndexes = new Set();
   let restartCount = 0;
   let advanceTimeout = null;
 
@@ -4656,7 +4661,7 @@ function startTOCVocabularyPractice(items, label, {
       </div>
     `;
     $('#restartTOCVocabularyPractice').addEventListener('click', () => {
-      startTOCVocabularyPractice(items, label, { backTarget, itemLabel, acceptPluralAnswers, startNewSequence: true });
+      startTOCVocabularyPractice(items, label, { backTarget, itemLabel, acceptPluralAnswers, allowPreviousQuestion, autoFocusAnswer, startNewSequence: true });
     });
   };
 
@@ -4671,17 +4676,21 @@ function startTOCVocabularyPractice(items, label, {
       <div class="lesson-header">
         <span class="file-num">Modo TOC · ${escapeHTML(label)}</span>
         <h1 style="margin-top:0.5rem">${escapeHTML(label)} practice</h1>
-        <p class="topics">Identify all ${questions.length} pictures in a shuffled order. An incorrect answer shows the correct name and lets you restart from question 1.</p>
+        <p class="topics">Identify all ${questions.length} pictures in a shuffled order. ${allowPreviousQuestion ? 'Use Previous question to review an earlier picture. ' : ''}An incorrect answer shows the correct name and lets you restart from question 1.</p>
       </div>
       <div class="reading-progress"><span>Exercise ${currentIndex + 1} of ${questions.length}</span><strong>${correctCount} correct · ${restartCount} restarts</strong></div>
       <div class="vocabulary-progress-track"><span style="width:${Math.round((currentIndex / questions.length) * 100)}%"></span></div>
       <div id="tocVocabularyQuestion" class="toc-question"></div>
-      <div class="exercise-actions"><button class="btn" id="checkTOCVocabularyAnswer" type="button">Check</button></div>
+      <div class="exercise-actions">
+        ${allowPreviousQuestion ? `<button class="btn btn-secondary" id="previousTOCVocabularyQuestion" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Previous question</button>` : ''}
+        <button class="btn" id="checkTOCVocabularyAnswer" type="button">Check</button>
+      </div>
     `;
 
     const questionContainer = $('#tocVocabularyQuestion', view);
     const answerControl = renderTOCManualQuestion(questions[currentIndex], currentIndex, questionContainer);
     const answerInput = $('.toc-manual-input', questionContainer);
+    if (autoFocusAnswer) answerInput.focus({ preventScroll: true });
     const exercise = $('.exercise', questionContainer);
     const feedback = document.createElement('div');
     feedback.className = 'vocabulary-feedback hidden';
@@ -4701,6 +4710,16 @@ function startTOCVocabularyPractice(items, label, {
       });
     }
 
+    $('#previousTOCVocabularyQuestion')?.addEventListener('click', () => {
+      if (currentIndex === 0) return;
+      if (advanceTimeout) {
+        clearTimeout(advanceTimeout);
+        advanceTimeout = null;
+      }
+      currentIndex -= 1;
+      renderQuestion();
+    });
+
     $('#checkTOCVocabularyAnswer').addEventListener('click', () => {
       const result = answerControl.check();
       if (result === null) {
@@ -4711,7 +4730,10 @@ function startTOCVocabularyPractice(items, label, {
       updateHeaderStats();
 
       if (result) {
-        correctCount += 1;
+        if (!correctQuestionIndexes.has(currentIndex)) {
+          correctQuestionIndexes.add(currentIndex);
+          correctCount += 1;
+        }
         playCorrectSound();
         feedback.className = 'vocabulary-feedback success';
         feedback.innerHTML = `<strong>✅ Correct!</strong><span>The answer is <strong>${escapeHTML(answerControl.answerText())}</strong>.</span>`;
@@ -4742,6 +4764,7 @@ function startTOCVocabularyPractice(items, label, {
       returnButton.addEventListener('click', () => {
         currentIndex = 0;
         correctCount = 0;
+        correctQuestionIndexes.clear();
         renderQuestion();
       });
       actions.appendChild(returnButton);
