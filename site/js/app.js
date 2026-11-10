@@ -4643,7 +4643,8 @@ function startTOCVocabularyPractice(items, label, {
   const view = $('#mainView');
   let currentIndex = 0;
   let correctCount = 0;
-  const correctQuestionIndexes = new Set();
+  const correctAnswersByQuestion = new Map();
+  const answerDrafts = new Map();
   let restartCount = 0;
   let advanceTimeout = null;
 
@@ -4670,6 +4671,8 @@ function startTOCVocabularyPractice(items, label, {
       renderSummary();
       return;
     }
+    const isReviewed = correctAnswersByQuestion.has(currentIndex);
+    const reviewedAnswer = correctAnswersByQuestion.get(currentIndex);
 
     view.innerHTML = `
       <a href="${backTarget}" class="back-link">← Back</a>
@@ -4683,26 +4686,46 @@ function startTOCVocabularyPractice(items, label, {
       <div id="tocVocabularyQuestion" class="toc-question"></div>
       <div class="exercise-actions">
         ${allowPreviousQuestion ? `<button class="btn btn-secondary" id="previousTOCVocabularyQuestion" type="button" ${currentIndex === 0 ? 'disabled' : ''}>← Previous question</button>` : ''}
-        <button class="btn" id="checkTOCVocabularyAnswer" type="button">Check</button>
+        ${isReviewed
+          ? `<button class="btn" id="nextTOCVocabularyQuestion" type="button">${currentIndex === questions.length - 1 ? 'Finish practice' : 'Next question →'}</button>`
+          : '<button class="btn" id="checkTOCVocabularyAnswer" type="button">Check</button>'}
       </div>
     `;
 
     const questionContainer = $('#tocVocabularyQuestion', view);
     const answerControl = renderTOCManualQuestion(questions[currentIndex], currentIndex, questionContainer);
     const answerInput = $('.toc-manual-input', questionContainer);
-    if (autoFocusAnswer) answerInput.focus({ preventScroll: true });
+    if (isReviewed) {
+      answerInput.value = reviewedAnswer;
+      answerInput.disabled = true;
+      answerInput.classList.add('correct');
+    } else if (answerDrafts.has(currentIndex)) {
+      answerInput.value = answerDrafts.get(currentIndex);
+    }
     const exercise = $('.exercise', questionContainer);
     const feedback = document.createElement('div');
-    feedback.className = 'vocabulary-feedback hidden';
+    feedback.className = isReviewed ? 'vocabulary-feedback success' : 'vocabulary-feedback hidden';
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
+    if (isReviewed) {
+      feedback.innerHTML = `<strong>✓ Reviewed</strong><span>Your answer <strong>${escapeHTML(reviewedAnswer)}</strong> was correct.</span>`;
+    }
     exercise.appendChild(feedback);
     const actions = $('.exercise-actions', view);
     actions.prepend(createPhoneticControl(
       () => answerInput.value.trim() || answerControl.answerText(),
       { watchInput: answerInput }
     ));
-    if (acceptPluralAnswers) {
+    if (autoFocusAnswer) {
+      const focusTarget = isReviewed
+        ? $('#nextTOCVocabularyQuestion', actions)
+        : answerInput;
+      focusTarget?.focus({ preventScroll: true });
+    }
+    if (!isReviewed) {
+      answerInput.addEventListener('input', () => answerDrafts.set(currentIndex, answerInput.value));
+    }
+    if (acceptPluralAnswers && !isReviewed) {
       answerInput.addEventListener('keydown', event => {
         if (event.key !== 'Enter') return;
         event.preventDefault();
@@ -4720,7 +4743,12 @@ function startTOCVocabularyPractice(items, label, {
       renderQuestion();
     });
 
-    $('#checkTOCVocabularyAnswer').addEventListener('click', () => {
+    $('#nextTOCVocabularyQuestion')?.addEventListener('click', () => {
+      currentIndex += 1;
+      renderQuestion();
+    });
+
+    $('#checkTOCVocabularyAnswer')?.addEventListener('click', () => {
       const result = answerControl.check();
       if (result === null) {
         showToast('Enter or select an answer before checking.', 'error');
@@ -4730,10 +4758,12 @@ function startTOCVocabularyPractice(items, label, {
       updateHeaderStats();
 
       if (result) {
-        if (!correctQuestionIndexes.has(currentIndex)) {
-          correctQuestionIndexes.add(currentIndex);
+        const answer = answerInput.value.trim();
+        if (!correctAnswersByQuestion.has(currentIndex)) {
+          correctAnswersByQuestion.set(currentIndex, answer);
           correctCount += 1;
         }
+        answerDrafts.set(currentIndex, answer);
         playCorrectSound();
         feedback.className = 'vocabulary-feedback success';
         feedback.innerHTML = `<strong>✅ Correct!</strong><span>The answer is <strong>${escapeHTML(answerControl.answerText())}</strong>.</span>`;
@@ -4764,7 +4794,8 @@ function startTOCVocabularyPractice(items, label, {
       returnButton.addEventListener('click', () => {
         currentIndex = 0;
         correctCount = 0;
-        correctQuestionIndexes.clear();
+        correctAnswersByQuestion.clear();
+        answerDrafts.clear();
         renderQuestion();
       });
       actions.appendChild(returnButton);

@@ -21,6 +21,7 @@ function transcribeEnglishIPA(text) {
     COCOS: 'ˈkəʊkɒs',
     COMOROS: 'ˈkɒmərəʊz',
     COTE: 'kəʊt',
+    CUCUMBERS: 'kjˈuːkˌɐmbəz',
     CUNHA: 'ˈkʊnjə',
     CURACAO: 'ˌkjʊərəˈsaʊ',
     'D\'IVOIRE': 'ˌdiːvwɑː',
