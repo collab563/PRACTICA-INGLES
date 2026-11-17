@@ -3,21 +3,16 @@
 build.py — Validador y gestor del proyecto English Practice.
 
 Uso:
-  python3 build.py validate     # Valida la estructura de los datos
-  python3 build.py stats        # Muestra estadísticas del contenido
+  python3 build.py validate     # Valida la estructura del sitio
   python3 build.py serve [port] # Sirve el sitio localmente para pruebas
   python3 build.py package      # Empaqueta el sitio en un .zip listo para GitHub Pages
-  python3 build.py add-file     # Muestra una plantilla para añadir un File nuevo
 
-Requisitos: solo Python 3.6+ (sin dependencias externas para validate/stats/package).
+Requisitos: Python 3.6+ (sin dependencias externas).
 Para serve, no necesita nada. Para un servidor con auto-reload, considera `python3 -m http.server`.
 """
 
 import os
 import sys
-import json
-import re
-import shutil
 import zipfile
 import http.server
 import socketserver
@@ -25,61 +20,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 SITE = ROOT / 'site'
-
-# ============================================================
-# UTILIDADES
-# ============================================================
-
-def parse_files_js():
-    """Extrae los datos del archivo site/data/files.js como JSON-like dict.
-
-    Nota: este parser maneja un subset del formato que generamos.
-    Para proyectos más complejos, considerar usar `node -e` y leer el JSON.
-    """
-    code = (SITE / 'data' / 'files.js').read_text(encoding='utf-8')
-    # Reemplaza `const Files =` por `globalThis.Files =` para eval en Node.
-    # Pero como estamos en Python, vamos a parsear con regex.
-    # Para máxima fidelidad, recomendamos usar el validador en Node (validate.js).
-    raise NotImplementedError("Usa `node validate.js` para validación exacta. Este script hace validación por regex para estadísticas.")
-
-def parse_files_with_node():
-    """Usa node para parsear el archivo JS y devolver estadísticas precisas."""
-    import subprocess
-    code = """
-const code = require('fs').readFileSync('site/data/files.js', 'utf8');
-global.Files = null;
-eval(code.replace('const Files =', 'global.Files ='));
-const stats = {
-  files: global.Files.length,
-  lessons: global.Files.reduce((s,f) => s + f.lessons.length, 0),
-  questions: global.Files.reduce((s,f) => s + f.lessons.reduce((ss,l) => ss + l.grammar.length + l.vocabulary.length + l.mixed.length, 0), 0),
-  byFile: global.Files.map(f => ({
-    id: f.id,
-    title: f.title,
-    lessons: f.lessons.length,
-    questions: f.lessons.reduce((ss,l) => ss + l.grammar.length + l.vocabulary.length + l.mixed.length, 0),
-  })),
-  byType: {}
-};
-global.Files.forEach(f => f.lessons.forEach(l => {
-  ['grammar','vocabulary','mixed'].forEach(sec => {
-    l[sec].forEach(q => {
-      stats.byType[q.type] = (stats.byType[q.type] || 0) + 1;
-    });
-  });
-}));
-console.log(JSON.stringify(stats));
-"""
-    result = subprocess.run(
-        ['node', '-e', code],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        print('❌ Error ejecutando node:', result.stderr)
-        sys.exit(1)
-    return json.loads(result.stdout)
 
 # ============================================================
 # COMANDOS
@@ -96,7 +36,6 @@ def cmd_validate():
         SITE / 'js' / 'exercises.js',
         SITE / 'js' / 'storage.js',
         SITE / 'js' / 'router.js',
-        SITE / 'data' / 'files.js',
     ]
     missing = [p for p in required if not p.exists()]
     if missing:
@@ -108,7 +47,7 @@ def cmd_validate():
 
     # 2. Validar HTML básico
     html = (SITE / 'index.html').read_text(encoding='utf-8')
-    required_tags = ['<title>', 'mainView', 'data/files.js', 'js/app.js']
+    required_tags = ['<title>', 'mainView', 'js/app.js']
     for tag in required_tags:
         if tag not in html:
             print(f'❌ index.html no contiene: {tag}')
@@ -126,40 +65,7 @@ def cmd_validate():
             sys.exit(1)
     print('✅ Todos los archivos JS tienen sintaxis válida')
 
-    # 4. Validar data/files.js ejecutando validate.js
-    if not (SITE / 'validate.js').exists():
-        print('⚠️  validate.js no existe (opcional, pero recomendado)')
-    else:
-        result = subprocess.run(['node', 'validate.js'], cwd=SITE, capture_output=True, text=True)
-        # Tomamos solo el resumen
-        lines = result.stdout.strip().split('\n')
-        summary = '\n'.join([l for l in lines if 'Total' in l or '✅' in l or 'Errors' in l or 'Warnings' in l])
-        print(summary)
-
     print('\n🎉 Validación completa')
-
-
-def cmd_stats():
-    """Muestra estadísticas del contenido."""
-    print('📊 Estadísticas del proyecto\n')
-    try:
-        stats = parse_files_with_node()
-    except FileNotFoundError:
-        print('❌ Node.js no encontrado. Instálalo desde https://nodejs.org/')
-        sys.exit(1)
-
-    print(f'   Files (niveles):  {stats["files"]}')
-    print(f'   Lecciones:         {stats["lessons"]}')
-    print(f'   Preguntas:         {stats["questions"]}')
-    print(f'   Preguntas/File:    {stats["questions"] / stats["files"]:.1f} promedio')
-    print(f'   Preguntas/Lección: {stats["questions"] / stats["lessons"]:.1f} promedio')
-    print('\n📚 Por File:')
-    for f in stats['byFile']:
-        bar = '█' * (f['questions'] // 5)
-        print(f"   File {f['id']:>2}  {f['title']:<20}  {f['questions']:>3} preguntas  {bar}")
-    print('\n🎯 Por tipo de pregunta:')
-    for t, n in sorted(stats['byType'].items(), key=lambda x: -x[1]):
-        print(f'   {t:<10}  {n:>4}  {"█" * (n // 10)}')
 
 
 def cmd_serve():
@@ -235,55 +141,12 @@ def cmd_package():
     print(f'   → Contiene build.py, site/, README.md (proyecto completo)')
 
 
-def cmd_add_file():
-    """Muestra una plantilla para añadir un File nuevo."""
-    print('📝 Plantilla para añadir un File nuevo\n')
-    print('Edita site/data/files.js y añade este objeto al array `Files`:\n')
-    template = """  {
-    id: '11',
-    title: 'Tu título aquí',
-    description: 'Descripción breve del nivel',
-    lessons: [
-      {
-        letter: 'A',
-        title: 'Nombre de la lección A',
-        grammar_topic: 'Tema de gramática',
-        vocab_topic: 'Tema de vocabulario',
-        grammar: [
-          { type: 'mc', prompt: 'Pregunta aquí', options: ['A','B','C','D'], answer: 0, explanation: 'Por qué' },
-          { type: 'fill', prompt: 'Completa: I ___ (be) happy.', answer: 'am' },
-          { type: 'reorder', prompt: 'Ordena:', words: ['I','am','happy','.'] },
-          { type: 'match', prompt: 'Empareja:', pairs: [['a','A'],['b','B']] },
-          { type: 'tf', prompt: '"A" es correcto.', answer: true },
-        ],
-        vocabulary: [ /* mismo formato */ ],
-        mixed: [ /* mismo formato */ ],
-      },
-      // Repite para B y C
-    ],
-  },"""
-    print(template)
-    print('\nTipos de pregunta disponibles:')
-    print('  • mc      → Multiple choice (4 opciones)')
-    print('  • fill    → Rellenar hueco(s) con texto')
-    print('  • reorder → Ordenar palabras para formar oración')
-    print('  • match   → Emparejar elementos (mínimo 2 pares)')
-    print('  • tf      → Verdadero / Falso')
-    print('\nDespués de editar, ejecuta: python3 build.py validate')
-
-
-# ============================================================
-# MAIN
-# ============================================================
-
 def usage():
     print(__doc__)
     print('Comandos disponibles:')
     print('  validate   Valida estructura y sintaxis')
-    print('  stats      Estadísticas del contenido')
     print('  serve      Servidor local (default: puerto 8000)')
     print('  package    Empaqueta el sitio en .zip')
-    print('  add-file   Plantilla para añadir un File nuevo')
 
 def main():
     if len(sys.argv) < 2:
@@ -292,14 +155,10 @@ def main():
     cmd = sys.argv[1]
     if cmd == 'validate':
         cmd_validate()
-    elif cmd == 'stats':
-        cmd_stats()
     elif cmd == 'serve':
         cmd_serve()
     elif cmd == 'package':
         cmd_package()
-    elif cmd == 'add-file':
-        cmd_add_file()
     elif cmd in ('-h', '--help', 'help'):
         usage()
     else:

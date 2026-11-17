@@ -2,7 +2,6 @@
 // Wires up routing, state, and views
 
 let STATE = { ...Storage.load(), theme: 'dark' };
-let EXAM = null;
 const ONLINE_TRANSLATOR_API = 'https://apertium.org/apy/translate';
 let feedbackAudioContext = null;
 let activeFlagResearchController = null;
@@ -193,7 +192,7 @@ function getImageCreditDisplayLabel(credit) {
   return creator ? `${creator} · ${source}` : `Image source · ${source}`;
 }
 
-const FILE_10_VOCABULARY = {
+const VOCABULARY_PRACTICE_DATA = {
   food: [
     { word: 'apples', aliases: ['apple'], translation: 'manzanas', image: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=900&q=80', alt: 'Apples' },
     { word: 'bread', translation: 'pan', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80', alt: 'Bread' },
@@ -421,21 +420,6 @@ function createNumberVocabulary() {
   return [...numberToWords, ...wordsToNumber];
 }
 
-const GRAMMAR_PRACTICE_SOURCES = [
-  [['1', 'A'], ['1', 'B'], ['1', 'C']],
-  [null, null, null],
-  [['2', 'A'], ['2', 'B'], ['2', 'C']],
-  [null, null, null],
-  [['3', 'A'], ['3', 'B'], ['3', 'C']],
-  [['4', 'A'], ['4', 'B'], ['4', 'C']],
-  [['5', 'A'], ['5', 'B'], ['5', 'C']],
-  [['5', 'C'], ['6', 'B'], ['6', 'C']],
-  [['7', 'A'], ['7', 'B'], ['7', 'C']],
-  [['8', 'A'], ['8', 'B'], ['8', 'C']],
-  [['9', 'A'], ['9', 'B'], ['9', 'C']],
-  [['10', 'A'], ['10', 'B'], ['10', 'C']],
-];
-
 const GRAMMAR_PRACTICE_QUESTIONS = {
   '1-0': [
     { type: 'mc', prompt: 'Choose the correct plural of <em>address</em>.', options: ['address', 'addressies', 'addresses', 'addresss'], answer: 2 },
@@ -474,6 +458,52 @@ const GRAMMAR_PRACTICE_QUESTIONS = {
     { type: 'fill', prompt: '___ often do you exercise?', answer: 'How' },
   ],
 };
+
+// 7B · Past Simple of Regular Verbs
+
+const PAST_SIMPLE_REGULAR_FILL_QUESTIONS = [
+  { prompt: 'We ___ (arrive) before noon.', answer: 'arrived' },
+  { prompt: 'Tess ___ (not answer) the message yesterday.', answer: "didn't answer" },
+  { prompt: 'You ___ (finish) the report yesterday.', answer: 'finished' },
+  { prompt: 'My sister ___ (study) for her exam last night.', answer: 'studied' },
+  { prompt: 'The children ___ (play) in the garden yesterday.', answer: 'played' },
+  { prompt: 'The bus ___ (stop) near the school yesterday.', answer: 'stopped' },
+  { prompt: 'My parents ___ (work) late last Friday.', answer: 'worked' },
+  { prompt: 'She ___ (not use) her phone during class.', answer: "didn't use" },
+
+  { prompt: 'I ___ a film at home last night. (watch)', answer: 'watched' },
+  { prompt: 'He ___ a table at the restaurant yesterday. (book)', answer: 'booked' },
+  { prompt: 'We ___ to the teacher in class. (listen)', answer: 'listened' },
+  { prompt: 'My mother ___ dinner for everyone. (cook)', answer: 'cooked' },
+  { prompt: 'They ___ by train in July. (travel)', answer: ['travelled', 'traveled'] },
+  { prompt: 'She ___ her friend this morning. (call)', answer: 'called' },
+  { prompt: 'We ___ near the beach when we were children. (live)', answer: 'lived' },
+  { prompt: 'The student ___ the teacher a question. (ask)', answer: 'asked' },
+  { prompt: 'They ___ at the party on Saturday. (dance)', answer: 'danced' },
+  { prompt: 'I ___ my homework before dinner. (finish)', answer: 'finished' },
+
+  { prompt: 'I ___ television last night. (not watch)', answer: "didn't watch" },
+  { prompt: 'She ___ a hotel room for the trip. (not book)', answer: "didn't book" },
+  { prompt: 'They ___ to the instructions during the test. (not listen)', answer: "didn't listen" },
+  { prompt: 'We ___ breakfast yesterday morning. (not cook)', answer: "didn't cook" },
+  { prompt: 'He ___ abroad last summer. (not travel)', answer: "didn't travel" },
+  { prompt: 'I ___ my brother yesterday. (not call)', answer: "didn't call" },
+  { prompt: 'My family ___ in that city in 2020. (not live)', answer: "didn't live" },
+  { prompt: 'The children ___ for help in the museum. (not ask)', answer: "didn't ask" },
+  { prompt: 'She ___ at the wedding reception. (not dance)', answer: "didn't dance" },
+  { prompt: 'We ___ the project on time. (not finish)', answer: "didn't finish" },
+
+  { prompt: 'Ana ___ the kitchen before lunch. (clean)', answer: 'cleaned' },
+  { prompt: 'The neighbour ___ me carry the boxes. (help)', answer: 'helped' },
+  { prompt: 'We ___ the museum at noon. (open)', answer: 'opened' },
+  { prompt: 'Tom ___ us in the garden. (paint)', answer: 'painted' },
+  { prompt: 'The meeting ___ at nine o’clock. (start)', answer: 'started' },
+  { prompt: 'I ___ the dishes after dinner. (wash)', answer: 'washed' },
+  { prompt: 'She ___ her aunt last weekend. (visit)', answer: 'visited' },
+  { prompt: 'The workers ___ a new bridge carefully. (plan)', answer: 'planned' },
+  { prompt: 'He ___ the birthday room with balloons. (decorate)', answer: 'decorated' },
+  { prompt: 'We ___ a cake for the birthday. (bake)', answer: 'baked' },
+];
 
 const PREPOSITION_FILL_QUESTIONS = [
   { prompt: 'Complete the sentence: The class starts ___ half past eight.', answer: 'at' },
@@ -844,9 +874,7 @@ function init() {
   // Set up routes
   Router.add('home', renderHome);
   Router.add('theory', renderTheory);
-  Router.add('file', renderFile);
   Router.add('vocabulary', params => renderVocabularyPractice(params[0]));
-  Router.add('lesson', renderLesson);
   Router.add('practice', renderPractice);
   Router.add('grammar-practice', renderGrammarPractice);
   Router.add('reading', renderReadingPractice);
@@ -854,10 +882,7 @@ function init() {
   Router.add('irregular-verbs', renderIrregularVerbsPractice);
   Router.add('learning-lab', renderLearningLabPractice);
   Router.add('translate', () => renderTranslator());
-  Router.add('review', renderReview);
   Router.add('stats', renderStats);
-  Router.add('exam', renderExam);
-  Router.add('exam-result', renderExamResult);
   Router.init();
 }
 
@@ -1305,55 +1330,22 @@ function syncFloatingTranslatorLayer(preferredDialog = null) {
 // --- HOME ---
 function renderHome() {
   const view = $('#mainView');
-  const totalQuestions = Files.reduce((sum, f) => sum + f.lessons.reduce((s, l) => s + l.grammar.length + l.vocabulary.length + l.mixed.length, 0), 0);
-  const totalLessons = Files.reduce((s, f) => s + f.lessons.length, 0);
-  const completedLessons = Object.values(STATE.fileProgress).reduce((s, f) => s + Object.values(f).filter(l => l.completed).length, 0);
-  const accuracy = STATE.totalAnswered > 0 ? Math.round((STATE.totalCorrect / STATE.totalAnswered) * 100) : 0;
+  const accuracy = STATE.totalAnswered > 0
+    ? Math.round((STATE.totalCorrect / STATE.totalAnswered) * 100)
+    : 0;
 
   view.innerHTML = `
-    <div class="hero">
+    <section class="hero">
       <h1>Practice English, one exercise at a time <span class="hero-title-icon" aria-hidden="true">📚</span></h1>
       <p>Independent activities to practise grammar, vocabulary, reading, and writing.</p>
       <div class="hero-stats">
-        <div class="hero-stat"><strong>${totalQuestions}</strong> questions</div>
-        <div class="hero-stat"><strong>${Files.length}</strong> levels</div>
-        <div class="hero-stat"><strong>${totalLessons}</strong> lessons</div>
-        <div class="hero-stat"><strong>${accuracy}%</strong> your accuracy</div>
-        <div class="hero-stat"><strong>${completedLessons}</strong> lessons completed</div>
+        <div class="hero-stat"><strong>${STATE.totalAnswered}</strong> exercises answered</div>
+        <div class="hero-stat"><strong>${STATE.totalCorrect}</strong> correct answers</div>
+        <div class="hero-stat"><strong>${accuracy}%</strong> accuracy</div>
       </div>
-    </div>
-
-    <h2 class="section-title">📂 Levels (Files)</h2>
-    <div class="files-grid">
-      ${Files.map(f => {
-        const progress = Storage.getFileProgress(STATE, f.id);
-        const done = f.lessons.filter(l => STATE.fileProgress[f.id]?.[l.letter]?.completed).length;
-        const total = f.lessons.length;
-        const totalQ = f.lessons.reduce((s, l) => s + l.grammar.length + l.vocabulary.length + l.mixed.length, 0);
-        return `
-          <div class="file-card" data-file="${f.id}">
-            <div class="file-header">
-              <span class="file-num">File ${f.id}</span>
-              <span class="file-status">${done}/${total} lessons</span>
-            </div>
-            <div class="file-title">${escapeHTML(f.title)}</div>
-            <div class="file-desc">${escapeHTML(f.description)}</div>
-            <div class="file-progress">
-              <div class="file-progress-fill" style="width: ${progress}%"></div>
-            </div>
-            <div class="file-stats">
-              <span>${totalQ} questions</span>
-              <span>${progress}% complete</span>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
+      <a href="#practice" class="btn">Open Practice</a>
+    </section>
   `;
-  attachTheoryInteractions(view);
-  $$('.file-card').forEach(card => {
-    card.addEventListener('click', () => Router.navigate('file/' + card.dataset.file));
-  });
 }
 
 const QUESTION_WORD_GUIDES = {
@@ -2312,14 +2304,14 @@ function renderVocabularyPractice(categoryKey = 'food') {
   const extraPractice = globalThis.ExtraVocabulary?.[categoryKey];
   let collection = isNumberPractice
     ? createNumberVocabulary()
-    : isFoodPractice ? FILE_10_VOCABULARY.food
-      : isTimePractice ? FILE_10_VOCABULARY.time
-          : isWeatherPractice ? FILE_10_VOCABULARY.weather
-          : isSeasonPractice ? FILE_10_VOCABULARY.season
-        : isPrepositionsPractice ? FILE_10_VOCABULARY.prepositions
-        : isMonthPractice ? FILE_10_VOCABULARY.months
-          : isDatePractice ? FILE_10_VOCABULARY.dates
-            : isOrdinalPractice ? FILE_10_VOCABULARY.ordinalNumbers
+    : isFoodPractice ? VOCABULARY_PRACTICE_DATA.food
+      : isTimePractice ? VOCABULARY_PRACTICE_DATA.time
+          : isWeatherPractice ? VOCABULARY_PRACTICE_DATA.weather
+          : isSeasonPractice ? VOCABULARY_PRACTICE_DATA.season
+        : isPrepositionsPractice ? VOCABULARY_PRACTICE_DATA.prepositions
+        : isMonthPractice ? VOCABULARY_PRACTICE_DATA.months
+          : isDatePractice ? VOCABULARY_PRACTICE_DATA.dates
+            : isOrdinalPractice ? VOCABULARY_PRACTICE_DATA.ordinalNumbers
           : isDishPractice ? dishCountry.items : extraPractice?.items || [];
   const label = isNumberPractice ? 'Numbers' : isFoodPractice ? 'Food' : isTimePractice ? 'Time'
     : isWeatherPractice ? 'Weather' : isSeasonPractice ? 'Season' : isPrepositionsPractice ? 'Prepositions' : isMonthPractice ? 'Months' : isDatePractice ? 'Dates'
@@ -2980,7 +2972,7 @@ function renderTranslationPractice(categoryKey = 'translation') {
   }
 
   const suppliedPairs = Array.isArray(globalThis.VocabularyWords) ? globalThis.VocabularyWords : [];
-  const foodPairs = FILE_10_VOCABULARY.food.map(item => ({ en: item.word, es: item.translation }));
+  const foodPairs = VOCABULARY_PRACTICE_DATA.food.map(item => ({ en: item.word, es: item.translation }));
   const pairs = customSet
     ? customSet.items.map(item => ({
       en: item.en,
@@ -3140,132 +3132,6 @@ function renderTranslationPractice(categoryKey = 'translation') {
   render();
 }
 
-// --- FILE (LESSON LIST) ---
-function renderFile(params) {
-  const fileId = params[0];
-  const file = Files.find(f => f.id === fileId);
-  if (!file) { Router.navigate('home'); return; }
-  const view = $('#mainView');
-  view.innerHTML = `
-    <a href="#home" class="back-link">← Back to Levels</a>
-    <div class="lesson-header">
-      <span class="file-num">File ${file.id}</span>
-      <h1 style="margin-top:0.5rem">${escapeHTML(file.title)}</h1>
-      <p class="topics">${escapeHTML(file.description)}</p>
-      <div class="section-tabs" style="margin-top:1rem">
-        <button class="tab-btn" id="startReview">📝 Practice the whole File</button>
-        <button class="tab-btn" id="startExam">🎯 Take the File exam</button>
-      </div>
-    </div>
-    <h2 class="section-title">📖 Lessons</h2>
-    <div class="lesson-list">
-      ${file.lessons.map(l => {
-        const lp = STATE.fileProgress[fileId]?.[l.letter] || { answered: 0, correct: 0, completed: false };
-        const total = l.grammar.length + l.vocabulary.length + l.mixed.length;
-        const acc = lp.answered > 0 ? Math.round((lp.correct / lp.answered) * 100) : null;
-        return `
-          <div class="lesson-card" data-lesson="${l.letter}">
-            <div>
-              <span class="lesson-letter">${l.letter}</span>
-              <strong>${escapeHTML(l.title)}</strong>
-            </div>
-            <div class="lesson-topics">${escapeHTML(l.grammar_topic)} · ${escapeHTML(l.vocab_topic)}</div>
-            <div class="lesson-meta">
-              <span>${total} questions</span>
-              <span>${lp.completed ? '✅ Completed' : (lp.answered > 0 ? `${lp.answered}/${total} answered · ${acc ?? 0}%` : 'Not started')}</span>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-  $$('.lesson-card').forEach(card => {
-    card.addEventListener('click', () => Router.navigate('lesson/' + fileId + '/' + card.dataset.lesson));
-  });
-  $('#startReview').addEventListener('click', () => Router.navigate('practice/file/' + fileId));
-  $('#startExam').addEventListener('click', () => Router.navigate('exam/' + fileId));
-}
-
-// --- LESSON DETAIL ---
-function renderLesson(params) {
-  const [fileId, lessonLetter] = params;
-  const file = Files.find(f => f.id === fileId);
-  if (!file) { Router.navigate('home'); return; }
-  const lesson = file.lessons.find(l => l.letter === lessonLetter);
-  if (!lesson) { Router.navigate('file/' + fileId); return; }
-  const view = $('#mainView');
-  view.innerHTML = `
-    <a href="#file/${fileId}" class="back-link">← Back to File ${fileId}</a>
-    <div class="lesson-header">
-      <span class="file-num">File ${fileId} · Lesson ${lesson.letter}</span>
-      <h1 style="margin-top:0.5rem">${escapeHTML(lesson.title)}</h1>
-      <p class="topics"><strong>Grammar:</strong> ${escapeHTML(lesson.grammar_topic)}<br><strong>Vocabulary:</strong> ${escapeHTML(lesson.vocab_topic)}</p>
-      <div class="section-tabs" id="sectionTabs">
-        <button class="tab-btn active" data-section="grammar">📐 Grammar <span class="count">${lesson.grammar.length}</span></button>
-        <button class="tab-btn" data-section="vocabulary">📚 Vocabulary <span class="count">${lesson.vocabulary.length}</span></button>
-        <button class="tab-btn" data-section="mixed">🎲 Mixed practice <span class="count">${lesson.mixed.length}</span></button>
-        <button class="tab-btn" data-section="all">📋 All <span class="count">${lesson.grammar.length + lesson.vocabulary.length + lesson.mixed.length}</span></button>
-      </div>
-    </div>
-    <div id="exerciseContainer"></div>
-    <div class="text-center mt-3" id="completionArea" style="display:none">
-      <p class="text-muted">You have finished this lesson! 🎉</p>
-      <button class="btn btn-success" id="markComplete">Mark as completed</button>
-      <a href="#file/${fileId}" class="btn btn-secondary" style="margin-left:0.5rem">Back to File</a>
-    </div>
-  `;
-
-  let answered = 0;
-  const total = lesson.grammar.length + lesson.vocabulary.length + lesson.mixed.length;
-  const showCompletion = () => {
-    if (answered >= total) $('#completionArea').style.display = 'block';
-  };
-
-  const renderSection = (section) => {
-    const c = $('#exerciseContainer');
-    c.innerHTML = '';
-    answered = 0;
-    $('#completionArea').style.display = 'none';
-    const items = section === 'all'
-      ? [
-          ...lesson.grammar.map((q, qIdx) => ({ ...q, _section: 'grammar', _qIdx: qIdx })),
-          ...lesson.vocabulary.map((q, qIdx) => ({ ...q, _section: 'vocabulary', _qIdx: qIdx })),
-          ...lesson.mixed.map((q, qIdx) => ({ ...q, _section: 'mixed', _qIdx: qIdx })),
-        ]
-      : lesson[section].map((q, qIdx) => ({ ...q, _section: section, _qIdx: qIdx }));
-    items.forEach((q, idx) => {
-      Exercises.render(q, idx, c);
-    });
-    // Listen for answers
-    c.addEventListener('answered', e => {
-      answered++;
-      const { correct, qIdx } = e.detail;
-      const item = items[qIdx];
-      const sectionKey = item._section;
-      STATE = Storage.recordAnswer(STATE, fileId, lessonLetter, sectionKey, item._qIdx, correct);
-      updateHeaderStats();
-      if (correct) showToast('+10 points ⭐', 'success');
-      showCompletion();
-    });
-  };
-
-  $$('.tab-btn[data-section]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $$('.tab-btn[data-section]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderSection(btn.dataset.section);
-    });
-  });
-
-  $('#markComplete')?.addEventListener('click', () => {
-    STATE = Storage.markCompleted(STATE, fileId, lessonLetter);
-    showToast('Lesson marked as completed ✅', 'success');
-    Router.navigate('file/' + fileId);
-  });
-
-  renderSection('grammar');
-}
-
 // --- PRACTICE HUB ---
 function startVerbPhrasePractice() {
   const view = $('#mainView');
@@ -3373,18 +3239,6 @@ function renderPractice(params) {
   const view = $('#mainView');
   if (params[0] === 'toc') return startTOCPractice();
   if (params[0] === 'verb-phrases') return startVerbPhrasePractice();
-  if (params[0] === 'file') {
-    const fileId = params[1];
-    const file = Files.find(f => f.id === fileId);
-    if (!file) { Router.navigate('home'); return; }
-    return startMixedPractice(file, 'file');
-  }
-  if (params[0] === 'review' || params[0] === 'wrong') {
-    return startWrongReview();
-  }
-  if (params[0] === 'all') {
-    return startAllPractice();
-  }
   if (params[0] === 'vocabulary') {
     view.innerHTML = `
       <a href="#practice" class="back-link">← Back</a>
@@ -3463,27 +3317,8 @@ function renderPractice(params) {
   }
   // Hub
   view.innerHTML = `
-    <h1 class="section-title">🎯 Practice modes</h1>
-    <p class="text-muted">Choose how you would like to practice today.</p>
-    <div class="practice-modes">
-      <div class="practice-mode" data-mode="all">
-        <div class="practice-mode-icon">🌍</div>
-        <h3>Global practice</h3>
-        <p>60 different random questions from all Files. Ideal for general review.</p>
-      </div>
-      <div class="practice-mode" data-mode="wrong">
-        <div class="practice-mode-icon">🔁</div>
-        <h3>Review mistakes (${STATE.wrongQuestions.length})</h3>
-        <p>Questions you have answered incorrectly. The more you miss them, the more often they will appear.</p>
-      </div>
-      ${Files.map(f => `
-        <div class="practice-mode" data-mode="file" data-file="${f.id}">
-          <div class="practice-mode-icon">📘</div>
-          <h3>File ${f.id}: ${escapeHTML(f.title)}</h3>
-          <p>Questions from this File only. Recommended when finishing a level.</p>
-        </div>
-      `).join('')}
-    </div>
+    <h1 class="section-title">🎯 Practice</h1>
+    <p class="text-muted">Choose a practice activity below.</p>
     <section class="grammar-practice-section">
       <h2 class="section-title">MODO TOC</h2>
       <button class="grammar-practice-card" id="openTOCPractice" type="button">
@@ -3567,14 +3402,6 @@ function renderPractice(params) {
       </button>
     </section>
   `;
-  $$('.practice-mode').forEach(el => {
-    el.addEventListener('click', () => {
-      const mode = el.dataset.mode;
-      if (mode === 'all') Router.navigate('practice/all');
-      else if (mode === 'wrong') Router.navigate('practice/wrong');
-      else if (mode === 'file') Router.navigate('practice/file/' + el.dataset.file);
-    });
-  });
   const openVocabularyPractice = $('#openVocabularyPractice');
   if (openVocabularyPractice) {
     openVocabularyPractice.addEventListener('click', () => Router.navigate('practice/vocabulary'));
@@ -3898,6 +3725,8 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
     ? 50
     : topicIndex === 8 && sectionIndex === 2
     ? 28
+    : topicIndex === 6 && sectionIndex === 1
+    ? PAST_SIMPLE_REGULAR_FILL_QUESTIONS.length
     : 10;
   const missingFill = Math.max(0, writeQuestionTarget - grammarQuestionCount(questions, 'write'));
   const writeCandidates = topicIndex === 3 && sectionIndex === 1
@@ -3909,6 +3738,8 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
       prompt: question.prompt.replace(/^Complete with a comparative adjective:\s*/, ''),
       answer: question.answer,
     }))
+    : topicIndex === 6 && sectionIndex === 1
+    ? PAST_SIMPLE_REGULAR_FILL_QUESTIONS
     : clozeCandidates;
   writeCandidates.slice(0, missingFill).forEach(candidate => {
     supplemental.push({
@@ -4015,18 +3846,7 @@ function createGrammarSupplementalExercises(topicIndex, sectionIndex, questions,
 
 function getGrammarSectionQuestions(topicIndex, sectionIndex) {
   const key = `${topicIndex}-${sectionIndex}`;
-  const source = GRAMMAR_PRACTICE_SOURCES[topicIndex][sectionIndex];
-  let questions = [];
-  if (source) {
-    const [fileId, lessonLetter] = source;
-    const lesson = Files.find(file => file.id === fileId)?.lessons.find(item => item.letter === lessonLetter);
-    questions = (lesson?.grammar || []).map((question, qIdx) => ({
-      ...question,
-      _ref: { file: fileId, lesson: lessonLetter, section: 'grammar', qIdx },
-    }));
-  } else {
-    questions = GRAMMAR_PRACTICE_QUESTIONS[key] || [];
-  }
+  const questions = GRAMMAR_PRACTICE_QUESTIONS[key] || [];
   const conversations = (GRAMMAR_CONVERSATIONS[key] || []).map(createGrammarConversationExercise);
   const orderedQuestions = (GRAMMAR_QUESTION_ORDER[key] || []).map(sentence => {
     const words = sentence.split(' ');
@@ -4333,18 +4153,9 @@ function startGrammarTypePractice(topicIndex, sectionIndex, exerciseType) {
     questionContainer.addEventListener('answered', event => {
       const { correct } = event.detail;
       questionResults.set(currentIndex, correct);
-      if (question._ref) {
-        STATE = Storage.recordAnswer(
-          STATE,
-          question._ref.file,
-          question._ref.lesson,
-          question._ref.section,
-          question._ref.qIdx,
-          correct
-        );
-        updateHeaderStats();
-        if (correct) showToast('+10 points ⭐', 'success');
-      }
+      STATE = Storage.recordActivity(STATE, correct);
+      updateHeaderStats();
+      if (correct) showToast('+10 points ⭐', 'success');
       if (correct) {
         correctCount += 1;
         advanceTimeout = setTimeout(() => {
@@ -4396,7 +4207,7 @@ function createTOCFillQuestion(prompt, answers, answerText = '') {
 }
 
 function createTOCQuestionSet() {
-  const pools = { course: [], grammar: [], vocabulary: [], reading: [], writing: [], irregular: [] };
+  const pools = { grammar: [], vocabulary: [], reading: [], writing: [], irregular: [] };
   const poolKeys = Object.fromEntries(Object.keys(pools).map(key => [key, new Set()]));
   const supportedTypes = new Set(['mc', 'fill', 'comparative-sentence', 'comparative-form', 'reorder', 'conversation', 'match', 'tf']);
   const addQuestion = (poolName, question) => {
@@ -4406,15 +4217,6 @@ function createTOCQuestionSet() {
     poolKeys[poolName].add(key);
     pools[poolName].push(question);
   };
-
-  Files.forEach(file => file.lessons.forEach(lesson => {
-    ['grammar', 'vocabulary', 'mixed'].forEach(section => {
-      (lesson[section] || []).forEach((question, qIdx) => addQuestion('course', {
-        ...question,
-        _ref: { file: file.id, lesson: lesson.letter, section, qIdx },
-      }));
-    });
-  }));
 
   GrammarTheory.forEach((topic, topicIndex) => topic.sections.forEach((section, sectionIndex) => {
     getGrammarSectionQuestions(topicIndex, sectionIndex).forEach(question => addQuestion('grammar', question));
@@ -4465,41 +4267,6 @@ function createTOCQuestionSet() {
     });
   });
 
-  FILE_10_VOCABULARY.food.forEach(item => addVocabularyPair(item.word, item.translation, item.aliases));
-  FILE_10_VOCABULARY.months.forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
-    `Write the month in English for <strong>${escapeHTML(item.prompt)}</strong>`, [item.word]
-  )));
-  FILE_10_VOCABULARY.time.forEach(item => {
-    const { hour, minute } = item.clockTime;
-    addQuestion('vocabulary', createTOCFillQuestion(
-      `Write this clock time in English: <strong>${hour}:${String(minute).padStart(2, '0')}</strong>`,
-      item.accepted || [item.word]
-    ));
-  });
-  FILE_10_VOCABULARY.dates.forEach(item => {
-    const date = item.calendarDate;
-    addQuestion('vocabulary', createTOCFillQuestion(
-      `Write the complete date in English for <strong>${date.day}/${date.monthIndex + 1}/${date.year}</strong> (include the weekday)`,
-      item.accepted || [item.word], item.accepted?.join(' / ') || item.word
-    ));
-  });
-  FILE_10_VOCABULARY.ordinalNumbers.forEach(item => {
-    addQuestion('vocabulary', createTOCFillQuestion(
-      `Write the ordinal suffix for <strong>${item.ordinalNumber}</strong>`, item.accepted
-    ));
-    addQuestion('vocabulary', createTOCFillQuestion(
-      `Write the ordinal number in words: <strong>${escapeHTML(item.word)}</strong>`, [item.pronunciation]
-    ));
-  });
-  ['weather', 'season'].forEach(setKey => {
-    FILE_10_VOCABULARY[setKey].forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
-      `Write the English ${setKey === 'weather' ? 'weather word' : 'season'} that matches this clue: <strong>${escapeHTML(item.alt || '')}</strong>`,
-      [item.word, ...(item.aliases || [])]
-    )));
-  });
-  FILE_10_VOCABULARY.prepositions.forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
-    escapeHTML(item.prompt), [item.word, ...(item.aliases || [])]
-  )));
   createNumberVocabulary().forEach(item => addQuestion('vocabulary', createTOCFillQuestion(
     item.direction === 'words-to-number'
       ? `Write this number in digits: <strong>${escapeHTML(item.word)}</strong>`
@@ -4551,7 +4318,6 @@ function createTOCQuestionSet() {
   }
 
   const buckets = [
-    ['course', 'Course practice', 20],
     ['grammar', 'Grammar', 20],
     ['vocabulary', 'Vocabulary', 20],
     ['reading', 'Reading', 15],
@@ -4872,8 +4638,7 @@ function startTOCPractice(startNewSequence = false) {
         return;
       }
       const ref = question._ref;
-      if (ref) STATE = Storage.recordAnswer(STATE, ref.file, ref.lesson, ref.section, ref.qIdx, result);
-      else STATE = Storage.recordActivity(STATE, result);
+      STATE = Storage.recordActivity(STATE, result);
       updateHeaderStats();
 
       if (result) {
@@ -5115,333 +4880,12 @@ function renderTOCManualQuestion(question, questionIndex, container) {
   };
 }
 
-function startAllPractice() {
-  const all = [];
-  Files.forEach(f => f.lessons.forEach(l => {
-    ['grammar', 'vocabulary', 'mixed'].forEach(section => {
-      l[section].forEach((q, qIdx) => {
-        all.push({ ...q, _ref: { file: f.id, lesson: l.letter, section, qIdx } });
-      });
-    });
-  }));
-  const uniqueQuestions = new Map();
-  all.forEach(question => {
-    const content = { ...question };
-    delete content._ref;
-    const key = JSON.stringify(content);
-    if (!uniqueQuestions.has(key)) uniqueQuestions.set(key, question);
-  });
-  const shuffled = [...uniqueQuestions.values()].sort(() => Math.random() - 0.5).slice(0, 60);
-  startSession('Global Practice', shuffled, { mode: 'global' });
-}
-
-function resolveWrongQuestion(record) {
-  const file = Files.find(item => item.id === record.file);
-  const lesson = file?.lessons.find(item => item.letter === record.lesson);
-  if (!lesson) return null;
-
-  const rawIndex = Number.isInteger(record.qIdx) ? record.qIdx : record.qIndex;
-  if (!Number.isInteger(rawIndex) || rawIndex < 0) return null;
-
-  const sections = ['grammar', 'vocabulary', 'mixed'];
-  const resolveCombinedIndex = () => {
-    let remaining = rawIndex;
-    for (const section of sections) {
-      const questions = lesson[section] || [];
-      if (remaining < questions.length) {
-        return { section, qIdx: remaining, question: questions[remaining] };
-      }
-      remaining -= questions.length;
-    }
-    return null;
-  };
-
-  let resolved;
-  if (record.section === 'all') {
-    // Older global practice entries used one index across all three lesson sections.
-    resolved = resolveCombinedIndex();
-  } else {
-    const questions = lesson[record.section];
-    if (Array.isArray(questions) && questions[rawIndex]) {
-      resolved = { section: record.section, qIdx: rawIndex, question: questions[rawIndex] };
-    } else {
-      // Recover entries saved by older "All" practice, which stored the combined index.
-      resolved = resolveCombinedIndex();
-    }
-  }
-
-  if (!resolved?.question) return null;
-  return {
-    record,
-    file,
-    lesson,
-    question: resolved.question,
-    ref: { file: file.id, lesson: lesson.letter, section: resolved.section, qIdx: resolved.qIdx },
-  };
-}
-
-function startWrongReview() {
-  const items = STATE.wrongQuestions.map(resolveWrongQuestion).filter(Boolean);
-  if (items.length === 0) {
-    const view = $('#mainView');
-    view.innerHTML = `
-      <h1 class="section-title">🔁 Review Mistakes</h1>
-      <div class="lesson-header" style="text-align:center">
-        <p style="font-size:1.2rem">🎉 You have no questions to review!</p>
-        <p class="text-muted">Keep practicing; questions you answer incorrectly will appear here.</p>
-        <a href="#review" class="btn mt-2">Back to Review</a>
-      </div>
-    `;
-    return;
-  }
-
-  // Shuffle the mistake queue once, then keep each original exercise's controls and grading.
-  for (let index = items.length - 1; index > 0; index--) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
-  }
-
-  const view = $('#mainView');
-  let currentIndex = 0;
-  let advanceTimeout = null;
-  const route = window.location.hash;
-  view.innerHTML = `
-    <a href="#review" class="back-link">← Back to Review</a>
-    <div class="lesson-header">
-      <span class="file-num">Review practice</span>
-      <h1 style="margin-top:0.5rem">Review Mistakes</h1>
-      <p class="topics">Answer each saved mistake correctly to move on. If you miss one, try it again.</p>
-    </div>
-    <div class="vocabulary-progress-bar" id="reviewPracticeProgress"></div>
-    <div id="reviewPracticeQuestion"></div>
-    <div class="exercise-actions hidden" id="reviewPracticeRetryActions">
-      <button class="btn" type="button" id="reviewPracticeRetry">Try this question again</button>
-    </div>
-    <div id="reviewPracticeSummary"></div>
-  `;
-
-  const progress = $('#reviewPracticeProgress');
-  const questionContainer = $('#reviewPracticeQuestion');
-  const retryActions = $('#reviewPracticeRetryActions');
-  const summary = $('#reviewPracticeSummary');
-
-  const finish = () => {
-    progress.innerHTML = `<span>Progress</span><strong>${items.length} / ${items.length}</strong>`;
-    questionContainer.innerHTML = '';
-    retryActions.classList.add('hidden');
-    summary.innerHTML = `
-      <div class="lesson-header text-center">
-        <div style="font-size:3rem">🎉</div>
-        <h2>Review complete!</h2>
-        <p class="topics">You answered all ${items.length} saved mistakes correctly.</p>
-        <a href="#review" class="btn mt-2">Return to Review</a>
-      </div>
-    `;
-  };
-
-  const renderCurrent = () => {
-    if (advanceTimeout) {
-      clearTimeout(advanceTimeout);
-      advanceTimeout = null;
-    }
-    if (currentIndex >= items.length) {
-      finish();
-      return;
-    }
-
-    const item = items[currentIndex];
-    progress.innerHTML = `<span>Progress</span><strong>${currentIndex + 1} / ${items.length}</strong>`;
-    questionContainer.innerHTML = '';
-    retryActions.classList.add('hidden');
-    summary.innerHTML = '';
-    Exercises.render(item.question, 0, questionContainer);
-    questionContainer.addEventListener('answered', event => {
-      const { correct } = event.detail;
-      STATE = Storage.recordReviewAnswer(STATE, item.ref, item.record, correct);
-      updateHeaderStats();
-      if (correct) {
-        showToast('+10 points ⭐', 'success');
-        advanceTimeout = setTimeout(() => {
-          advanceTimeout = null;
-          if (window.location.hash !== route) return;
-          currentIndex++;
-          renderCurrent();
-        }, 900);
-      } else {
-        retryActions.classList.remove('hidden');
-        $('#reviewPracticeRetry').addEventListener('click', renderCurrent, { once: true });
-      }
-    }, { once: true });
-  };
-
-  renderCurrent();
-}
-
-function startMixedPractice(file, mode) {
-  const items = [];
-  file.lessons.forEach(l => {
-    ['grammar', 'vocabulary', 'mixed'].forEach(section => {
-      l[section].forEach((q, qIdx) => {
-        items.push({ ...q, _ref: { file: file.id, lesson: l.letter, section, qIdx } });
-      });
-    });
-  });
-  items.sort(() => Math.random() - 0.5);
-  startSession(`File ${file.id} — Practice`, items, { mode });
-}
-
-function startSession(title, items, opts = {}) {
-  const view = $('#mainView');
-  const backRoute = opts.backRoute || '#home';
-  const backLabel = opts.backLabel || '← Back to Home';
-  view.innerHTML = `
-    <a href="${escapeHTML(backRoute)}" class="back-link">${escapeHTML(backLabel)}</a>
-    <div class="lesson-header">
-      <h1>${escapeHTML(title)}</h1>
-      <p class="topics">${items.length} questions · Take your time; your progress is saved automatically.</p>
-      <div class="mt-2">
-        <button class="btn btn-secondary" id="restartBtn">🔀 Shuffle and restart</button>
-        <button class="btn btn-ghost" id="exitBtn">Exit</button>
-      </div>
-    </div>
-    <div id="exerciseContainer"></div>
-    <div id="endSummary" style="display:none"></div>
-  `;
-  const c = $('#exerciseContainer');
-  const results = [];
-  items.forEach((q, idx) => {
-    const exEl = document.createElement('div');
-    exEl.dataset.idx = idx;
-    c.appendChild(exEl);
-    Exercises.render(q, idx, exEl);
-  });
-  c.addEventListener('answered', e => {
-    const { correct, qIdx } = e.detail;
-    const item = items[qIdx];
-    const r = item._ref;
-    if (r) {
-      STATE = Storage.recordAnswer(STATE, r.file, r.lesson, r.section, r.qIdx, correct);
-      updateHeaderStats();
-      if (correct) showToast('+10 points ⭐', 'success');
-    }
-    results[qIdx] = correct;
-  });
-  // Summary at end: scroll watcher
-  const observer = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting && entries[0].boundingClientRect.top > 0) {
-      const allAnswered = results.filter(r => r !== undefined).length === items.length;
-      if (allAnswered) {
-        observer.disconnect();
-        const correct = results.filter(Boolean).length;
-        const pointsEarned = items.reduce((sum, item, index) => sum + (item._ref && results[index] ? 10 : 0), 0);
-        $('#endSummary').style.display = 'block';
-        $('#endSummary').innerHTML = `
-        <div class="lesson-header text-center">
-          <h2>🎉 Session complete!</h2>
-          <p style="font-size:1.5rem; color:var(--primary); font-weight:700;">${correct} / ${items.length} correct (${Math.round(correct/items.length*100)}%)</p>
-          ${pointsEarned ? `<p class="text-muted">Points earned: <strong>+${pointsEarned}</strong></p>` : ''}
-          <div class="mt-2">
-            <a href="${escapeHTML(backRoute)}" class="btn">${escapeHTML(backLabel.replace(/^←\s*/, ''))}</a>
-            <button class="btn btn-secondary" id="repeatBtn">🔁 Try again</button>
-          </div>
-          </div>
-        `;
-        $('#repeatBtn').addEventListener('click', () => {
-          if (opts.mode === 'global') startAllPractice();
-          else if (opts.mode === 'review') startWrongReview();
-          else if (opts.mode === 'file') {
-            const file = Files.find(f => f.id === items[0]?._ref?.file);
-            if (file) startMixedPractice(file, 'file');
-          }
-          else location.reload();
-        });
-      }
-    }
-  });
-  observer.observe($('#endSummary'));
-
-  $('#restartBtn').addEventListener('click', () => {
-    if (opts.mode === 'global') startAllPractice();
-    else if (opts.mode === 'review') startWrongReview();
-    else if (opts.mode === 'file') {
-      const file = Files.find(f => f.id === items[0]?._ref?.file);
-      if (file) startMixedPractice(file, 'file');
-    }
-  });
-  $('#exitBtn').addEventListener('click', () => Router.navigate(backRoute));
-}
-
-// --- REVIEW PAGE ---
-function renderReview() {
-  const view = $('#mainView');
-  const wrong = STATE.wrongQuestions.map(resolveWrongQuestion).filter(Boolean);
-  if (wrong.length !== STATE.wrongQuestions.length) {
-    STATE.wrongQuestions = wrong.map(item => item.record);
-    Storage.save(STATE);
-  }
-  view.innerHTML = `
-    <h1 class="section-title">🔁 Review Mistakes (${wrong.length})</h1>
-    ${wrong.length === 0 ? `
-      <div class="lesson-header text-center">
-        <p style="font-size:1.2rem">🎉 You have no mistakes to review.</p>
-        <p class="text-muted">Questions you answer incorrectly are saved here automatically so you can review them.</p>
-        <a href="#practice" class="btn mt-2">Go to Practice</a>
-      </div>
-    ` : `
-      <p class="text-muted mb-2">These are the questions you answered incorrectly. Practice them until you master them.</p>
-      <button class="btn mb-2" id="practiceWrong">🎯 Practice now</button>
-      <button class="btn btn-ghost mb-2" id="clearWrong">🗑️ Clear list</button>
-      <div class="review-list">
-        ${wrong.map(item => {
-          const { record, question, ref } = item;
-          const sectionLabel = ref.section === 'grammar' ? 'Grammar' : ref.section === 'vocabulary' ? 'Vocabulary' : 'Mixed practice';
-          const date = Number.isFinite(record.ts) ? new Date(record.ts).toLocaleDateString() : '';
-          return `
-            <div class="review-item">
-              <div class="meta">
-                <span>File ${escapeHTML(item.file.id)} · Lesson ${escapeHTML(item.lesson.letter)} · ${sectionLabel}</span>
-                <span>${escapeHTML(date)}</span>
-              </div>
-              <div class="q">${Exercises.localizePrompt(question.prompt || 'Exercise')}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `}
-  `;
-  $('#practiceWrong')?.addEventListener('click', () => Router.navigate('practice/wrong'));
-  $('#clearWrong')?.addEventListener('click', () => {
-    if (confirm('Clear the entire list of mistakes?')) {
-      STATE.wrongQuestions = [];
-      Storage.save(STATE);
-      renderReview();
-    }
-  });
-}
-
-// --- STATS PAGE ---
 function renderStats() {
   const view = $('#mainView');
   const totalAnswered = STATE.totalAnswered;
-  const accuracy = totalAnswered > 0 ? Math.round((STATE.totalCorrect / totalAnswered) * 100) : 0;
-  // Per-file accuracy
-  const fileStats = Files.map(f => {
-    const lp = STATE.fileProgress[f.id] || {};
-    const answered = Object.values(lp).reduce((s, l) => s + l.answered, 0);
-    const correct = Object.values(lp).reduce((s, l) => s + l.correct, 0);
-    const totalQuestions = f.lessons.reduce(
-      (sum, lesson) => sum + lesson.grammar.length + lesson.vocabulary.length + lesson.mixed.length,
-      0
-    );
-    return {
-      file: f,
-      answered,
-      correct,
-      totalQuestions,
-      completion: totalQuestions > 0 ? Math.round(answered / totalQuestions * 100) : 0,
-      accuracy: answered > 0 ? Math.round(correct / answered * 100) : 0
-    };
-  });
+  const accuracy = totalAnswered > 0
+    ? Math.round((STATE.totalCorrect / totalAnswered) * 100)
+    : 0;
 
   view.innerHTML = `
     <h1 class="section-title">📊 Your Progress</h1>
@@ -5454,67 +4898,23 @@ function renderStats() {
       <div class="stat-card">
         <div class="label">Total points</div>
         <div class="value">${STATE.points} ⭐</div>
-        <div class="sub">+10 for a correct answer, -2 for a mistake</div>
       </div>
       <div class="stat-card">
         <div class="label">Questions answered</div>
         <div class="value">${totalAnswered}</div>
-        <div class="sub">in total</div>
       </div>
       <div class="stat-card">
         <div class="label">Overall accuracy</div>
         <div class="value">${accuracy}%</div>
         <div class="sub">${STATE.totalCorrect} correct out of ${totalAnswered}</div>
       </div>
-      <div class="stat-card">
-        <div class="label">Mistakes to review</div>
-        <div class="value">${STATE.wrongQuestions.length} 🔁</div>
-        <div class="sub">to review</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Exams taken</div>
-        <div class="value">${STATE.examHistory.length} 🎯</div>
-      </div>
     </div>
-    <div class="chart">
-      <h3>📈 Activity by File</h3>
-      <div class="bar-chart">
-        ${fileStats.map(s => `
-          <div class="bar-row">
-            <div class="bar-label">File ${s.file.id}</div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width: ${s.completion}%"></div>
-            </div>
-            <div class="bar-value" title="${s.accuracy}% accuracy">${s.answered}/${s.totalQuestions} (${s.completion}%)</div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-    ${STATE.examHistory.length > 0 ? `
-      <div class="chart">
-        <h3>🎯 Exam History</h3>
-        <div class="bar-chart">
-          ${STATE.examHistory.slice().reverse().slice(0, 10).map(e => {
-            const pct = Math.round(e.score / e.total * 100);
-            return `
-              <div class="bar-row">
-                <div class="bar-label">${new Date(e.date).toLocaleDateString()}</div>
-                <div class="bar-track">
-                  <div class="bar-fill" style="width: ${pct}%; background: ${pct >= 70 ? 'var(--success)' : pct >= 50 ? 'var(--warning)' : 'var(--error)'}"></div>
-                </div>
-                <div class="bar-value">${e.score}/${e.total} (${pct}%)</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    ` : ''}
     <div class="text-center mt-3">
       <button class="btn btn-ghost" id="resetBtn">🗑️ Reset all my progress</button>
     </div>
   `;
   $('#resetBtn').addEventListener('click', () => {
-    if (confirm('Are you sure? This will erase ALL your points, streaks, mistakes, and progress.')) {
+    if (confirm('Are you sure? This will erase all saved activity, points, and streaks.')) {
       Storage.reset();
       STATE = Storage.load();
       updateHeaderStats();
@@ -5523,156 +4923,5 @@ function renderStats() {
     }
   });
 }
-
-// --- EXAM MODE ---
-function renderExam(params) {
-  stopExamTimer();
-  const fileId = params[0];
-  const file = Files.find(f => f.id === fileId);
-  if (!file) { Router.navigate('home'); return; }
-  // Build a 15-question random exam
-  const all = [];
-  file.lessons.forEach(l => {
-    [...l.grammar, ...l.vocabulary, ...l.mixed].forEach((q, i) => {
-      all.push({ ...q, _ref: { file: file.id, lesson: l.letter, section: 'exam', qIdx: i } });
-    });
-  });
-  const questions = all.sort(() => Math.random() - 0.5).slice(0, Math.min(15, all.length));
-  EXAM = {
-    fileId,
-    questions,
-    idx: 0,
-    score: 0,
-    answers: [],
-    started: false,
-    startTime: null,
-    intervalId: null,
-  };
-  renderExamIntro();
-}
-
-function renderExamIntro() {
-  const view = $('#mainView');
-  view.innerHTML = `
-    <div class="lesson-header text-center exam-intro">
-      <div style="font-size:3rem">🎯</div>
-      <h1>Exam — File ${escapeHTML(EXAM.fileId)}</h1>
-      <p class="topics">${EXAM.questions.length} questions. The timer will start when you click “Start Exam”.</p>
-      <div class="mt-3">
-        <button class="btn" id="startExamNow">▶ Start Exam</button>
-        <a href="#file/${encodeURIComponent(EXAM.fileId)}" class="btn btn-secondary">Back to File</a>
-      </div>
-    </div>
-  `;
-  $('#startExamNow').addEventListener('click', () => {
-    EXAM.started = true;
-    EXAM.startTime = Date.now();
-    renderExamQuestion();
-    EXAM.intervalId = setInterval(updateExamTimer, 1000);
-  });
-}
-
-function updateExamTimer() {
-  if (!EXAM || !EXAM.started || !EXAM.startTime) return;
-  if (Router.current !== 'exam') {
-    clearInterval(EXAM.intervalId);
-    EXAM.intervalId = null;
-    return;
-  }
-  const elapsed = Math.floor((Date.now() - EXAM.startTime) / 1000);
-  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-  const secs = (elapsed % 60).toString().padStart(2, '0');
-  const timer = $('#examTimer');
-  if (timer) timer.textContent = `⏱ ${mins}:${secs}`;
-}
-
-function stopExamTimer() {
-  if (EXAM && EXAM.intervalId) {
-    clearInterval(EXAM.intervalId);
-    EXAM.intervalId = null;
-  }
-}
-
-function renderExamQuestion() {
-  if (!EXAM || !EXAM.started) return;
-  const view = $('#mainView');
-  const q = EXAM.questions[EXAM.idx];
-  const total = EXAM.questions.length;
-  const elapsed = Math.floor((Date.now() - EXAM.startTime) / 1000);
-  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-  const secs = (elapsed % 60).toString().padStart(2, '0');
-
-  view.innerHTML = `
-    <div class="exam-banner">
-      <div>
-        <strong>🎯 Exam — File ${EXAM.fileId}</strong>
-        <div style="font-size:0.85rem; opacity:0.9">Question ${EXAM.idx + 1} of ${total}</div>
-        <div class="exam-progress"><div class="exam-progress-fill" style="width: ${(EXAM.idx / total) * 100}%"></div></div>
-      </div>
-      <div class="timer" id="examTimer">⏱ ${mins}:${secs}</div>
-    </div>
-    <div id="examQuestion"></div>
-    <div class="text-center mt-2">
-      <button class="btn btn-ghost" id="exitExam">Exit Exam</button>
-    </div>
-  `;
-  const container = $('#examQuestion');
-  Exercises.render(q, EXAM.idx, container);
-  container.addEventListener('answered', e => {
-    const correct = e.detail.correct;
-    EXAM.answers.push(correct);
-    if (correct) EXAM.score++;
-    setTimeout(() => {
-      EXAM.idx++;
-      if (EXAM.idx >= EXAM.questions.length) {
-        // Finish
-        stopExamTimer();
-        STATE = Storage.recordExam(STATE, EXAM.score, EXAM.questions.length, 'file-' + EXAM.fileId, [EXAM.fileId]);
-        STATE = Storage.updateStreak(STATE);
-        STATE.points += EXAM.score * 5; // bonus for exam
-        Storage.save(STATE);
-        Router.navigate('exam-result');
-      } else {
-        renderExamQuestion();
-      }
-    }, 1200);
-  });
-  $('#exitExam').addEventListener('click', () => {
-    if (confirm('Exit the exam? You will lose your current progress.')) {
-      stopExamTimer();
-      Router.navigate('home');
-    }
-  });
-}
-
-function renderExamResult() {
-  const view = $('#mainView');
-  const { score, questions } = EXAM;
-  const total = questions.length;
-  const pct = Math.round((score / total) * 100);
-  let msg = '', emoji = '';
-  if (pct >= 90) { msg = 'Excellent! You have mastered this level.'; emoji = '🏆'; }
-  else if (pct >= 70) { msg = 'Very good! Almost perfect.'; emoji = '🎉'; }
-  else if (pct >= 50) { msg = 'Good work, but a little more review would help.'; emoji = '👍'; }
-  else { msg = 'You need more practice with this File.'; emoji = '💪'; }
-
-  view.innerHTML = `
-    <div class="lesson-header text-center">
-      <div style="font-size:4rem">${emoji}</div>
-      <h1>Exam Results</h1>
-      <p style="font-size:2rem; color:var(--primary); font-weight:700;">${score} / ${total} (${pct}%)</p>
-      <p class="text-muted">${msg}</p>
-      <p class="text-muted">Bonus points: +${score * 5} ⭐</p>
-      <div class="mt-3">
-        <a href="#home" class="btn">Back to Home</a>
-        <button class="btn btn-secondary" id="retakeBtn">🔁 Retake Exam</button>
-        <a href="#file/${EXAM.fileId}" class="btn btn-secondary">📖 Review File</a>
-      </div>
-    </div>
-  `;
-  $('#retakeBtn').addEventListener('click', () => Router.navigate('exam/' + EXAM.fileId));
-  updateHeaderStats();
-}
-
 // Start
 document.addEventListener('DOMContentLoaded', init);

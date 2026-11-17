@@ -1,8 +1,8 @@
-const CACHE_NAME = 'english-practice-v82';
+const CACHE_NAME = 'english-practice-v83';
 const APP_SHELL = [
   './',
   './index.html',
-  './vocabulary_words.md',
+  './vocabulary_words.js',
   './manifest.webmanifest',
   './icons/app-icon.svg',
   './images/weather/sunny.png',
@@ -33,7 +33,6 @@ const APP_SHELL = [
   './images/prepositions/down-stairs.png',
   './css/styles.css',
   './css/writing-evaluator.css',
-  './data/files.js',
   './data/theory.js',
   './data/reading.js',
   './data/reading-extensions.js',

@@ -39,7 +39,7 @@ function getLearningVocabulary() {
   Object.entries(globalThis.VocabularyTranslationSets || {}).forEach(([setKey, set]) => {
     (set.items || []).forEach(item => add(item.en, item.es, { setTitle: set.title, setKey }));
   });
-  const localFoodWords = typeof FILE_10_VOCABULARY !== 'undefined' ? FILE_10_VOCABULARY.food : [];
+  const localFoodWords = typeof VOCABULARY_PRACTICE_DATA !== 'undefined' ? VOCABULARY_PRACTICE_DATA.food : [];
   (localFoodWords || []).forEach(item => add(item.word, item.translation, { aliases: item.aliases || [] }));
 
   const unique = new Map();
@@ -292,12 +292,13 @@ function renderLearningLabPractice(params = []) {
       es: (Array.isArray(word.es) ? word.es : String(word.es || '').split(/\s*\/\s*/)).filter(Boolean),
     }));
     const grammar = [];
-    const courseFiles = typeof Files !== 'undefined' ? Files : (globalThis.Files || []);
-    courseFiles.forEach(file => file.lessons.forEach(lesson => {
-      ['grammar', 'vocabulary', 'mixed'].forEach(group => lesson[group].forEach(question => {
-        if (['mc', 'fill', 'reorder', 'conversation', 'match', 'tf'].includes(question.type)) grammar.push(question);
+    if (typeof GrammarTheory !== 'undefined' && typeof getGrammarSectionQuestions === 'function') {
+      GrammarTheory.forEach((topic, topicIndex) => topic.sections.forEach((section, sectionIndex) => {
+        getGrammarSectionQuestions(topicIndex, sectionIndex).forEach(question => {
+          if (['mc', 'fill', 'reorder', 'conversation', 'match', 'tf'].includes(question.type)) grammar.push(question);
+        });
       }));
-    }));
+    }
     const sample = (items, count) => {
       const pool = [...items];
       for (let i = pool.length - 1; i > 0; i -= 1) {

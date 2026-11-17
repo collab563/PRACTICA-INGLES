@@ -205,37 +205,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   gap: 0.5rem;
 }
 
-/* ========== FILE CARDS ========== */
-.files-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 3rem;
-}
-.file-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all var(--transition);
-  position: relative;
-  overflow: hidden;
-}
-.file-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
-}
-.file-card.disabled { opacity: 0.5; cursor: not-allowed; }
-.file-card.disabled:hover { transform: none; box-shadow: none; border-color: var(--border); }
-.file-card.coming-soon { opacity: 0.7; }
-.file-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
-}
 .file-num {
   font-size: 0.85rem;
   font-weight: 700;
@@ -244,33 +213,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
 }
-.file-status { font-size: 0.75rem; color: var(--text-muted); }
-.file-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-.file-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
-.file-progress {
-  background: var(--bg);
-  height: 6px;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 0.75rem;
-}
-.file-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-accent));
-  transition: width 0.4s ease;
-}
-.file-stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 0.5rem;
-}
-
 /* ========== GRAMMAR THEORY ========== */
 .theory-section {
   margin: 2rem 0 2.5rem;
@@ -485,50 +427,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
 .question-word-section li { display: grid; gap: 0.15rem; padding: 0.6rem 0.75rem; background: var(--bg); border-radius: var(--radius-sm); line-height: 1.5; }
 .question-word-section li strong { color: var(--primary); }
 .question-word-section li span { color: var(--text-muted); font-size: 0.92rem; }
-
-/* ========== LESSON LIST ========== */
-.lesson-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-.lesson-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-.lesson-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
-.lesson-letter {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background: var(--primary);
-  color: var(--on-primary);
-  border-radius: 8px;
-  text-align: center;
-  line-height: 32px;
-  font-weight: 700;
-  margin-right: 0.5rem;
-}
-.lesson-title { font-size: 1.05rem; font-weight: 600; margin: 0.5rem 0 0.25rem; }
-.lesson-topics { font-size: 0.85rem; color: var(--text-muted); }
-.lesson-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-}
 
 /* ========== VOCABULARY PRACTICE ========== */
 .vocabulary-menu {
@@ -1787,30 +1685,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
 .btn-success { background: var(--success); color: var(--on-success); }
 .btn-success:hover { filter: brightness(0.92); }
 
-/* ========== PRACTICE HUB ========== */
-.practice-modes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1.5rem;
-}
-.practice-mode {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-.practice-mode:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-  border-color: var(--primary);
-}
-.practice-mode-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.practice-mode h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-.practice-mode p { color: var(--text-muted); font-size: 0.9rem; }
-
 /* ========== OFFLINE TRANSLATOR ========== */
 .translator-note { margin-bottom: 1rem; }
 .translator-card {
@@ -2040,40 +1914,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
 .stat-card .value { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
 .stat-card .sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
 
-.chart {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  margin-top: 1.5rem;
-}
-.chart h3 { margin-bottom: 1rem; }
-.bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
-.bar-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; }
-.bar-label { width: 100px; flex-shrink: 0; color: var(--text-muted); }
-.bar-track { flex: 1; background: var(--bg); height: 24px; border-radius: 4px; overflow: hidden; position: relative; }
-.bar-fill { background: linear-gradient(90deg, var(--primary), var(--primary-accent)); height: 100%; transition: width 0.5s ease; }
-.bar-value { width: 100px; text-align: right; font-weight: 600; white-space: nowrap; }
-
-/* ========== REVIEW ========== */
-.review-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
-.review-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-}
-.review-item .meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
-}
-.review-item .q { font-size: 0.95rem; margin-bottom: 0.5rem; }
-.review-item .a { color: var(--success-text); font-weight: 500; font-size: 0.9rem; }
-.review-item .your { color: var(--error-text); font-size: 0.85rem; margin-top: 0.25rem; }
-
 /* ========== TOAST ========== */
 .toast {
   position: fixed;
@@ -2117,23 +1957,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
 .flex-wrap { flex-wrap: wrap; }
 .hidden { display: none !important; }
 
-/* ========== EXAM MODE ========== */
-.exam-banner {
-  background: linear-gradient(135deg, #1d4ed8, #0e7490);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius);
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-.exam-banner .timer { font-size: 1.5rem; font-weight: 700; }
-.exam-progress { background: rgba(255,255,255,0.2); height: 4px; border-radius: 999px; margin-top: 0.5rem; overflow: hidden; }
-.exam-progress-fill { background: white; height: 100%; transition: width 0.3s ease; }
-
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .header-inner {
@@ -2166,8 +1989,7 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   .header-stats { margin-left: auto; }
   .header-stats .points-badge { display: none; }
   main.container { padding: 1.25rem 0.75rem; }
-  .files-grid, .lesson-list { grid-template-columns: 1fr; }
-  .practice-modes, .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr; }
   .theory-grid { grid-template-columns: 1fr; }
   .theory-heading { align-items: flex-start; flex-direction: column; }
   .theory-content { max-height: min(62vh, 520px); }
@@ -2200,11 +2022,7 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   .lesson-header { padding: 1.25rem; }
   .section-tabs { gap: 0.25rem; }
   .tab-btn { padding: 0.5rem 0.85rem; font-size: 0.85rem; }
-  .bar-label { width: 70px; font-size: 0.75rem; }
   .hero h1 { font-size: 1.75rem; }
-  .exam-banner { padding: 1rem; }
-  .exam-banner > div:first-child { flex: 1; min-width: 0; }
-  .exam-banner .timer { font-size: 1.3rem; white-space: nowrap; }
 }
 
 @media (max-width: 480px) {
@@ -2235,10 +2053,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   .word-chip { min-height: 44px; padding: 0.55rem 0.7rem; }
   .exercise-actions { gap: 0.5rem; }
   .exercise-actions .btn { flex: 1 1 auto; justify-content: center; min-height: 44px; }
-  .bar-row { gap: 0.4rem; }
-  .bar-label { width: 56px; font-size: 0.7rem; }
-  .bar-value { width: 74px; font-size: 0.7rem; }
-  .chart { padding: 1rem; }
   .translator-card { padding: 0.85rem; }
   .translator-verb-card { padding: 0.85rem; }
   .translator-verb-card > p { min-height: 0; }
@@ -2246,10 +2060,6 @@ main { flex: 1; padding: 2.5rem 1.5rem; }
   .translator-toolbar label { flex: 0 0 100%; }
   .translator-direction { flex: 1; }
   .translator-actions .btn { flex: 1 1 auto; justify-content: center; min-height: 44px; }
-  .review-item .meta { flex-wrap: wrap; gap: 0.25rem 0.75rem; }
   .app-footer { padding: 1rem 0; }
   .app-footer .container { font-size: 0.8rem; }
-  .exam-banner { gap: 0.6rem; }
-  .exam-banner .timer { font-size: 1.15rem; }
-  .exam-intro .btn { margin-bottom: 0.5rem; }
 }

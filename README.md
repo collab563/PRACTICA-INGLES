@@ -8,18 +8,10 @@ Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicio
 
 ## ✨ Características
 
-- **10 niveles (Files)** × **3 lecciones** = 30 lecciones
-- **~460 preguntas en los 10 Files** en 5 formatos básicos; Grammar Practice también incluye ejercicios de conversación y comparativos:
-  - 📝 Opción múltiple
-  - ✍️ Rellenar huecos
-  - 🔀 Ordenar palabras
-  - 🔗 Emparejar elementos
-  - ✓/✗ Verdadero / Falso
-- **Progreso guardado** en el navegador (localStorage)
+- **Ejercicios independientes de gramática** en opción múltiple, completar huecos, ordenar palabras, conversación, emparejar y verdadero/falso.
+- **Progreso general** guardado en el navegador (localStorage)
 - **Racha de días** 🔥 y puntos ⭐
 - **Sonido de acierto** generado localmente por el navegador; se puede activar o silenciar desde el botón 🔊
-- **Repaso de errores** automático
-- **Modo práctica libre** y **Modo examen** con temporizador en vivo, iniciado al pulsar «Iniciar examen»
 - **Teoría de gramática** con 12 temas y 36 subtemas; cada tema se puede leer en una tarjeta desplazable o ampliar a pantalla completa desde la navegación principal
 - **Traductores inglés ↔ español online y offline**: el panel flotante permite elegir entre el glosario local, que no envía texto a internet, o el servicio público de Apertium por HTTPS, que requiere conexión y recibe el texto para traducirlo. No envíes información confidencial; la disponibilidad y la calidad pueden variar. El traductor offline sigue disponible como alternativa. El glosario conserva palabras desconocidas y ofrece traducciones aproximadas, sin análisis gramatical completo.
 - **Práctica de lectura**: 10 lecturas en cada uno de tres niveles, con preguntas de comprensión y actividades de emparejar.
@@ -28,7 +20,7 @@ Sitio web independiente para practicar inglés de nivel A1/A2. Incluye ejercicio
 - **Vocabulario de comida, números, días, continentes, países, adjetivos, trabajos, familia y lugares**, con pronunciación mediante las voces disponibles en el navegador.
 - **Ayuda con banderas**: revela la respuesta del ejercicio sin conexión, conserva en este dispositivo los datos consultados antes y permite identificar una foto usando Gemini y Google Search.
 - **Créditos de imágenes**: las fotos locales y sus fuentes/licencias verificables están documentadas en [`site/IMAGE-CREDITS.md`](site/IMAGE-CREDITS.md); la aplicación muestra los créditos junto a cada foto.
-- **Estadísticas detalladas** con gráficos
+- **Resumen del progreso**: racha, puntos y precisión general
 - **Modo oscuro** 🌙
 - **Diseño responsive** (móvil, tablet, PC)
 - **Uso sin conexión tras la primera visita online**: el navegador guarda los archivos de la aplicación mediante un service worker. Abre y deja cargar el sitio con internet una vez; luego podrá abrirse offline en ese mismo navegador. Las traducciones online siguen necesitando conexión.
@@ -95,7 +87,6 @@ git push
 ### Requisitos
 
 - Python 3.6+ para los comandos de `build.py`
-- Node.js 14+ para validar y obtener estadísticas (`build.py validate`, `build.py stats` y `site/validate.js`)
 - No se requieren dependencias de npm para ejecutar el sitio
 
 ### Servir localmente
@@ -126,7 +117,6 @@ Al abrir el sitio publicado con conexión, un service worker guarda la aplicaci�
 ```bash
 python3 build.py validate    # valida estructura
 python3 build.py stats       # muestra estadísticas
-node site/validate.js        # validación detallada de cada pregunta
 ```
 
 ### Empaquetar para distribuir
@@ -137,42 +127,9 @@ python3 build.py package     # crea english-practice-deploy.zip y english-practi
 
 ---
 
-## ➕ Añadir más contenido
+## Añadir más ejercicios
 
-Para añadir un File nuevo (por ejemplo, File 11):
-
-1. Abre `site/data/files.js`
-2. Copia la plantilla:
-
-```js
-{
-  id: '11',
-  title: 'Mi nuevo nivel',
-  description: 'Descripción del nivel',
-  lessons: [
-    {
-      letter: 'A',
-      title: 'Lección A',
-      grammar_topic: 'Tema de gramática',
-      vocab_topic: 'Tema de vocabulario',
-      grammar: [
-        { type: 'mc', prompt: 'Pregunta', options: ['A','B','C','D'], answer: 0, explanation: 'Por qué' },
-        { type: 'fill', prompt: 'I ___ (be) happy.', answer: 'am' },
-        { type: 'reorder', prompt: 'Ordena:', words: ['I','am','happy','.'] },
-        { type: 'match', prompt: 'Empareja:', pairs: [['a','A'],['b','B']] },
-        { type: 'tf', prompt: '"Frase" es correcta.', answer: true },
-      ],
-      vocabulary: [ /* mismo formato */ ],
-      mixed: [ /* mismo formato */ ],
-    },
-    // Repite para B y C
-  ],
-},
-```
-
-O usa `python3 build.py add-file` para ver la plantilla.
-
-3. Valida: `python3 build.py validate`
+Las actividades independientes se pueden ampliar en los archivos de datos de `site/data/` y en los módulos de práctica de `site/js/`.
 
 ---
 
@@ -198,31 +155,12 @@ O usa `python3 build.py add-file` para ver la plantilla.
 │   │   ├── writing-evaluator.js ← Evaluación y traducción con Gemini
 │   │   └── register-service-worker.js
 │   ├── data/
-│   │   ├── files.js      ← Preguntas de 10 niveles y 30 lecciones
 │   │   ├── theory.js     ← 12 temas de teoría gramatical
 │   │   ├── reading.js    ← Lecturas y preguntas de comprensión
 │   │   ├── reading-extensions.js
 │   │   └── writing.js    ← Oraciones para practicar traducción
-│   └── validate.js       ← Validador Node.js
 └── README.md             ← Este archivo
 ```
-
----
-
-## 🎓 Temas cubiertos
-
-| File | Tema | Gramática principal |
-|------|------|---------------------|
-| 1 | Hello! | verb be, subject pronouns, days, numbers, countries |
-| 2 | Daily life | present simple, word order in questions |
-| 3 | What can you do? | can/can't, present continuous, weather |
-| 4 | Things I like | object pronouns, like + verb-ing, the date |
-| 5 | Where did you go? | past simple (was/were, regular, irregular) |
-| 6 | Places and things | there is/are, there was/were, prepositions |
-| 7 | Food and quantities | countable/uncountable, quantifiers, comparatives |
-| 8 | Going places | superlatives, be going to (plans & predictions) |
-| 9 | Modifiers and more | adverbs of manner, verb + to + infinitive, the article |
-| 10 | Life experiences | present perfect, present perfect vs past simple |
 
 ---
 

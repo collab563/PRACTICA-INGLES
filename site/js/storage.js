@@ -1,5 +1,5 @@
 // ============== STORAGE MODULE ==============
-// Manages localStorage for user progress, streak, points, theme, wrong answers
+// Manages localStorage for user progress, streak, points, and theme
 
 const STORAGE_KEY = 'englishPractice_v1';
 
@@ -9,9 +9,6 @@ const defaultState = {
   lastActiveDate: null,
   totalAnswered: 0,
   totalCorrect: 0,
-  fileProgress: {}, // { '1': { 'A': { answered: 0, correct: 0, completed: false } } }
-  wrongQuestions: [], // [{ file, lesson, section, qIdx, ts }]
-  examHistory: [],   // [{ date, score, total, mode, fileIds }]
   theme: 'dark',
   soundEnabled: true,
   lastVisited: null,
@@ -23,6 +20,11 @@ const Storage = {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return { ...defaultState };
       const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        delete parsed.wrongQuestions;
+        delete parsed.fileProgress;
+        delete parsed.examHistory;
+      }
       return { ...defaultState, ...parsed };
     } catch (e) {
       console.warn('Storage load failed', e);
@@ -54,70 +56,6 @@ const Storage = {
     state.lastActiveDate = today;
     return state;
   },
-  // Update progress for a question
-  recordAnswer(state, file, lesson, section, qIndex, correct) {
-    const key = `${file}-${lesson}-${section}`;
-    if (!state.fileProgress[file]) state.fileProgress[file] = {};
-    if (!state.fileProgress[file][lesson]) state.fileProgress[file][lesson] = { answered: 0, correct: 0, completed: false };
-    const lessonProgress = state.fileProgress[file][lesson];
-    lessonProgress.answered++;
-    if (correct) {
-      lessonProgress.correct++;
-      state.points += 10;
-    } else {
-      state.points = Math.max(0, state.points - 2);
-    }
-    state.totalAnswered++;
-    if (correct) state.totalCorrect++;
-    // Track wrong questions for review
-    if (!correct) {
-      const existing = state.wrongQuestions.find(w =>
-        w.file === file && w.lesson === lesson && w.section === section &&
-        (Number.isInteger(w.qIdx) ? w.qIdx : w.qIndex) === qIndex
-      );
-      if (!existing) {
-        state.wrongQuestions.push({ file, lesson, section, qIdx: qIndex, ts: Date.now() });
-      }
-    } else {
-      // Remove from wrong list when answered correctly
-      state.wrongQuestions = state.wrongQuestions.filter(w => !(
-        w.file === file && w.lesson === lesson && w.section === section &&
-        (Number.isInteger(w.qIdx) ? w.qIdx : w.qIndex) === qIndex
-      ));
-    }
-    Storage.updateStreak(state);
-    Storage.save(state);
-    return state;
-  },
-  // Record a review attempt while keeping its original mistake queued until it is correct.
-  recordReviewAnswer(state, questionRef, storedQuestion, correct) {
-    const { file, lesson, section, qIdx } = questionRef;
-    if (!state.fileProgress[file]) state.fileProgress[file] = {};
-    if (!state.fileProgress[file][lesson]) state.fileProgress[file][lesson] = { answered: 0, correct: 0, completed: false };
-    const lessonProgress = state.fileProgress[file][lesson];
-    lessonProgress.answered++;
-    if (correct) {
-      lessonProgress.correct++;
-      state.points += 10;
-      state.totalCorrect++;
-    } else {
-      state.points = Math.max(0, state.points - 2);
-    }
-    state.totalAnswered++;
-
-    const sameQuestion = (entry, ref) => Boolean(ref && entry.file === ref.file && entry.lesson === ref.lesson &&
-      entry.section === ref.section &&
-      (Number.isInteger(entry.qIdx) ? entry.qIdx : entry.qIndex) === ref.qIdx);
-    if (correct) {
-      state.wrongQuestions = state.wrongQuestions.filter(entry =>
-        !sameQuestion(entry, questionRef) && !sameQuestion(entry, storedQuestion)
-      );
-    }
-
-    Storage.updateStreak(state);
-    Storage.save(state);
-    return state;
-  },
   recordActivity(state, correct) {
     state.totalAnswered += 1;
     if (correct) {
@@ -130,30 +68,4 @@ const Storage = {
     Storage.save(state);
     return state;
   },
-  markCompleted(state, file, lesson) {
-    if (!state.fileProgress[file]) state.fileProgress[file] = {};
-    if (!state.fileProgress[file][lesson]) state.fileProgress[file][lesson] = { answered: 0, correct: 0, completed: false };
-    state.fileProgress[file][lesson].completed = true;
-    Storage.save(state);
-    return state;
-  },
-  recordExam(state, score, total, mode, fileIds) {
-    state.examHistory.push({
-      date: new Date().toISOString(),
-      score, total, mode, fileIds
-    });
-    // Keep last 20
-    state.examHistory = state.examHistory.slice(-20);
-    Storage.save(state);
-    return state;
-  },
-  // Compute file progress percentage (0-100) based on lessons completed
-  getFileProgress(state, file) {
-    const f = Files.find(x => x.id === file);
-    if (!f) return 0;
-    const lessons = ['A', 'B', 'C'];
-    const total = lessons.length;
-    const done = lessons.filter(l => state.fileProgress[file]?.[l]?.completed).length;
-    return Math.round((done / total) * 100);
-  }
 };
